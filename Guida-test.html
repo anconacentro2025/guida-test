@@ -1,0 +1,1399 @@
+Guida test 
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ancona Centro · Guida Ospiti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+/* ============================================================
+   VARIABILI — tema blu scuro / bianco / oro
+   ============================================================ */
+:root {
+  --navy:      #0B1F33;
+  --navy-2:    #163350;
+  --navy-3:    #1E4A70;
+  --gold:      #C8A45A;
+  --gold-2:    #E2C07A;
+  --gold-3:    #F5E6C0;
+  --white:     #FFFFFF;
+  --bg:        #F3F0EA;
+  --bg-2:      #EAE6DD;
+  --muted:     #6B7280;
+  --text:      #1A2332;
+  --border:    rgba(200,164,90,.22);
+  --shadow:    0 2px 16px rgba(11,31,51,.10);
+  --shadow-lg: 0 6px 32px rgba(11,31,51,.16);
+}
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:'Outfit',sans-serif;cursor:pointer}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header{
+  background:var(--navy);
+  color:var(--white);
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 20px rgba(0,0,0,.30);
+}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px max(28px, calc(env(safe-area-inset-left, 0px) + 18px));
+  padding-left:max(28px, calc(env(safe-area-inset-left, 0px) + 18px));
+  padding-right:max(28px, calc(env(safe-area-inset-right, 0px) + 18px));
+  border-bottom:1px solid rgba(200,164,90,.18);
+}
+.header-brand{}
+.header-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.25rem;font-weight:600;line-height:1.15;
+  color:var(--white);
+}
+.header-sub{
+  font-size:.65rem;font-weight:300;opacity:.6;
+  letter-spacing:.1em;text-transform:uppercase;margin-top:1px;
+}
+.lang-toggle{
+  display:flex;
+  background:rgba(255,255,255,.08);
+  border-radius:22px;overflow:hidden;
+  border:1px solid rgba(200,164,90,.30);
+}
+.lang-btn{
+  padding:5px 11px;font-size:.68rem;font-weight:500;
+  border:none;background:transparent;color:rgba(255,255,255,.55);
+  transition:all .2s;
+}
+.lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600;}
+
+/* ============================================================
+   HERO BANNER
+   ============================================================ */
+.hero{
+  width:100%;height:320px;overflow:hidden;position:relative;
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 50%,var(--navy-3) 100%);
+  transition:height .3s ease;
+}
+.hero.section-mode{height:68px;}
+.hero-img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  opacity:.55;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:rgba(11,31,51,.45);
+  pointer-events:none;
+}
+.hero-caption{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--white);text-align:center;padding:0 24px;
+}
+.hero-caption-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem;font-weight:600;
+  line-height:1.1;letter-spacing:.02em;
+  text-shadow:0 2px 12px rgba(0,0,0,.65);
+  color:var(--white);
+}
+.hero-caption-gold{
+  display:block;width:60px;height:2px;
+  background:var(--gold);margin:10px auto 8px;
+  border-radius:2px;
+}
+.hero-caption-sub{
+  font-size:.72rem;font-weight:400;opacity:.85;
+  letter-spacing:.14em;text-transform:uppercase;
+  text-shadow:0 1px 6px rgba(0,0,0,.5);
+}
+.hero.section-mode .hero-caption{display:none;}
+
+/* ============================================================
+   GOLD DIVIDER
+   ============================================================ */
+.gold-bar{height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+
+/* ============================================================
+   NAV PILLS
+   ============================================================ */
+.nav-scroll{
+  display:flex;gap:7px;padding:11px 16px;
+  overflow-x:auto;background:var(--navy-2);
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap;
+}
+.nav-scroll::-webkit-scrollbar{display:none;}
+.nav-pill{
+  flex-shrink:0;padding:6px 13px;border-radius:22px;
+  font-size:.68rem;font-weight:500;
+  border:1.5px solid rgba(200,164,90,.35);
+  background:transparent;color:rgba(255,255,255,.60);
+  transition:all .2s;white-space:nowrap;
+}
+.nav-pill.active{background:var(--gold);border-color:var(--gold);color:var(--navy);font-weight:600;}
+.nav-pill:active{transform:scale(.95);}
+
+/* ============================================================
+   HOME GRID
+   ============================================================ */
+.home-welcome{
+  padding:20px 16px 12px;
+  background:var(--white);
+  border-bottom:1px solid var(--bg-2);
+}
+.home-checkin-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;
+}
+.checkin-tile{
+  background:var(--bg);border-radius:10px;padding:10px 12px;
+  border:1px solid var(--border);
+}
+.checkin-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px;}
+.checkin-val{font-size:.9rem;font-weight:600;color:var(--navy);}
+
+/* Box Social (sostituisce Wi-Fi) */
+.home-social{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+  border-radius:10px;padding:10px 14px;margin-top:8px;
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid rgba(200,164,90,.25);
+  color:var(--white);
+}
+.home-social-label{color:rgba(255,255,255,.6);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;}
+.home-social-links{display:flex;gap:14px;align-items:center;}
+.home-social-link{
+  color:var(--gold-2);font-size:.85rem;font-weight:500;
+  display:flex;align-items:center;gap:4px;
+  transition:color .2s;
+}
+.home-social-link:hover{color:var(--gold-3);}
+.home-social-link:active{color:var(--gold);}
+
+.nav-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  padding:14px 16px 20px;
+}
+.nav-tile{
+  background:var(--white);border-radius:14px;padding:16px 14px;
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+  transition:transform .15s,box-shadow .15s;
+  border-left:3px solid var(--gold);
+}
+.nav-tile:active{transform:scale(.97);box-shadow:none;}
+.nav-tile-icon{font-size:1.4rem;line-height:1;}
+.nav-tile-label{font-size:.8rem;font-weight:500;color:var(--navy);line-height:1.2;}
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+.section-header{
+  background:var(--navy);padding:16px 18px 14px;
+  border-bottom:2px solid var(--gold);
+}
+.section-header-inner{display:flex;align-items:center;gap:12px;}
+.section-icon{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  background:rgba(200,164,90,.18);flex-shrink:0;
+}
+.section-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:600;color:var(--white);line-height:1.1;
+}
+.section-sub{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:2px;letter-spacing:.05em;}
+
+/* ============================================================
+   CARDS CONTAINER
+   ============================================================ */
+.cards{padding:14px 14px 0;display:flex;flex-direction:column;gap:10px;}
+
+/* ============================================================
+   GENERIC CARD
+   ============================================================ */
+.card{
+  background:var(--white);border-radius:13px;overflow:hidden;
+  box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05);
+}
+.card-header{
+  padding:12px 14px;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+  border-bottom:1px solid var(--border);
+}
+.card-header-icon{font-size:1rem;}
+.card-title{font-weight:500;font-size:.85rem;color:var(--white);}
+.card-body{padding:12px 14px 14px;font-size:.82rem;line-height:1.6;color:var(--text);}
+.card-body p{margin:0;}
+.card-body a{color:var(--navy-3);font-weight:500;text-decoration:underline;text-decoration-color:rgba(30,74,112,.3);}
+
+/* ============================================================
+   MAP + PLACE LIST
+   ============================================================ */
+.map-list-wrap{
+  display:flex;height:340px;border-radius:13px;overflow:hidden;
+  border:1px solid var(--border);box-shadow:var(--shadow);
+}
+.section-map-el{flex:1;min-width:0;z-index:1;}
+.place-btn-col{
+  width:142px;overflow-y:auto;padding:5px 5px;
+  display:flex;flex-direction:column;gap:4px;
+  background:var(--white);border-left:1px solid var(--bg-2);
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+.place-btn-col::-webkit-scrollbar{width:3px;}
+.place-btn-col::-webkit-scrollbar-thumb{background:var(--bg-2);border-radius:3px;}
+.place-btn-mini{
+  width:100%;text-align:left;padding:7px 8px;border-radius:8px;
+  border:1px solid var(--bg-2);background:transparent;
+  font-size:.65rem;color:var(--text);line-height:1.3;
+  white-space:normal;transition:all .15s;
+}
+.place-btn-mini.selected,
+.place-btn-mini:active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+
+/* Leaflet marker */
+.map-marker-num{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--navy);border:2px solid var(--white);
+  color:var(--white);font-family:'Outfit',sans-serif;
+  font-size:10px;font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,.40);
+}
+.map-marker-num.selected{background:var(--gold);color:var(--navy);transform:scale(1.25);z-index:999!important;}
+
+/* ============================================================
+   PLACE DETAIL
+   ============================================================ */
+.back-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;border:none;color:var(--navy-3);
+  font-size:.82rem;font-weight:500;padding:6px 0 4px;
+}
+.back-btn:active{opacity:.6;}
+.detail-photo-wrap{
+  width:100%;height:200px;overflow:hidden;position:relative;
+  background:var(--bg-2);
+}
+.detail-photo{
+  width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity .4s;display:block;
+}
+.detail-photo.loaded{opacity:1;}
+.detail-photo-placeholder{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
+  background:linear-gradient(135deg,var(--bg-2),var(--bg));
+  transition:opacity .3s;
+  flex-direction:column;
+  gap:6px;
+}
+.detail-photo-placeholder.hidden{opacity:0;pointer-events:none;}
+/* Link segnaposto foto (quando non c'è immagine) */
+.detail-photo-link{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;text-decoration:none;color:inherit;
+}
+.placeholder-emoji{font-size:2.5rem;margin-bottom:4px;}
+.placeholder-text{font-size:0.75rem;font-weight:500;color:var(--navy-3);text-align:center;}
+
+.place-card{
+  background:var(--white);border-radius:13px;overflow:hidden;
+  box-shadow:var(--shadow);border:1px solid var(--border);
+}
+.place-body{padding:12px 14px;display:flex;align-items:flex-start;gap:10px;}
+.place-emoji-sm{font-size:1.1rem;min-width:22px;margin-top:2px;}
+.place-name{font-weight:600;font-size:.9rem;margin-bottom:2px;color:var(--navy);}
+.place-desc{font-size:.77rem;color:var(--muted);line-height:1.45;}
+.place-dist{font-size:.68rem;color:var(--gold);font-weight:600;margin-top:4px;}
+.place-actions{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px;}
+.map-button{
+  display:inline-block;font-size:.68rem;
+  color:var(--navy);background:var(--bg);
+  padding:4px 10px;border-radius:16px;
+  border:1px solid var(--border);font-weight:500;
+}
+.map-button:active{background:var(--bg-2);}
+.detail-nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 2px 4px;
+}
+.nav-detail-btn{
+  background:var(--navy);color:var(--white);
+  border:none;padding:8px 16px;border-radius:20px;
+  font-size:.75rem;font-weight:500;transition:background .15s;
+}
+.nav-detail-btn:active{background:var(--navy-3);}
+.detail-counter{font-size:.70rem;color:var(--muted);}
+
+/* ============================================================
+   CONTACT / EMERGENCY
+   ============================================================ */
+.contact-card{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+  border-radius:13px;padding:20px;color:var(--white);text-align:center;
+  border:1px solid rgba(200,164,90,.20);
+}
+.contact-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;opacity:.5;}
+.contact-number{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-weight:600;color:var(--gold-2);
+  margin:10px 0 12px;letter-spacing:.04em;
+}
+.contact-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+.btn-wa{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#25D366;color:var(--white);
+  padding:9px 18px;border-radius:24px;font-size:.8rem;font-weight:500;
+  text-decoration:none;
+}
+.btn-call{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.15);color:var(--white);
+  padding:9px 18px;border-radius:24px;font-size:.8rem;font-weight:500;
+  text-decoration:none;border:1px solid rgba(255,255,255,.2);
+}
+.contact-email{font-size:.78rem;opacity:.65;margin-top:6px;}
+.contact-email a{color:var(--gold-2);}
+.emerg-card{
+  background:var(--white);border-radius:13px;overflow:hidden;
+  margin-top:10px;box-shadow:var(--shadow);border:1px solid var(--border);
+}
+.emerg-row{
+  display:flex;align-items:center;padding:12px 14px;gap:12px;
+  border-bottom:1px solid var(--bg-2);
+}
+.emerg-row:last-child{border-bottom:none;}
+.emerg-num{
+  font-size:.8rem;font-weight:700;color:var(--navy-3);
+  min-width:110px;
+}
+.emerg-desc{font-size:.8rem;color:var(--text);}
+
+/* ============================================================
+   INFO ROWS (regole)
+   ============================================================ */
+.rule-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bg-2);}
+.rule-row:last-child{border-bottom:none;}
+.rule-icon{font-size:1.1rem;}
+.rule-text{font-size:.8rem;line-height:1.4;}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast{
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--navy);color:var(--white);
+  padding:10px 20px;border-radius:22px;
+  font-size:.8rem;opacity:0;transition:all .3s;
+  z-index:500;white-space:nowrap;
+  border:1px solid rgba(200,164,90,.3);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ============================================================
+   FOOTER / BOTTOM HOME BTN
+   ============================================================ */
+.goto-home{display:flex;justify-content:center;margin:20px 0 30px;}
+.home-btn{
+  background:var(--navy);color:var(--white);border:none;
+  padding:10px 22px;border-radius:30px;font-size:.78rem;font-weight:500;
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:var(--shadow);
+}
+.home-btn:active{transform:scale(.95);}
+.copyright-footer{
+  text-align:center;padding:12px 16px;
+  font-size:.62rem;color:var(--muted);
+  border-top:1px solid var(--bg-2);margin-top:8px;
+}
+.content{padding-bottom:40px;}
+
+/* ============================================================
+   ANIMAZIONI
+   ============================================================ */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .28s ease;}
+
+/* ============================================================
+   LINK UTILI CARD
+   ============================================================ */
+.link-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-bottom:1px solid var(--bg-2);
+}
+.link-row:last-child{border-bottom:none;}
+.link-icon{font-size:1.2rem;min-width:24px;}
+.link-info{flex:1;}
+.link-name{font-size:.82rem;font-weight:500;color:var(--navy);}
+.link-desc{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.link-action{
+  font-size:.68rem;color:var(--navy-3);
+  background:var(--bg);padding:4px 9px;border-radius:14px;
+  border:1px solid var(--border);white-space:nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-title">Affittacamere<br>Ancona Centro</div>
+      <div class="header-sub" id="header-sub">Guest Guide · Piazza Roma 3</div>
+    </div>
+    <div class="lang-toggle" role="radiogroup" aria-label="Selezione lingua">
+      <button class="lang-btn active" onclick="setLang('it')" id="btn-it" role="radio" aria-checked="true" aria-label="Italiano">IT</button>
+      <button class="lang-btn" onclick="setLang('en')" id="btn-en" role="radio" aria-checked="false" aria-label="English">EN</button>
+      <button class="lang-btn" onclick="setLang('pl')" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     HERO BANNER
+     ============================================================ -->
+<div class="hero" id="hero">
+  <img class="hero-img" id="heroImg"
+       src="https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/home.jpg"
+       alt="Ancona Centro" onerror="this.style.display='none'">
+  <div class="hero-overlay" aria-hidden="true"></div>
+  <div class="hero-caption">
+    <div class="hero-caption-title">Affittacamere<br>Ancona Centro</div>
+  </div>
+</div>
+<div class="gold-bar" aria-hidden="true"></div>
+
+<!-- ============================================================
+     NAV PILLS (visibili solo dentro una sezione)
+     ============================================================ -->
+<nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="content" id="content" role="main"></main>
+
+<div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V3.0 · All rights reserved</div>
+<div class="toast" id="toastEl" role="alert" aria-live="polite"></div>
+
+<!-- ============================================================
+     LEAFLET + LOGICA
+     ============================================================ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ============================================================
+   STATO GLOBALE
+   ============================================================ */
+var currentLang         = 'it';
+var currentSection      = -1;   // -1 = home
+var currentPlaceDetail  = -1;   // -1 = mappa lista
+var currentSectionPlaces = [];
+var leafletMap          = null;
+
+/* ============================================================
+   COSTANTI
+   ============================================================ */
+var HOST_PHONE = '3356750269';
+var HOST_EMAIL = 'anconacentro@yahoo.com';
+var PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/';
+
+/* ============================================================
+   LINGUA — funzione tr() statica
+   ============================================================ */
+function tr(it, en, pl){
+  if (currentLang === 'it') return it;
+  if (currentLang === 'en') return en || it;
+  if (currentLang === 'pl') return pl || it;
+  return it;
+}
+
+function setLang(lang){
+  currentLang = lang;
+  ['it','en','pl'].forEach(function(l){
+    document.getElementById('btn-'+l).classList.toggle('active', l===lang);
+    document.getElementById('btn-'+l).setAttribute('aria-checked', l===lang ? 'true' : 'false');
+  });
+  renderAll();
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+function showToast(msg){
+  var el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 3000);
+}
+
+function getMapLink(query){
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query+', Ancona Italia');
+}
+
+// Fallback quando una foto locale non si carica
+function photoFallback(wrapId, name){
+  var el = document.getElementById(wrapId);
+  if(el){
+    var q = encodeURIComponent(name + ' Ancona');
+    el.innerHTML = '<a href="https://www.google.com/search?tbm=isch&q='+q+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+name+' su Google Immagini">'
+    +'<span class="placeholder-emoji" aria-hidden="true">🖼️</span>'
+    +'<span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Kliknij, aby zobaczyć zdjęcia')+'</span>'
+    +'</a>';
+  }
+}
+
+/* ============================================================
+   DATI APPARTAMENTO
+   ============================================================ */
+var appData = {
+  checkin:  'da concordare / on request / do ustalenia',
+  checkout: '11:00',
+  address:  'Piazza Roma 3, 4° piano',
+  rules: [
+    { icon:'🚭',
+      it:'Vietato fumare in tutto l\'appartamento',
+      en:'No smoking anywhere in the apartment',
+      pl:'Zakaz palenia w całym mieszkaniu' },
+    { icon:'🐾',
+      it:'Vietati gli animali domestici',
+      en:'No pets allowed',
+      pl:'Zakaz wprowadzania zwierząt domowych' }
+  ],
+  social: {
+    instagram: 'https://www.instagram.com/anconacentro',
+    facebook: 'https://www.facebook.com/profile.php?id=61575688633462'
+  },
+
+  /* ----------------------------------------------------------
+     TOUR A PIEDI — 22 luoghi
+     ---------------------------------------------------------- */
+  mustsee: [
+    { order:1,  name:'Fontana del Calamo (13 Cannelle)', emoji:'⛲',
+      photo:'fontana-calamo.jpg',
+      it:'Antica fontana pubblica del XIII secolo, simbolo di Ancona.',
+      en:'Ancient 13th-century public fountain, symbol of Ancona.',
+      pl:'Starożytna XIII-wieczna fontanna, symbol Ankony.',
+      dist:'📍 0 m – Punto di partenza',
+      mapQuery:'Fontana delle 13 Cannelle Ancona',
+      lat:43.6184165, lng:13.5129301 },
+    { order:2,  name:'Teatro delle Muse', emoji:'🎭',
+      photo:'teatro-muse.jpg',
+      it:'Teatro storico, edificio neoclassico.',
+      en:'Historic theatre, neoclassical building.',
+      pl:'Zabytkowy teatr, budynek neoklasyczny.',
+      dist:'🚶 350 m – 4 min',
+      mapQuery:'Teatro delle Muse Ancona',
+      lat:43.6192483, lng:13.5099488 },
+    { order:3,  name:'Loggia dei Mercanti', emoji:'🏛️',
+      photo:'loggia-mercanti.jpg',
+      it:'Gotico-veneziano del XV secolo.',
+      en:'15th-century Venetian Gothic style.',
+      pl:'Wenecko-gotycki styl XV wieku.',
+      dist:'🚶 400 m – 5 min',
+      mapQuery:'Loggia dei Mercanti Ancona',
+      lat:43.6199818, lng:13.5098563 },
+    { order:4,  name:'Santa Maria della Piazza', emoji:'⛪',
+      photo:'santa-maria-piazza.jpg',
+      it:'Romanica dell\'XI secolo, mosaici.',
+      en:'11th-century Romanesque church with mosaics.',
+      pl:'XI-wieczny kościół romański z mozaikami.',
+      dist:'🚶 400 m – 5 min',
+      mapQuery:'Santa Maria della Piazza Ancona',
+      lat:43.6205592, lng:13.5103676 },
+    { order:5,  name:'Arco di Traiano', emoji:'🏛️',
+      photo:'arco-traiano.jpg',
+      it:'Arco romano del 114 d.C.',
+      en:'Roman arch from 114 AD.',
+      pl:'Łuk rzymski z 114 r. n.e.',
+      dist:'🚶 1150 m – 16 min',
+      mapQuery:'Arco di Traiano Ancona',
+      lat:43.6252706, lng:13.5066018 },
+    { order:6,  name:'Arco Clementino', emoji:'🚪',
+      photo:'arco-clementino.jpg',
+      it:'Arco monumentale, ingresso al porto storico.',
+      en:'Monumental arch, entrance to the historic harbour.',
+      pl:'Monumentalny łuk, wejście do historycznego portu.',
+      dist:'🚶 1250 m – 17 min',
+      mapQuery:'Arco Clementino Ancona',
+      lat:43.6252604, lng:13.5049529 },
+    { order:7,  name:'Fontana dei due Soli (Enzo Cucchi)', emoji:'☀️',
+      photo:'fontana-due-soli.jpg',
+      it:'Fontana contemporanea, simboleggia alba e tramonto.',
+      en:'Contemporary fountain symbolising sunrise and sunset.',
+      pl:'Współczesna fontanna symbolizująca wschód i zachód słońca.',
+      dist:'🚶 1350 m – 18 min',
+      mapQuery:'Fontana dei due Soli Ancona',
+      lat:43.6250546, lng:13.5032946 },
+    { order:8,  name:'Lanterna Rossa', emoji:'🗼',
+      photo:'lanterna-rossa.jpg',
+      it:'Faro storico del porto (1860).',
+      en:'Historic harbour lighthouse (1860).',
+      pl:'Historyczna latarnia portowa (1860).',
+      dist:'🚶 2200 m – 29 min',
+      mapQuery:'Lanterna Rossa Ancona',
+      lat:43.6255485, lng:13.4942123 },
+    { order:9,  name:'Resti del Porto Romano', emoji:'🏛️',
+      photo:'porto-romano.jpg',
+      it:'Resti dell\'antico porto romano (II sec. a.C.).',
+      en:'Remains of the ancient Roman harbour (2nd c. BC).',
+      pl:'Pozostałości starożytnego portu rzymskiego (II w. p.n.e.).',
+      dist:'🚶 800 m – 11 min',
+      mapQuery:'Porto Traianeo Ancona',
+      lat:43.6235224, lng:13.509572 },
+    { order:10, name:'Palazzo degli Anziani e Ascensore', emoji:'🏛️',
+      photo:'palazzo-anziani.jpg',
+      it:'Palazzo comunale, ascensore panoramico per San Ciriaco.',
+      en:'Town hall with panoramic lift to San Ciriaco.',
+      pl:'Ratusz z panoramiczną windą do katedry San Ciriaco.',
+      dist:'🚶 650 m – 9 min',
+      mapQuery:'Palazzo degli Anziani Ancona',
+      lat:43.6226783, lng:13.5105215,
+      extraMap:{ label:'⬆️ Ascensore San Ciriaco', query:'Ascensore San Ciriaco Ancona' } },
+    { order:11, name:'Museo Archeologico Nazionale', emoji:'🏺',
+      photo:'museo-archeologico.jpg',
+      it:'Palazzo Ferretti, collezioni greche, etrusche e romane.',
+      en:'Palazzo Ferretti, Greek, Etruscan and Roman collections.',
+      pl:'Palazzo Ferretti, kolekcje greckie, etruskie i rzymskie.',
+      dist:'🚶 750 m – 10 min',
+      mapQuery:'Museo Archeologico Nazionale Ancona',
+      lat:43.6234656, lng:13.5109808 },
+    { order:12, name:'Cattedrale di San Ciriaco', emoji:'⛪',
+      photo:'duomo-san-ciriaco.jpg',
+      it:'Duomo romanico, vista 360° sul porto.',
+      en:'Romanesque cathedral with 360° harbour view.',
+      pl:'Romańska katedra z widokiem 360° na port.',
+      dist:'🚶 1000 m – 13 min',
+      mapQuery:'Cattedrale di San Ciriaco Ancona',
+      lat:43.6251216, lng:13.510037 },
+    { order:13, name:'Episcopio / Museo Diocesano', emoji:'🏛️',
+      photo:'museo-diocesano.jpg',
+      it:'Palazzo del Vescovo con Museo Diocesano.',
+      en:'Bishop\'s Palace with Diocesan Museum.',
+      pl:'Pałac biskupi z Muzeum Diecezjalnym.',
+      dist:'🚶 1050 m – 14 min',
+      mapQuery:'Museo Diocesano Ancona',
+      lat:43.6255279, lng:13.510087 },
+    { order:14, name:'Anfiteatro Romano', emoji:'🏟️',
+      photo:'anfiteatro-romano.jpg',
+      it:'Resti dell\'anfiteatro romano del I sec. d.C., tra i meglio conservati delle Marche.',
+      en:'Remains of a 1st-century Roman amphitheatre, among the best preserved in Marche.',
+      pl:'Pozostałości rzymskiego amfiteatru z I w. n.e., jedne z najlepiej zachowanych w Marchii.',
+      dist:'🚶 900 m – 12 min',
+      mapQuery:'Anfiteatro Romano Ancona',
+      lat:43.6247408, lng:13.5117513 },
+    { order:15, name:'Parco del Cardeto', emoji:'🏞️',
+      photo:'parco-cardeto.jpg',
+      it:'Parco panoramico con resti romani e fortificazioni.',
+      en:'Panoramic park with Roman remains and fortifications.',
+      pl:'Park panoramiczny z pozostałościami rzymskimi i fortyfikacjami.',
+      dist:'🚶 700 m – 10 min',
+      mapQuery:'Parco del Cardeto Ancona',
+      lat:43.6234064, lng:13.5137894 },
+    { order:16, name:'Chiesa del Gesù', emoji:'⛪',
+      photo:'chiesa-gesu.jpg',
+      it:'Chiesa barocca in Piazza Stracca.',
+      en:'Baroque church in Piazza Stracca.',
+      pl:'Kościół barokowy na Piazza Stracca.',
+      dist:'🚶 600 m – 8 min',
+      mapQuery:'Chiesa del Gesù Ancona',
+      lat:43.6226099, lng:13.5111676 },
+    { order:17, name:'San Francesco alle Scale', emoji:'⛪',
+      photo:'san-francesco-scale.jpg',
+      it:'Chiesa medievale, chiostro e opere d\'arte.',
+      en:'Medieval church with cloister and artworks.',
+      pl:'Średniowieczny kościół z krużgankiem i dziełami sztuki.',
+      dist:'🚶 450 m – 6 min',
+      mapQuery:'Chiesa di San Francesco alle Scale Ancona',
+      lat:43.6214786, lng:13.5118841 },
+    { order:18, name:'Piazza del Plebiscito', emoji:'⛲',
+      photo:'piazza-plebiscito.jpg',
+      it:'Piazza storica, cuore della vita cittadina.',
+      en:'Historic square, heart of city life.',
+      pl:'Historyczny plac, serce życia miejskiego.',
+      dist:'🚶 200 m – 3 min',
+      mapQuery:'Piazza del Plebiscito Ancona',
+      lat:43.6195337, lng:13.511651 },
+    { order:19, name:'Porta Pia', emoji:'🚪',
+      photo:'porta-pia.jpg',
+      it:'Porta monumentale nelle mura cittadine.',
+      en:'Monumental gate in the city walls.',
+      pl:'Monumentalna brama w murach miejskich.',
+      dist:'🚶 950 m – 13 min',
+      mapQuery:'Porta Pia Ancona',
+      lat:43.6152484, lng:13.5048966 },
+    { order:20, name:'Mole Vanvitelliana', emoji:'🏛️',
+      photo:'mole-vanvitelliana.jpg',
+      it:'Lazzaretto pentagonale del XVIII sec. Sede del Museo Tattile Statale Omero.',
+      en:'18th-century pentagonal lazaretto. Home to the Museo Tattile Statale Omero.',
+      pl:'XVIII-wieczny pięciokątny lazaret. Siedziba Muzeum Dotykowego Omero.',
+      dist:'🚶 1100 m – 14 min',
+      mapQuery:'Mole Vanvitelliana Ancona',
+      lat:43.6143735, lng:13.504058,
+      extraMap:{ label:'🖐️ Museo Tattile Omero', query:'Museo Tattile Statale Omero Ancona' } },
+    { order:21, name:'Fortezza della Cittadella', emoji:'🏰',
+      photo:'cittadella.jpg',
+      it:'Fortezza cinquecentesca, belvedere sul mare.',
+      en:'16th-century fortress with sea viewpoint.',
+      pl:'XVI-wieczna forteca z widokiem na morze.',
+      dist:'🚶 800 m – 11 min',
+      mapQuery:'Fortezza della Cittadella Ancona',
+      lat:43.6138415, lng:13.5080277,
+      extraMap:{ label:'🌳 Parco della Cittadella', query:'Parco della Cittadella Ancona' } },
+    { order:22, name:'Passetto', emoji:'🌊',
+      photo:'passetto.jpg',
+      it:'La spiaggia di Ancona, note grotte.',
+      en:'The beach of Ancona, famous sea grottos.',
+      pl:'Plaża Ankony, słynne groty morskie.',
+      dist:'🚶 2150 m – 29 min',
+      mapQuery:'Spiaggia del Passetto Ancona',
+      lat:43.616139, lng:13.533622 }
+  ],
+
+  /* ----------------------------------------------------------
+     RISTORANTI
+     ---------------------------------------------------------- */
+  restaurants: [
+    { name:'La Cantineta', emoji:'🍷', photo:'rist-cantineta.jpg',
+      it:'Trattoria tipica, tagliolini allo scoglio.',
+      en:'Classic trattoria, tagliolini with seafood.',
+      pl:'Klasyczna trattoria, makaron z owocami morza.',
+      dist:'🚶 300 m – 4 min', mapQuery:'La Cantineta Ancona',
+      lat:43.6192908, lng:13.5102798 },
+    { name:'Il Pozzo', emoji:'🍲', photo:'rist-pozzo.jpg',
+      it:'Trattoria tradizionale nel centro storico.',
+      en:'Traditional trattoria in the historic centre.',
+      pl:'Tradycyjna trattoria w centrum historycznym.',
+      dist:'🚶 350 m – 4 min', mapQuery:'Il Pozzo Ancona',
+      lat:43.6199425, lng:13.5104826 },
+    { name:'La Moretta', emoji:'🍸', photo:'rist-moretta.jpg',
+      it:'Locale storico, caffè Moretta.',
+      en:'Historic venue, the famous Moretta coffee.',
+      pl:'Historyczny lokal, słynna kawa Moretta.',
+      dist:'🚶 200 m – 3 min', mapQuery:'La Moretta Ancona',
+      lat:43.6195442, lng:13.5114100 },
+    { name:'La Degosteria', emoji:'🍝', photo:'degosteria.jpg',
+      it:'Ottimo ristorante del centro storico',
+      en:'An excellent restaurant in the old town',
+      pl:'Świetna restauracja w historycznym centrum miasta',
+      dist:'🚶 400 m – 6 min', mapQuery:'La Degosteria Ancona',
+      lat:43.6202772, lng:13.5110345 },
+    { name:'Vino e Cucina Miscia', emoji:'🐟', photo:'rist-miscia.jpg',
+      it:'Pesce fresco, ottimo rapporto qualità/prezzo.',
+      en:'Fresh fish, excellent value for money.',
+      pl:'Świeże ryby, doskonały stosunek jakości do ceny.',
+      dist:'🚗 1 km – 2 min', mapQuery:'Vino e Cucina Miscia Ancona',
+      lat:43.6126474, lng:13.5044134 },
+    { name:'Amelie', emoji:'🦐', photo:'rist-amelie.jpg',
+      it:'Pesce freschissimo, fritto misto.',
+      en:'Super-fresh fish, mixed fry.',
+      pl:'Bardzo świeże ryby, mieszane smażone owoce morza.',
+      dist:'🚗 2 km – 3 min', mapQuery:'Amelie Ancona',
+      lat:43.6022208, lng:13.5060781 },
+    { name:'Il Giardino', emoji:'🌿', photo:'rist-giardino.jpg',
+      it:'Raffinato, cucina di mare.',
+      en:'Refined seafood cuisine.',
+      pl:'Wyrafinowana kuchnia morska.',
+      dist:'🚶 1350 m – 18 min', mapQuery:'Il Giardino Ancona',
+      lat:43.6158317, lng:13.5257132 },
+    { name:'Ristorante Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg',
+      it:'Sulla spiaggia di Portonovo.',
+      en:'Right on Portonovo beach.',
+      pl:'Bezpośrednio na plaży Portonovo.',
+      dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona',
+      lat:43.5721, lng:13.5982 }
+  ],
+
+  /* ----------------------------------------------------------
+     BAR & PIZZERIE
+     ---------------------------------------------------------- */
+  barpub: [
+    { name:'Bar Torino', emoji:'☕', photo:'',
+      it:'Bar centrale, frequentato dagli anconetani.',
+      en:'Central café, popular with locals.',
+      pl:'Centralna kawiarnia, popularna wśród miejscowych.',
+      dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona',
+      lat:43.6182553, lng:13.5118948 },
+    { name:'White Bakery', emoji:'🥐', photo:'',
+      it:'Bakery e caffetteria, ottimi dolci e brunch.',
+      en:'Bakery and café, excellent pastries and brunch.',
+      pl:'Piekarnia i kawiarnia, doskonałe ciasta i brunch.',
+      dist:'🚶 100 m – 1 min', mapQuery:'White Bakery Ancona',
+      lat:43.6172070, lng:13.5140194 },
+    { name:'Bar Giuliani', emoji:'☕', photo:'',
+      it:'Bar storico, colazioni e aperitivi.',
+      en:'Historic bar, breakfast and aperitifs.',
+      pl:'Historyczny bar, śniadania i aperitivy.',
+      dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona',
+      lat:43.6186929, lng:13.5101527 },
+    { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg',
+      it:'Lasagne anconetane fatte a mano.',
+      en:'Handmade Ancona-style lasagne.',
+      pl:'Ręcznie robione lasagne w stylu Ankony.',
+      dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona',
+      lat:43.6175592, lng:13.5143695 },
+    { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg',
+      it:'Pizzeria da asporto, rapida e buona.',
+      en:'Take-away pizzeria, fast and good.',
+      pl:'Pizzeria na wynos, szybka i dobra.',
+      dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona',
+      lat:43.6182580, lng:13.5138206 },
+    { name:'La Farina', emoji:'🍕', photo:'',
+      it:'Pizzeria al taglio, ottima pizza romana.',
+      en:'Pizza by the slice, excellent Roman pizza.',
+      pl:'Pizza na kawałki, doskonała pizza w stylu rzymskim.',
+      dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona',
+      lat:43.6191247, lng:13.5103683 },
+    { name:'Il Chiosco', emoji:'🍹', photo:'',
+      it:'Chiosco bar, aperitivi all\'aperto.',
+      en:'Bar kiosk, outdoor aperitifs.',
+      pl:'Bar kiosk, aperitivy na świeżym powietrzu.',
+      dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona',
+      lat:43.6168065, lng:13.5175774 },
+    { name:'Donegal Irish Pub', emoji:'🍺', photo:'',
+      it:'Pub irlandese, birre alla spina e musica dal vivo.',
+      en:'Irish pub, draught beer and live music.',
+      pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.',
+      dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona',
+      lat:43.6163846, lng:13.5156090 }
+  ],
+
+  /* ----------------------------------------------------------
+     SUPERMERCATI
+     ---------------------------------------------------------- */
+  supermarkets: [
+    { name:'Coal – Via Podesti', emoji:'🛒', photo:'',
+      it:'Supermercato ben fornito, vicino.',
+      en:'Well-stocked supermarket, nearby.',
+      pl:'Dobrze zaopatrzony supermarket, blisko.',
+      dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona',
+      lat:43.6181806, lng:13.5112789 },
+    { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg',
+      it:'Mercato coperto storico, frutta e verdura fresca.',
+      en:'Historic covered market, fresh fruit and vegetables.',
+      pl:'Historyczny kryty targ, świeże owoce i warzywa.',
+      dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona',
+      lat:43.6182992, lng:13.5140040 },
+    { name:'Coal – Via San Martino', emoji:'🛒', photo:'',
+      it:'Aperto anche domenica mattina.',
+      en:'Open on Sunday mornings too.',
+      pl:'Czynny też w niedzielne poranki.',
+      dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona',
+      lat:43.6158232, lng:13.5145948 },
+    { name:'Sì con te – Via Matteotti', emoji:'🛒', photo:'',
+      it:'Via Matteotti 115.',
+      en:'Via Matteotti 115.',
+      pl:'Via Matteotti 115.',
+      dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona',
+      lat:43.6186104, lng:13.5163007 }
+  ],
+
+  /* ----------------------------------------------------------
+     PARCHEGGI
+     ---------------------------------------------------------- */
+  parking: [
+    { name:'Parcheggio degli Archi', emoji:'🅿️', photo:'parcheggio-archi.jpg',
+      it:'Consigliato – €6/giorno, oltre 500 posti, custodito.',
+      en:'Recommended – €6/day, over 500 spaces, supervised.',
+      pl:'Polecany – €6/dzień, ponad 500 miejsc, strzeżony.',
+      dist:'🚗 1 km – 2 min', mapQuery:'Parcheggio degli Archi Ancona',
+      lat:43.6098074, lng:13.5032732 },
+    { name:'Parcheggio Traiano', emoji:'🅿️', photo:'',
+      it:'Comodo per porto e centro storico.',
+      en:'Convenient for the harbour and historic centre.',
+      pl:'Wygodny dla portu i centrum historycznego.',
+      dist:'🚶 550 m – 7 min', mapQuery:'Parcheggio Traiano Ancona',
+      lat:43.6175179, lng:13.5079818 },
+    { name:'Parcheggio Stamira', emoji:'🅿️', photo:'',
+      it:'Più vicino, più caro.',
+      en:'Closer, more expensive.',
+      pl:'Bliżej, drożej.',
+      dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona',
+      lat:43.6162329, lng:13.5154477 },
+    { name:'Strisce blu (zona centro)', emoji:'🅿️', photo:'',
+      it:'Parcheggio a pagamento su strada, posto difficile.',
+      en:'Pay-and-display street parking, hard to find.',
+      pl:'Płatny parking uliczny, trudno znaleźć miejsce.',
+      dist:'📍 In zona centro', mapQuery:'Parcheggio strisce blu Ancona centro',
+      lat:43.6184165, lng:13.5129301 }
+  ],
+
+  /* ----------------------------------------------------------
+     DINTORNI
+     ---------------------------------------------------------- */
+  around: [
+    { name:'Portonovo (Baia del Conero)', emoji:'🌊', photo:'portonovo.jpg',
+      it:'Baia incantevole, bus 94 da Piazza Cavour.',
+      en:'Enchanting bay, bus 94 from Piazza Cavour.',
+      pl:'Urzekająca zatoka, autobus 94 z Piazza Cavour.',
+      dist:'🚌 12 km – 25 min', mapQuery:'Portonovo Ancona',
+      lat:43.5636463, lng:13.5976903 },
+    { name:'Sirolo e Numana', emoji:'🏖️', photo:'sirolo.jpg',
+      it:'Perle del Conero, spiagge tra le più belle delle Marche.',
+      en:'Gems of the Conero, among the most beautiful beaches in Marche.',
+      pl:'Perły Conero, jedne z najpiękniejszych plaż w Marchii.',
+      dist:'🚗 14 km – 21 min', mapQuery:'Sirolo AN',
+      lat:43.5231225, lng:13.6200824 },
+    { name:'Offagna', emoji:'🏰', photo:'offagna.jpg',
+      it:'Piccolo borgo medievale con rocca, panorama sulla campagna marchigiana.',
+      en:'Small medieval village with fortress, views over the Marche countryside.',
+      pl:'Małe średniowieczne miasteczko z zamkiem i widokiem na wieś marchijską.',
+      dist:'🚗 12 km – 18 min', mapQuery:'Offagna Ancona',
+      lat:43.5274876, lng:13.4412360 },
+    { name:'Loreto', emoji:'⛪', photo:'loreto.jpg',
+      it:'Santuario della Santa Casa, mèta di pellegrinaggio.',
+      en:'Sanctuary of the Holy House, pilgrimage destination.',
+      pl:'Sanktuarium Świętego Domu, miejsce pielgrzymek.',
+      dist:'🚗 21 km – 32 min', mapQuery:'Loreto AN',
+      lat:43.4411021, lng:13.6094860 },
+    { name:'Recanati', emoji:'📖', photo:'recanati.jpg',
+      it:'Città di Leopardi, centro storico intatto.',
+      en:'City of Leopardi, intact historic centre.',
+      pl:'Miasto Leopardiego, nienaruszony historyczny rynek.',
+      dist:'🚗 25 km – 38 min', mapQuery:'Recanati',
+      lat:43.3980809, lng:13.5518423 }
+  ],
+
+  /* ----------------------------------------------------------
+     NELLE MARCHE
+     ---------------------------------------------------------- */
+  marche: [
+    { name:'Grotte di Frasassi', emoji:'🕯️', photo:'frasassi.jpg',
+      it:'Complesso carsico spettacolare, tra i più grandi d\'Europa.',
+      en:'Spectacular karst cave system, among the largest in Europe.',
+      pl:'Spektakularny system krasowy, jeden z największych w Europie.',
+      dist:'🚗 65 km – 50 min', mapQuery:'Grotte di Frasassi',
+      lat:43.3963, lng:12.9691 },
+    { name:'Urbino', emoji:'🏛️', photo:'urbino.jpg',
+      it:'Città rinascimentale UNESCO, Palazzo Ducale e Raffaello.',
+      en:'UNESCO Renaissance city, Ducal Palace and Raphael.',
+      pl:'Miasto renesansowe UNESCO, Palazzo Ducale i Raphael.',
+      dist:'🚗 100 km – 1h20', mapQuery:'Urbino PU',
+      lat:43.7262, lng:12.6363 },
+    { name:'Ascoli Piceno', emoji:'⛲', photo:'ascoli.jpg',
+      it:'Piazza del Popolo, una delle più belle d\'Italia. Olive ascolane.',
+      en:'Piazza del Popolo, one of Italy\'s most beautiful squares. Olive ascolane.',
+      pl:'Piazza del Popolo, jeden z najpiękniejszych placów we Włoszech. Oliwki ascolane.',
+      dist:'🚗 90 km – 1h', mapQuery:'Ascoli Piceno AP',
+      lat:42.8534, lng:13.5741 }
+  ],
+
+  /* ----------------------------------------------------------
+     TRASPORTI
+     ---------------------------------------------------------- */
+  transport: {
+    bus: {
+      it: 'Linee 1 e 4 da Piazza Roma (sotto casa). Per Portonovo: bus 94 da Piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/wp-content/uploads/2026/05/AnconaFerialeEstivogiugnosettembre2026_06_08-1.pdf" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Orari estivi Conerobus →</a>',
+      en: 'Lines 1 and 4 from Piazza Roma (right below). For Portonovo: bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/wp-content/uploads/2026/05/AnconaFerialeEstivogiugnosettembre2026_06_08-1.pdf" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Summer timetables →</a>',
+      pl: 'Linie 1 i 4 z Piazza Roma (pod domem). Do Portonovo: autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/wp-content/uploads/2026/05/AnconaFerialeEstivogiugnosettembre2026_06_08-1.pdf" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład letni Conerobus →</a>'
+    },
+    train: {
+      it: 'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>',
+      en: 'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>',
+      pl: 'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>'
+    },
+    taxi: {
+      it: 'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)',
+      en: 'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)',
+      pl: 'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)'
+    },
+    ferry: {
+      it: 'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>',
+      en: 'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>',
+      pl: 'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>'
+    },
+    airport: {
+      it: 'Aeroporto Falconara "Raffaello Sanzio": 15 km – 30 min in auto, bus o treno.',
+      en: 'Falconara Airport "Raffaello Sanzio": 15 km – 30 min by car, bus or train.',
+      pl: 'Lotnisko Falconara "Raffaello Sanzio": 15 km – 30 min samochodem, autobusem lub pociągiem.'
+    }
+  }
+};
+
+/* ============================================================
+   SEZIONI — ordine e icone
+   ============================================================ */
+var sections = [
+  { id:'mustsee',      icon:'🚶',  it:'Tour a piedi',          en:'Walking Tour',          pl:'Wycieczka piesza' },
+  { id:'around',       icon:'🌊',  it:'Dintorni',              en:'Around Ancona',         pl:'Okolice' },
+  { id:'marche',       icon:'🏛️', it:'Nelle Marche',          en:'Marche Region',         pl:'Region Marche' },
+  { id:'restaurants',  icon:'🍽️', it:'Ristoranti',            en:'Restaurants',           pl:'Restauracje' },
+  { id:'barpub',       icon:'🍕',  it:'Bar & Pizzerie',        en:'Bars & Pizzerias',      pl:'Bary i pizzerie' },
+  { id:'supermarkets', icon:'🛒',  it:'Supermercati',          en:'Supermarkets',          pl:'Supermarkety' },
+  { id:'parking',      icon:'🅿️', it:'Parcheggi',             en:'Parking',               pl:'Parkingi' },
+  { id:'transport',    icon:'🚌',  it:'Trasporti',             en:'Transport',             pl:'Transport' },
+  { id:'rules',        icon:'📋',  it:'Regole',                en:'House Rules',           pl:'Zasady domu' },
+  { id:'contact',      icon:'📞',  it:'Contatti & Emergenze',  en:'Contacts & Emergency',  pl:'Kontakt i alarmy' }
+];
+
+/* ============================================================
+   NAVIGAZIONE
+   ============================================================ */
+function goTo(i){
+  currentSection     = i;
+  currentPlaceDetail = -1;
+  if (leafletMap){ leafletMap.remove(); leafletMap = null; }
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function selectPlaceDetail(i){
+  currentPlaceDetail = i;
+  if (leafletMap){ leafletMap.remove(); leafletMap = null; }
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function backToMap(){
+  currentPlaceDetail = -1;
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ============================================================
+   MAPPA LEAFLET
+   ============================================================ */
+function initSectionMap(){
+  if (typeof L === 'undefined'){ setTimeout(initSectionMap, 300); return; }
+  var el = document.getElementById('sectionMap');
+  if (!el || !currentSectionPlaces.length) return;
+  if (leafletMap){ leafletMap.remove(); leafletMap = null; }
+
+  var valid = currentSectionPlaces.filter(function(p){ return p.lat && p.lng; });
+  if (!valid.length) return;
+
+  leafletMap = L.map('sectionMap', { zoomControl:true, attributionControl:false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(leafletMap);
+  L.control.attribution({ prefix:'© <a href="https://openstreetmap.org">OSM</a>' }).addTo(leafletMap);
+
+  var bounds = [];
+  valid.forEach(function(p){
+    var idx = currentSectionPlaces.indexOf(p);
+    var icon = L.divIcon({
+      html:'<div class="map-marker-num" id="mkr-'+idx+'" aria-label="'+p.name+'">'+(idx+1)+'</div>',
+      className:'', iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-14]
+    });
+    var m = L.marker([p.lat, p.lng], { icon:icon }).addTo(leafletMap);
+    m.bindPopup('<b style="font-size:.78rem;">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888;">'+p.dist+'</span>');
+    m.on('click', function(){ selectPlaceDetail(idx); });
+    bounds.push([p.lat, p.lng]);
+  });
+  leafletMap.fitBounds(bounds, { padding:[22,22] });
+}
+
+/* ============================================================
+   RENDER PRINCIPALE
+   ============================================================ */
+function renderAll(){
+  var hero = document.getElementById('hero');
+  var nav  = document.getElementById('nav');
+  var cont = document.getElementById('content');
+
+  if (currentSection === -1 && leafletMap) {
+    leafletMap.remove();
+    leafletMap = null;
+  }
+
+  hero.classList.toggle('section-mode', currentSection !== -1);
+
+  if (currentSection === -1){
+    nav.style.display = 'none';
+    cont.innerHTML = renderHome();
+    return;
+  }
+
+  nav.style.display = 'flex';
+  nav.innerHTML = sections.map(function(s,i){
+    return '<button class="nav-pill'+(i===currentSection?' active':'')+'" onclick="goTo('+i+')" role="tab" aria-selected="'+(i===currentSection?'true':'false')+'">'
+           +s.icon+' '+tr(s.it,s.en,s.pl)+'</button>';
+  }).join('');
+
+  var s = sections[currentSection];
+  var body = renderSection(s.id);
+
+  cont.innerHTML =
+    '<section class="section active">'
+    +'<div class="section-header"><div class="section-header-inner">'
+    +'<div class="section-icon" aria-hidden="true">'+s.icon+'</div>'
+    +'<div><div class="section-title">'+tr(s.it,s.en,s.pl)+'</div></div>'
+    +'</div></div>'
+    +'<div class="cards">'+body
+    +'<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div>'
+    +'</div></section>';
+
+  if (currentPlaceDetail < 0){
+    setTimeout(initSectionMap, 0);
+  }
+}
+
+/* ============================================================
+   RENDER HOME
+   ============================================================ */
+function renderHome(){
+  var checkinLabel  = tr('Check-in','Check-in','Zameldowanie');
+  var checkoutLabel = tr('Check-out','Check-out','Wymeldowanie');
+
+  var tiles = sections.map(function(s,i){
+    return '<button class="nav-tile" onclick="goTo('+i+')" aria-label="'+tr(s.it,s.en,s.pl)+'">'
+           +'<div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div>'
+           +'<div class="nav-tile-label">'+tr(s.it,s.en,s.pl)+'</div>'
+           +'</button>';
+  }).join('');
+
+  var socialHtml = '<div class="home-social">'
+    +'<div><div class="home-social-label">Social</div>'
+    +'<div class="home-social-links">'
+    +'<a href="'+appData.social.instagram+'" target="_blank" class="home-social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a>'
+    +'<a href="'+appData.social.facebook+'" target="_blank" class="home-social-link" aria-label="Pagina Facebook">📘 Facebook</a>'
+    +'</div></div>'
+    +'</div>';
+
+  return '<section class="section active">'
+    +'<div class="home-welcome">'
+    +'<div style="font-family:\'Cormorant Garamond\',serif;font-size:1.1rem;font-weight:600;color:var(--navy);margin-bottom:10px;">'
+    +tr('Benvenuti!','Welcome!','Witamy!')+'</div>'
+    +'<div class="home-checkin-grid">'
+    +'<div class="checkin-tile"><div class="checkin-label">'+checkinLabel+'</div><div class="checkin-val">'+tr('da concordare','on request','do ustalenia')+'</div></div>'
+    +'<div class="checkin-tile"><div class="checkin-label">'+checkoutLabel+'</div><div class="checkin-val">11:00</div></div>'
+    +'</div>'
+    + socialHtml
+    +'</div>'
+    +'<div class="nav-grid">'+tiles+'</div>'
+    +'</section>';
+}
+
+/* ============================================================
+   ROUTER SEZIONI
+   ============================================================ */
+function renderSection(id){
+  if (id === 'contact')     return renderContact();
+  if (id === 'rules')       return renderRules();
+  if (id === 'transport')   return renderTransport();
+
+  var map = {
+    mustsee:      function(){ return appData.mustsee.slice().sort(function(a,b){ return a.order-b.order; }); },
+    restaurants:  function(){ return appData.restaurants; },
+    barpub:       function(){ return appData.barpub; },
+    supermarkets: function(){ return appData.supermarkets; },
+    parking:      function(){ return appData.parking; },
+    around:       function(){ return appData.around; },
+    marche:       function(){ return appData.marche; }
+  };
+  if (map[id]) return renderPlaceSection(map[id]());
+  return '';
+}
+
+/* ============================================================
+   SEZIONE CON MAPPA + LISTA
+   ============================================================ */
+function renderPlaceSection(items){
+  currentSectionPlaces = items;
+
+  if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length){
+    return renderPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length);
+  }
+
+  var btns = items.map(function(p,i){
+    return '<button class="place-btn-mini" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+(i+1)+'. '+p.name+'</button>';
+  }).join('');
+
+  return '<div class="map-list-wrap">'
+    +'<div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div>'
+    +'<div class="place-btn-col">'+btns+'</div>'
+    +'</div>';
+}
+
+/* ============================================================
+   DETTAGLIO LUOGO
+   ============================================================ */
+function renderPlaceDetail(p, index, total){
+  var desc = tr(p.it, p.en, p.pl);
+  var photoHtml = '';
+
+  if (p.photo){
+    var src = PHOTO_BASE + p.photo;
+    var wrapId = 'photowrap_'+index;
+    var pid = 'ph_'+index;
+    photoHtml = '<div class="detail-photo-wrap" id="'+wrapId+'">'
+      +'<div class="detail-photo-placeholder" id="'+pid+'" aria-hidden="true">'+p.emoji+'</div>'
+      +'<img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" '
+      +'onload="this.classList.add(\'loaded\');var e=document.getElementById(\''+pid+'\');if(e)e.classList.add(\'hidden\');" '
+      +'onerror="photoFallback(\''+wrapId+'\', \''+p.name.replace(/'/g, "\\'")+'\')" loading="lazy">'
+      +'</div>';
+  } else {
+    var imgSearchQuery = encodeURIComponent(p.name + ' Ancona');
+    var imgSearchUrl = 'https://www.google.com/search?tbm=isch&q=' + imgSearchQuery;
+    photoHtml = '<div class="detail-photo-wrap">'
+      +'<a href="'+imgSearchUrl+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini">'
+      +'<span class="placeholder-emoji" aria-hidden="true">🖼️</span>'
+      +'<span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Kliknij, aby zobaczyć zdjęcia')+'</span>'
+      +'</a></div>';
+  }
+
+  var btns = '<a href="'+getMapLink(p.mapQuery||p.name)+'" target="_blank" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '
+             +tr('Apri mappa','Open map','Otwórz mapę')+'</a>';
+  if (p.extraMap){
+    btns += ' <a href="'+getMapLink(p.extraMap.query)+'" target="_blank" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';
+  }
+
+  var prev = index > 0
+    ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index-1)+')" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Poprz.')+'</button>'
+    : '<span></span>';
+  var next = index < total-1
+    ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index+1)+')" aria-label="Luogo successivo">'+tr('Succ.','Next','Nast.')+' ▶</button>'
+    : '<span></span>';
+
+  return '<button class="back-btn" onclick="backToMap()" aria-label="Torna alla lista dei luoghi">← '+tr('Tutti i luoghi','All places','Wszystkie miejsca')+'</button>'
+    +'<div class="place-card">'
+    +photoHtml
+    +'<div class="place-body">'
+    +'<div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div>'
+    +'<div><div class="place-name">'+p.name+'</div>'
+    +'<div class="place-dist">'+p.dist+'</div>'
+    +'<div class="place-desc" style="margin-top:5px;">'+desc+'</div>'
+    +'</div></div>'
+    +'<div class="place-actions">'+btns+'</div>'
+    +'</div>'
+    +'<div class="detail-nav">'+prev
+    +'<span class="detail-counter">'+(index+1)+' / '+total+'</span>'
+    +next+'</div>';
+}
+
+/* ============================================================
+   TRASPORTI
+   ============================================================ */
+function renderTransport(){
+  var td = appData.transport;
+  var items = [
+    { icon:'🚌', label:tr('Bus','Bus','Autobus'),            text:tr(td.bus.it,     td.bus.en,     td.bus.pl) },
+    { icon:'🚂', label:tr('Treno','Train','Pociąg'),         text:tr(td.train.it,   td.train.en,   td.train.pl) },
+    { icon:'🚕', label:tr('Taxi','Taxi','Taxi'),             text:tr(td.taxi.it,    td.taxi.en,    td.taxi.pl) },
+    { icon:'⛴️', label:tr('Traghetti','Ferries','Promy'),   text:tr(td.ferry.it,   td.ferry.en,   td.ferry.pl) },
+    { icon:'✈️', label:tr('Aeroporto','Airport','Lotnisko'), text:tr(td.airport.it, td.airport.en, td.airport.pl) }
+  ];
+
+  var cardsHtml = items.map(function(item){
+    return '<div class="card">'
+      +'<div class="card-header"><span class="card-header-icon" aria-hidden="true">'+item.icon+'</span>'
+      +'<span class="card-title">'+item.label+'</span></div>'
+      +'<div class="card-body"><p>'+item.text+'</p></div>'
+      +'</div>';
+  }).join('');
+
+  var portalLabel = tr('Portale turistico ufficiale','Official tourism portal','Oficjalny portal turystyczny');
+  cardsHtml += '<div class="card">'
+    +'<div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span>'
+    +'<span class="card-title">'+portalLabel+'</span></div>'
+    +'<div class="card-body"><a href="https://anconatourism.it" target="_blank" '
+    +'style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px;" aria-label="Apri portale turistico">anconatourism.it ↗</a></div>'
+    +'</div>';
+
+  return cardsHtml;
+}
+
+/* ============================================================
+   REGOLE DELLA CASA
+   ============================================================ */
+function renderRules(){
+  var rulesHtml = appData.rules.map(function(r){
+    return '<div class="rule-row">'
+      +'<span class="rule-icon" aria-hidden="true">'+r.icon+'</span>'
+      +'<span class="rule-text">'+tr(r.it,r.en,r.pl)+'</span>'
+      +'</div>';
+  }).join('');
+
+  return '<div class="card">'
+    +'<div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span>'
+    +'<span class="card-title">'+tr('Regole della casa','House rules','Zasady domu')+'</span></div>'
+    +'<div class="card-body">'+rulesHtml+'</div>'
+    +'</div>';
+}
+
+/* ============================================================
+   CONTATTI & EMERGENZE
+   ============================================================ */
+function renderContact(){
+  var fp = HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
+  var waLabel   = tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gospodarz dostępny na WhatsAppie');
+  var emergTitle= tr('Numeri di emergenza','Emergency numbers','Numery alarmowe');
+  var usefulTitle=tr('Link utili','Useful links','Przydatne linky');
+
+  var socialLinks = '<div style="margin-top:14px;display:flex;justify-content:center;gap:20px;">'
+    +'<a href="'+appData.social.instagram+'" target="_blank" class="btn-call" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a>'
+    +'<a href="'+appData.social.facebook+'" target="_blank" class="btn-call" aria-label="Pagina Facebook">📘 Facebook</a>'
+    +'</div>';
+
+  return '<div class="contact-card">'
+    +'<div class="contact-label">📞 '+waLabel+'</div>'
+    +'<div class="contact-number">'+fp+'</div>'
+    +'<div class="contact-btns">'
+    +'<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a>'
+    +'<a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Zadzwoń')+'</a>'
+    +'</div>'
+    +'<div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div>'
+    + socialLinks
+    +'</div>'
+
+    +'<div class="emerg-card">'
+    +'<div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span>'
+    +'<span class="card-title">'+emergTitle+'</span></div>'
+    +'<div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Ogólne zagrożenie')+'</span></div>'
+    +'<div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Policja')+'</span></div>'
+    +'<div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Nagły wypadek medyczny')+'</span></div>'
+    +'<div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Szpital Riuniti – Izba przyjęć')+'</span></div>'
+    +'<div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div>'
+    +'</div>'
+
+    +'<div class="card" style="margin-top:10px;">'
+    +'<div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span>'
+    +'<span class="card-title">'+usefulTitle+'</span></div>'
+    +'<div class="card-body" style="padding:0;">'
+    +'<div class="link-row">'
+    +'<span class="link-icon" aria-hidden="true">📰</span>'
+    +'<div class="link-info"><div class="link-name">Edicola di Piazza Roma</div>'
+    +'<div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Tuż przed wejściem')+'</div></div>'
+    +'<a href="'+getMapLink('Edicola Piazza Roma Ancona')+'" target="_blank" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Mapa')+'</a>'
+    +'</div>'
+    +'<div class="link-row">'
+    +'<span class="link-icon" aria-hidden="true">🌐</span>'
+    +'<div class="link-info"><div class="link-name">anconatourism.it</div>'
+    +'<div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Oficjalny portal turystyczny Ankony')+'</div></div>'
+    +'<a href="https://anconatourism.it" target="_blank" class="link-action" aria-label="Apri portale turistico">↗</a>'
+    +'</div>'
+    +'</div></div>';
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderAll();
+</script>
+</body>
+</html>
+```
