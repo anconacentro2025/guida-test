@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -179,12 +180,12 @@
         var currentPlaceDetail = -1;
         var currentSectionPlaces = [];
         var leafletMap = null;
-        var currentSubItinerary = null; // 'cardeto', 'cittadella', oppure null
+        var currentSubItinerary = null;
         var HOST_PHONE = '3356750269';
         var HOST_EMAIL = 'anconacentro@yahoo.com';
         var PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/';
         var HOME_COORDS = { lat: 43.6181895, lng: 13.5129489, name: '★ Ancona Centro' };
-        var placeDataMap = {}; // per recuperare i dati del luogo nell'onerror
+        var placeDataMap = {};
 
         function tr(it, en, pl) { if (currentLang === 'it') return it; if (currentLang === 'en') return en || it; if (currentLang === 'pl') return pl || it; return it; }
         function setLang(lang) { currentLang = lang; ['it','en','pl'].forEach(function(l) { document.getElementById('btn-'+l).classList.toggle('active', l===lang); document.getElementById('btn-'+l).setAttribute('aria-checked', l===lang?'true':'false'); }); renderAll(); }
@@ -384,7 +385,7 @@
                 { name: 'Vino e Cucina Miscia', emoji: '🐟', photo: 'rist-miscia.jpg', it: 'Ristorante di pesce nel quartiere Archi.', en: 'Fish restaurant in the Archi district.', pl: 'Restauracja rybna w dzielnicy Archi.', dist: '🚗 1 km – 2 min', mapQuery: 'Vino e Cucina Miscia Ancona', lat: 43.6126474, lng: 13.5044134 },
                 { name: 'Amélie', emoji: '🦐', photo: 'rist-amelie.jpg', it: 'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en: 'Family-run and friendly restaurant. Excellent mixed fried fish.', pl: 'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist: '🚗 2 km – 3 min', mapQuery: 'Amelie Ancona', lat: 43.6022208, lng: 13.5060781 },
                 { name: 'Giardino', emoji: '🌿', photo: 'rist-giardino.jpg', it: 'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en: 'Elegant restaurant along Viale della Vittoria that never disappoints.', pl: 'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist: '🚶 1350 m – 18 min', mapQuery: 'Il Giardino Ancona', lat: 43.6158317, lng: 13.5257132 },
-                { name: 'Marcello (Portonovo)', emoji: '🍝', photo: 'rist-marcello.jpg', it: 'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en: 'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', pl: 'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist: '🚌 12 km – 25 min', mapQuery: 'Ristorante Marcello Portonovo Ancona', lat: 43.5721, lng: 13.5982 }
+                { name: 'Marcello (Portonovo)', emoji: '🍝', photo: 'rist-marcello.jpg', it: 'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en: 'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', pl: 'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist: '🚌 12 km – 25 min', mapQuery: 'Ristorante Marcello Portonovo Ancona', lat: 43.5641460, lng: 13.5910907 }
             ],
             barpub: [
                 { name: 'Bar Torino', emoji: '☕', photo: '', it: 'Bar centrale, frequentato dagli anconetani.', en: 'Central café, popular with locals.', pl: 'Centralna kawiarnia, popularna wśród miejscowych.', dist: '🚶 100 m – 1 min', mapQuery: 'Bar Torino Ancona', lat: 43.6182553, lng: 13.5118948 },
@@ -493,7 +494,6 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
             L.control.attribution({ prefix: '© <a href="https://openstreetmap.org">OSM</a>' }).addTo(leafletMap);
 
-            // Marker stellina Ancona Centro
             var homeIcon = L.divIcon({ html: '<div class="map-marker-star">★</div>', className: '', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14] });
             L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { icon: homeIcon }).addTo(leafletMap)
                 .bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
