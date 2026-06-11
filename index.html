@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V3.4</title>
+    <title>Ancona Centro · Guida Ospiti V3.5</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -30,7 +29,6 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         a { color: inherit; text-decoration: none }
         button { font-family: 'Outfit', sans-serif; cursor: pointer }
-
         .header { background: var(--navy); color: var(--white); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 20px rgba(0,0,0,.30) }
         .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 13px max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-left: max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-right: max(28px, calc(env(safe-area-inset-right, 0px) + 18px)); border-bottom: 1px solid rgba(200,164,90,.18) }
         .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.15; color: var(--white) }
@@ -40,6 +38,8 @@
         .lang-btn.active { background: var(--gold); color: var(--navy); font-weight: 600 }
         .hero { width: 100%; height: 320px; overflow: hidden; position: relative; background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy-3) 100%); transition: height .3s ease }
         .hero.section-mode { height: 68px }
+        /* FIX #7: nasconde la caption hero in modalità sezione */
+        .hero.section-mode .hero-caption { visibility: hidden }
         .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .55 }
         .hero-overlay { position: absolute; inset: 0; background: rgba(11,31,51,.45); pointer-events: none }
         .hero-caption { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--white); text-align: center; padding: 0 24px }
@@ -78,16 +78,20 @@
         .card-body { padding: 12px 14px 14px; font-size: .82rem; line-height: 1.6; color: var(--text) }
         .card-body a { color: var(--navy-3); font-weight: 500; text-decoration: underline; text-decoration-color: rgba(30,74,112,.3) }
         .map-list-wrap { display: flex; height: 340px; border-radius: 13px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow) }
-        .section-map-el { flex: 1; min-width: 0; z-index: 1 }
+        /* FIX #11: sfondo di attesa mappa */
+        .section-map-el { flex: 1; min-width: 0; z-index: 1; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%) }
         .place-btn-col { width: 142px; overflow-y: auto; padding: 5px 5px; display: flex; flex-direction: column; gap: 4px; background: var(--white); border-left: 1px solid var(--bg-2); -webkit-overflow-scrolling: touch; scrollbar-width: thin }
         .place-btn-col::-webkit-scrollbar { width: 3px }
         .place-btn-col::-webkit-scrollbar-thumb { background: var(--bg-2); border-radius: 3px }
         .place-btn-mini { width: 100%; text-align: left; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--bg-2); background: transparent; font-size: .65rem; color: var(--text); line-height: 1.3; white-space: normal; transition: all .15s }
         .place-btn-mini.selected, .place-btn-mini:active { background: var(--navy); color: var(--white); border-color: var(--navy) }
         .map-marker-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--navy); border: 2px solid var(--white); color: var(--white); font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40) }
-        .map-marker-num.cardeto, .map-marker-num.cittadella { background: #2E7D32; }
+        .map-marker-num.cardeto, .map-marker-num.cittadella { background: #2E7D32 }
         .map-marker-num.selected { background: var(--gold); color: var(--navy); transform: scale(1.25); z-index: 999!important }
-        .map-marker-star { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FFD700; border: 2px solid var(--white); color: var(--navy); font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40); }
+        .map-marker-star { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FFD700; border: 2px solid var(--white); color: var(--navy); font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40) }
+        /* FIX #3: star-list-item come button */
+        .star-list-btn { width: 100%; text-align: left; padding: 7px 8px; border-radius: 8px; border: 1.5px solid #FFD700; background: #FFD700; font-size: .65rem; font-weight: 700; color: var(--navy); line-height: 1.3; cursor: pointer; transition: all .15s }
+        .star-list-btn:active { background: #e6c200; border-color: #e6c200 }
         .back-btn { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; color: var(--navy-3); font-size: .82rem; font-weight: 500; padding: 6px 0 4px }
         .back-btn:active { opacity: .6 }
         .detail-photo-wrap { width: 100%; height: 200px; overflow: hidden; position: relative; background: var(--bg-2) }
@@ -145,7 +149,6 @@
         .link-name { font-size: .82rem; font-weight: 500; color: var(--navy) }
         .link-desc { font-size: .7rem; color: var(--muted); margin-top: 1px }
         .link-action { font-size: .68rem; color: var(--navy-3); background: var(--bg); padding: 4px 9px; border-radius: 14px; border: 1px solid var(--border); white-space: nowrap }
-        .star-list-item { background: #FFD700; color: var(--navy); font-weight: 700; padding: 5px 8px; border-radius: 8px; font-size: .68rem; text-align: center; cursor: pointer; border: 1px solid #e6c200; }
     </style>
 </head>
 <body>
@@ -170,7 +173,7 @@
     <div class="gold-bar" aria-hidden="true"></div>
     <nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V3.4 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V3.5 · All rights reserved</div>
     <div class="toast" id="toastEl" role="alert" aria-live="polite"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -184,303 +187,311 @@
         var HOST_PHONE = '3356750269';
         var HOST_EMAIL = 'anconacentro@yahoo.com';
         var PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/';
-        var HOME_COORDS = { lat: 43.6181895, lng: 13.5129489, name: '★ Ancona Centro' };
+        var HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
+
+        // FIX #1: placeDataMap viene resettato a ogni cambio sezione/sotto-itinerario
+        // La chiave include la sezione corrente per evitare collisioni
         var placeDataMap = {};
 
-        function tr(it, en, pl) { if (currentLang === 'it') return it; if (currentLang === 'en') return en || it; if (currentLang === 'pl') return pl || it; return it; }
-        function setLang(lang) { currentLang = lang; ['it','en','pl'].forEach(function(l) { document.getElementById('btn-'+l).classList.toggle('active', l===lang); document.getElementById('btn-'+l).setAttribute('aria-checked', l===lang?'true':'false'); }); renderAll(); }
-        function showToast(msg) { var el = document.getElementById('toastEl'); el.textContent = msg; el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); }, 3000); }
+        function tr(it, en, pl) { if (currentLang==='it') return it; if (currentLang==='en') return en||it; if (currentLang==='pl') return pl||it; return it; }
+        function setLang(lang) { currentLang=lang; ['it','en','pl'].forEach(function(l){ document.getElementById('btn-'+l).classList.toggle('active',l===lang); document.getElementById('btn-'+l).setAttribute('aria-checked',l===lang?'true':'false'); }); renderAll(); }
+        function showToast(msg) { var el=document.getElementById('toastEl'); el.textContent=msg; el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); },3000); }
         function getMapLink(query) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query+', Ancona Italia'); }
-        function getImgSearchUrl(p) { var query = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(query); }
+        function getImgSearchUrl(p) { var q=p.imgQuery||(p.name+' Ancona'); return 'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(q); }
+
+        // photoFallback usa placeDataMap con chiave sicura
         function photoFallback(wrapId) {
-            var el = document.getElementById(wrapId);
-            var p = placeDataMap[wrapId];
-            if(el && p) {
-                el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Kliknij, aby zobaczyć zdjęcia')+'</span></a>';
+            var el=document.getElementById(wrapId);
+            var p=placeDataMap[wrapId];
+            if(el&&p) {
+                el.innerHTML='<a href="'+getImgSearchUrl(p)+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Kliknij, aby zobaczyć zdjęcia')+'</span></a>';
             }
         }
 
         var appData = {
-            checkin: 'da concordare / on request / do ustalenia',
-            checkout: '11:00',
-            address: 'Piazza Roma 3, 4° piano',
             rules: [
                 { icon: '🚭', it: 'Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', pl: 'Zakaz palenia w całym mieszkaniu' },
                 { icon: '🐾', it: 'Vietati gli animali domestici', en: 'No pets allowed', pl: 'Zakaz wprowadzania zwierząt domowych' }
             ],
             social: { instagram: 'https://www.instagram.com/anconacentro', facebook: 'https://www.facebook.com/profile.php?id=61575688633462' },
             mustsee: [
-                { order: 1, name: 'Fontana del Calamo (13 Cannelle)', emoji: '⛲', photo: 'fontana-calamo.jpg', itinerario: 'centro',
-                  it: 'Storica fontana pubblica simbolo della città detta anche delle 13 cannelle ricostruita nelle attuali forme rinascimentali a metà del 500. Una targa posta sul muro di fronte ricorda l\'adiacente Porta del Calamo, abbattuta dopo l\'unificazione d\'Italia nel 1860. Dalla Fontana del Calamo, o delle 13 Cannelle come la chiamano gli anconetani, si scende lungo Corso Mazzini e si arriva a Piazza della Repubblica, dove si affaccia il Teatro delle Muse.',
-                  en: 'Historic public fountain, symbol of the city, also known as the 13 Cannelle, rebuilt in its current Renaissance form in the mid‑16th century. A plaque on the opposite wall recalls the adjacent Porta del Calamo, demolished after the unification of Italy in 1860. From the Fontana del Calamo, or "13 Cannelle" as the locals call it, walk down Corso Mazzini to Piazza della Repubblica, where the Teatro delle Muse stands.',
-                  pl: 'Historyczna fontanna publiczna, symbol miasta, zwana także 13 Cannelle, odbudowana w obecnej renesansowej formie w połowie XVI wieku. Tablica na przeciwległej ścianie przypomina o sąsiedniej Porta del Calamo, zburzonej po zjednoczeniu Włoch w 1860 roku. Od Fontana del Calamo, czyli "13 Cannelle" jak nazywają ją miejscowi, schodzimy w dół Corso Mazzini i docieramy na Piazza della Repubblica, gdzie znajduje się Teatro delle Muse.',
-                  dist: '📍 0 m – Punto di partenza', mapQuery: 'Fontana delle 13 Cannelle Ancona', lat: 43.6184165, lng: 13.5129301 },
-                { order: 2, name: 'Teatro delle Muse', emoji: '🎭', photo: 'teatro-muse.jpg', itinerario: 'centro',
-                  it: 'Teatro in stile neoclassico inaugurato nel 1827, danneggiato dalla seconda guerra mondiale e riaperto nel 2002. Dal Teatro delle Muse, prendendo via della Loggia, si arriva al Palazzo Benincasa e alla Loggia dei Mercanti.',
-                  en: 'Neoclassical theatre inaugurated in 1827, damaged during World War II and reopened in 2002. From the Teatro delle Muse, take Via della Loggia to Palazzo Benincasa and the Loggia dei Mercanti.',
-                  pl: 'Teatr neoklasyczny otwarty w 1827 roku, zniszczony podczas II wojny światowej i ponownie otwarty w 2002 roku. Z Teatro delle Muse, idąc Via della Loggia, docieramy do Palazzo Benincasa i Loggia dei Mercanti.',
-                  dist: '🚶 350 m – 4 min', mapQuery: 'Teatro delle Muse Ancona', lat: 43.6192483, lng: 13.5099488 },
-                { order: 3, name: 'Loggia dei Mercanti', emoji: '🏛️', photo: 'loggia-mercanti.jpg', itinerario: 'centro',
-                  it: 'Edificio quattrocentesco progettato da Giorgio da Sebenico (come l\'adiacente Palazzo Benincasa) destinato alla compravendita delle merci che arrivavano in città dal porto. Proseguendo poco oltre per via della Loggia si arriva alla Chiesa di Santa Maria della Piazza.',
-                  en: '15th‑century building designed by Giorgio da Sebenico (like the adjacent Palazzo Benincasa), used for the trading of goods arriving in the city from the port. Continuing a little further along Via della Loggia you reach the Church of Santa Maria della Piazza.',
-                  pl: 'XV‑wieczny budynek zaprojektowany przez Giorgio da Sebenico (podobnie jak sąsiedni Palazzo Benincasa), przeznaczony do handlu towarami przybywającymi do miasta z portu. Idąc nieco dalej wzdłuż Via della Loggia, docieramy do Kościoła Santa Maria della Piazza.',
-                  dist: '🚶 400 m – 5 min', mapQuery: 'Loggia dei Mercanti Ancona', lat: 43.6199818, lng: 13.5098563 },
-                { order: 4, name: 'Chiesa Santa Maria della Piazza', emoji: '⛪', photo: 'santa-maria-piazza.jpg', itinerario: 'centro',
-                  it: 'Eretta tra l\'XI e il XII secolo, è un pregevole esempio di stile romanico. Costruita su una chiesa paleocristiana del IV secolo fu restaurata nel VI. Una parte del pavimento della chiesa attuale è in vetro per permettere la visione dei mosaici paleocristiani sottostanti. Si accede al porto attraversando la Portella Santa Maria collocata proprio di fronte alla chiesa. Proseguendo sulla destra dopo 300 metri si raggiunge l\'Arco di Traiano.',
-                  en: 'Built between the 11th and 12th centuries, it is a fine example of Romanesque style. Constructed on a 4th‑century early Christian church, it was restored in the 6th century. Part of the current church floor is made of glass to allow a view of the early Christian mosaics underneath. The port is accessed through Portella Santa Maria, located right opposite the church. Continuing to the right after 300 metres you reach the Arch of Trajan.',
-                  pl: 'Zbudowany między XI a XII wiekiem, jest to znakomity przykład stylu romańskiego. Wzniesiony na wczesnochrześcijańskim kościele z IV wieku, został odrestaurowany w VI wieku. Część obecnej podłogi kościoła jest szklana, aby umożliwić oglądanie wczesnochrześcijańskich mozaik znajdujących się poniżej. Do portu wchodzi się przez Portella Santa Maria, znajdującą się dokładnie naprzeciwko kościoła. Idąc dalej w prawo po 300 metrach docieramy do Łuku Trajana.',
-                  dist: '🚶 400 m – 5 min', mapQuery: 'Santa Maria della Piazza Ancona', lat: 43.6205592, lng: 13.5103676 },
-                { order: 5, name: 'Arco di Traiano', emoji: '🏛️', photo: 'arco-traiano.jpg', itinerario: 'centro',
-                  it: 'Arco trionfale fatto costruire nel II secolo d.C. dal Senato romano per esprimere la propria riconoscenza all\'imperatore Traiano il quale aveva ampliato il porto di Ancona a proprie spese. Poco più avanti l\'Arco Clementino.',
-                  en: 'Triumphal arch built in the 2nd century AD by the Roman Senate to express gratitude to Emperor Trajan, who had enlarged the port of Ancona at his own expense. A little further on, the Arco Clementino.',
-                  pl: 'Łuk triumfalny wzniesiony w II wieku n.e. przez rzymski Senat, aby wyrazić wdzięczność cesarzowi Trajanowi, który na własny koszt rozbudował port w Ankonie. Nieco dalej Łuk Klementyński.',
-                  dist: '🚶 1150 m – 16 min', mapQuery: 'Arco di Traiano Ancona', lat: 43.6252706, lng: 13.5066018 },
-                { order: 6, name: 'Arco Clementino', emoji: '🚪', photo: 'arco-clementino.jpg', itinerario: 'centro',
-                  it: 'Monumento progettato nel XVIII secolo dall\'architetto Luigi Vanvitelli sotto forma di arco di trionfo a un solo fornice, in pietra d\'Istria, in onore di Papa Clemente XII che concesse alla città il "porto franco" dando un notevole impulso ai traffici marittimi.',
-                  en: 'Monument designed in the 18th century by the architect Luigi Vanvitelli as a single-fornix triumphal arch in Istrian stone, in honour of Pope Clement XII, who granted the city "free port" status, giving a significant boost to maritime traffic.',
-                  pl: 'Monument zaprojektowany w XVIII wieku przez architekta Luigiego Vanvitellego jako jednoprzęsłowy łuk triumfalny z kamienia istryjskiego, na cześć papieża Klemensa XII, który przyznał miastu status "wolnego portu", dając znaczący impuls dla ruchu morskiego.',
-                  dist: '🚶 1250 m – 17 min', mapQuery: 'Arco Clementino Ancona', lat: 43.6252604, lng: 13.5049529 },
-                { order: '6-bis', name: 'Lanterna Rossa (facoltativo)', emoji: '🗼', photo: 'lanterna-rossa.jpg', itinerario: 'centro',
-                  it: '(Facoltativo) Per chi vuole proseguire, andando poco avanti sulla destra, si attraversa un varco nelle mura e si arriva alla torre dei piloti del porto. Dietro di essa, poco visibile, una stretta apertura nelle mura conduce al molo in fondo al quale è collocata la lanterna rossa. Salendo per una scaletta si raggiunge la sommità del molo da dove si può ammirare uno splendido panorama sulla città e su tutta la costa.',
-                  en: '(Optional) For those who wish to continue, just ahead on the right, pass through a gap in the walls and reach the harbour pilots\' tower. Behind it, barely visible, a narrow opening in the walls leads to the pier where the red lantern stands. Climbing a short staircase you reach the top of the pier, from which you can admire a splendid view of the city and the entire coast.',
-                  pl: '(Opcjonalnie) Dla tych, którzy chcą kontynuować, nieco dalej po prawej stronie przechodzi się przez przejście w murach i dociera do wieży pilotów portowych. Za nią, ledwo widoczne, wąskie przejście w murach prowadzi na molo, na końcu którego znajduje się czerwona latarnia. Wspinając się po krótkich schodkach, można dotrzeć na szczyt mola, skąd można podziwiać wspaniały widok na miasto i całe wybrzeże.',
-                  dist: '🚶 2200 m – 29 min', mapQuery: 'Lanterna Rossa Ancona', lat: 43.6255485, lng: 13.4942123 },
-                { order: 7, name: 'Resti del Porto Romano (II sec. a.C.)', emoji: '🏛️', photo: 'porto-romano.jpg', itinerario: 'centro',
-                  it: 'Tornando indietro verso la città costeggiando Fincantieri, tenendosi sulla sinistra, si percorre una passerella sui resti dell\'antico porto romano. Sulla destra la Casa del Capitano del Porto del XIII sec. Proseguendo si raggiunge largo Dante Alighieri, su cui si affaccia l\'imponente Palazzo degli Anziani.',
-                  en: 'Heading back towards the city along the Fincantieri shipyard, keeping to the left, you walk along a footbridge over the remains of the ancient Roman port. On the right, the 13th-century Harbour Master\'s House. Continuing, you reach Largo Dante Alighieri, where the imposing Palazzo degli Anziani stands.',
-                  pl: 'Wracając w kierunku miasta wzdłuż stoczni Fincantieri, trzymając się lewej strony, idziemy kładką nad pozostałościami starożytnego portu rzymskiego. Po prawej stronie Dom Kapitana Portu z XIII wieku. Kontynuując, docieramy do Largo Dante Alighieri, przy którym stoi okazały Palazzo degli Anziani.',
-                  dist: '🚶 800 m – 11 min', mapQuery: 'Porto Traianeo Ancona', lat: 43.6235224, lng: 13.509572 },
-                { order: 8, name: 'Palazzo degli Anziani e Ascensore', emoji: '🏛️', photo: 'palazzo-anziani.jpg', itinerario: 'centro',
-                  it: 'Sulla sinistra ascensore (con accesso a bagni pubblici) che porta fino a piazza Stracca, dove si trova l\'ingresso dell\'edificio. Sede storica delle Magistrature cittadine sin dall\'Alto Medioevo e a partire dall\'XI secolo, con la nascita della Repubblica di Ancona, luogo dove si riuniva il Consiglio degli Anziani, da cui prende il nome. Il Palazzo vanta origini antichissime e travagliate con la sua costruzione attribuita a Galla Placidia (governatrice dell\'impero) nel 425 d.C. L\'edificio attuale venne eretto nel 1270 su disegno di Margaritone d\'Arezzo e poi ristrutturato nel XVI sec. da Pellegrino Tibaldi. È attualmente sede del Consiglio comunale di Ancona. Continuando in leggera salita per via Pizzecolli si arriva a Palazzo Ferretti, sede del Museo Archeologico Nazionale delle Marche.',
-                  en: 'On the left, a lift (with access to public toilets) takes you up to Piazza Stracca, where the entrance to the building is located. Historic seat of the city magistrates since the Early Middle Ages and, from the 11th century with the birth of the Republic of Ancona, meeting place of the Council of Elders (Consiglio degli Anziani), from which it takes its name. The palace boasts ancient and troubled origins, with its construction attributed to Galla Placidia (governor of the empire) in 425 AD. The current building was erected in 1270 to a design by Margaritone d\'Arezzo and later renovated in the 16th century by Pellegrino Tibaldi. It is now the seat of Ancona\'s City Council. Continuing slightly uphill along Via Pizzecolli you reach Palazzo Ferretti, home of the National Archaeological Museum of the Marche.',
-                  pl: 'Po lewej stronie winda (z dostępem do toalet publicznych) prowadzi na Piazza Stracca, gdzie znajduje się wejście do budynku. Historyczna siedziba miejskich magistratur od wczesnego średniowiecza, a od XI wieku, wraz z narodzinami Republiki Ankony, miejsce obrad Rady Starszych (Consiglio degli Anziani), od której pochodzi jego nazwa. Pałac ma starożytne i burzliwe dzieje – jego budowę przypisuje się Galli Placydii (namiestniczce cesarstwa) w 425 r. n.e. Obecny budynek wzniesiono w 1270 roku według projektu Margaritone d\'Arezzo, a następnie przebudowano w XVI wieku przez Pellegrina Tibaldiego. Obecnie jest siedzibą Rady Miejskiej Ankony. Kontynuując lekkim wzniesieniem wzdłuż Via Pizzecolli, docieramy do Palazzo Ferretti, siedziby Narodowego Muzeum Archeologicznego Marchii.',
-                  dist: '🚶 650 m – 9 min', mapQuery: 'Palazzo degli Anziani Ancona', lat: 43.6226783, lng: 13.5105215, extraMap: { label: '⬆️ Ascensore San Ciriaco', query: 'Ascensore San Ciriaco Ancona' } },
-                { order: 9, name: 'Museo Archeologico Nazionale delle Marche', emoji: '🏺', photo: 'museo-archeologico.jpg', itinerario: 'centro',
-                  it: 'Palazzo cinquecentesco dei conti Ferretti con sale affrescate dal Tibaldi, sede del Museo Archeologico Nazionale delle Marche con ricchissima collezione di reperti dal paleolitico al periodo ellenistico romano. Proseguendo si passa davanti al Palazzo del Senato del XIII sec. per continuare per una scalinata che porta fino al Duomo.',
-                  en: '16th-century palace of the Ferretti counts with frescoed halls by Tibaldi, home of the National Archaeological Museum of the Marche with a rich collection of finds from the Palaeolithic to the Hellenistic-Roman period. Continuing, you pass the 13th-century Palazzo del Senato and then take a staircase leading up to the Cathedral.',
-                  pl: 'XVI-wieczny pałac hrabiów Ferretti z salami ozdobionymi freskami przez Tibaldiego, siedziba Narodowego Muzeum Archeologicznego Marchii z bogatą kolekcją znalezisk od paleolitu po okres hellenistyczno-rzymski. Idąc dalej, mijamy XIII-wieczny Palazzo del Senato, a następnie schodami prowadzącymi do Katedry.',
-                  dist: '🚶 750 m – 10 min', mapQuery: 'Museo Archeologico Nazionale Ancona', lat: 43.6234656, lng: 13.5109808 },
-                { order: 10, name: 'Cattedrale di San Ciriaco', emoji: '⛪', photo: 'duomo-san-ciriaco.jpg', itinerario: 'centro',
-                  it: 'La Cattedrale di San Ciriaco, che rappresenta l\'emblema di Ancona, sorge sull\'antico tempio dedicato a Venere Euplea, protettrice della navigazione, di cui restano parte delle fondamenta. Su di esso, nel VI secolo d.C., venne costruita la basilica paleocristiana dedicata a San Lorenzo, che divenne Cattedrale nel 1000 quando vi furono traslati i corpi di San Ciriaco e San Marcellino. Spettacolare panorama sulla città. A sinistra della facciata c\'è il Museo Diocesano. Scendendo invece sulla destra si arriva ai resti dell\'Anfiteatro romano.',
-                  en: 'The Cathedral of San Ciriaco, the emblem of Ancona, stands on the ancient temple dedicated to Venus Euplea, protector of navigation, of which part of the foundations remain. On it, in the 6th century AD, the early Christian basilica dedicated to San Lorenzo was built, which became the Cathedral in the year 1000 when the bodies of Saint Cyriacus and Saint Marcellinus were transferred there. Spectacular view over the city. To the left of the façade is the Diocesan Museum. Descending to the right, instead, you reach the remains of the Roman Amphitheatre.',
-                  pl: 'Katedra San Ciriaco, która jest symbolem Ankony, wznosi się na starożytnej świątyni poświęconej Wenus Euplea, opiekunce żeglugi, z której zachowała się część fundamentów. Na niej, w VI wieku n.e., zbudowano wczesnochrześcijańską bazylikę pod wezwaniem San Lorenzo, która stała się katedrą w roku 1000, kiedy przeniesiono tam ciała świętego Cyriaka i świętego Marcellina. Spektakularny widok na miasto. Na lewo od fasady znajduje się Muzeum Diecezjalne. Schodząc natomiast w prawo, docieramy do pozostałości rzymskiego Amfiteatru.',
-                  dist: '🚶 1000 m – 13 min', mapQuery: 'Cattedrale di San Ciriaco Ancona', lat: 43.6251216, lng: 13.510037 },
-                { order: 11, name: 'Anfiteatro Romano', emoji: '🏟️', photo: 'anfiteatro-romano.jpg', itinerario: 'centro',
-                  it: 'Anfiteatro realizzato in età augustea (I sec. a.C.) che poteva accogliere fino a 10.000 spettatori. Dopo l\'abbandono in età antica (IV sec. d.C.) venne utilizzato come cava di materiali e, a partire dal XIII secolo, come base per nuove costruzioni che ne hanno nascosto la struttura. Fu riportato alla luce solo a partire dagli anni 70. Tornando in discesa verso piazza del Senato si possono ammirare degli splendidi mosaici. Scendendo per via Pizzecolli si torna in piazza Stracca dove, di fronte alla facciata del Palazzo degli Anziani si erge la maestosa chiesa del Gesù progettata dal Vanvitelli.',
-                  en: 'Amphitheatre built in the Augustan age (1st century BC) that could hold up to 10,000 spectators. After its abandonment in ancient times (4th century AD), it was used as a quarry for building materials and, from the 13th century, as a foundation for new constructions that concealed its structure. It was brought back to light only from the 1970s onwards. Heading back down towards Piazza del Senato you can admire some splendid mosaics. Descending Via Pizzecolli you return to Piazza Stracca where, opposite the façade of Palazzo degli Anziani, stands the majestic Chiesa del Gesù designed by Vanvitelli.',
-                  pl: 'Amfiteatr zbudowany w epoce augustiańskiej (I w. p.n.e.), który mógł pomieścić do 10 000 widzów. Po opuszczeniu w starożytności (IV w. n.e.) był wykorzystywany jako kamieniołom, a od XIII wieku jako podstawa dla nowych budowli, które ukryły jego strukturę. Został ponownie odsłonięty dopiero od lat 70. XX wieku. Schodząc z powrotem w kierunku Piazza del Senato, można podziwiać wspaniałe mozaiki. Idąc w dół Via Pizzecolli, wracamy na Piazza Stracca, gdzie naprzeciwko fasady Palazzo degli Anziani wznosi się majestatyczny kościół del Gesù zaprojektowany przez Vanvitellego.',
-                  dist: '🚶 900 m – 12 min', mapQuery: 'Anfiteatro Romano Ancona', lat: 43.6247408, lng: 13.5117513 },
-                { order: 12, name: 'Chiesa del Gesù', emoji: '⛪', photo: 'chiesa-gesu.jpg', itinerario: 'centro',
-                  it: 'Monumento commissionato dal conte Nappi nel 1605. Nel 1733 i Gesuiti affidarono a Luigi Vanvitelli il progetto dell\'ampliamento della chiesa realizzato con la facciata concava che richiama la forma del porto. Continuando a scendere per via Pizzecolli, una delle più antiche vie della città, si raggiunge piazza San Francesco, ove si erge l\'omonima chiesa.',
-                  en: 'Monument commissioned by Count Nappi in 1605. In 1733 the Jesuits entrusted Luigi Vanvitelli with the project for the enlargement of the church, carried out with a concave façade that echoes the shape of the harbour. Continuing down Via Pizzecolli, one of the oldest streets in the city, you reach Piazza San Francesco, where the church of the same name stands.',
-                  pl: 'Monument zamówiony przez hrabiego Nappi w 1605 roku. W 1733 roku Jezuici powierzyli Luigiemu Vanvitellemu projekt rozbudowy kościoła, zrealizowany z wklęsłą fasadą nawiązującą do kształtu portu. Kontynuując w dół Via Pizzecolli, jedną z najstarszych ulic miasta, docieramy do Piazza San Francesco, gdzie wznosi się kościół o tej samej nazwie.',
-                  dist: '🚶 600 m – 8 min', mapQuery: 'Chiesa del Gesù Ancona', lat: 43.6226099, lng: 13.5111676 },
-                { order: 13, name: 'San Francesco alle Scale', emoji: '⛪', photo: 'san-francesco-scale.jpg', itinerario: 'centro',
-                  it: 'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico. Facciata con magnifico portale gotico-veneziano a forma di tabernacolo, realizzato in pietra di Brioni da Giorgio da Sebenico, alla metà del Quattrocento (1455). All\'interno opere notevoli, dal Lotto a Tibaldi. Scendendo per via Pizzecolli si arriva alla Pinacoteca civica.',
-                  en: 'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect. Façade with a magnificent Venetian-Gothic tabernacle-shaped portal, made of Brioni stone by Giorgio da Sebenico in the mid-15th century (1455). Inside, notable works from Lotto to Tibaldi. Descending Via Pizzecolli you reach the Civic Art Gallery (Pinacoteca civica).',
-                  pl: 'Ze szczytu schodów kościół San Francesco delle Scale góruje nad Piazza San Francesco, tworząc niezwykły efekt scenograficzny. Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego. Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).',
-                  dist: '🚶 450 m – 6 min', mapQuery: 'Chiesa di San Francesco alle Scale Ancona', lat: 43.6214786, lng: 13.5118841 },
-                { order: 14, name: 'Pinacoteca Civica F. Podesti', emoji: '🖼️', photo: '', itinerario: 'centro',
-                  it: 'Pinacoteca civica con opere di importanti autori tra cui Tiziano, Lotto, Crivelli, Guercino. Continuando si passa per il cinquecentesco Arco del Rastrello e si arriva in Piazza del Plebiscito.',
-                  en: 'Civic art gallery with works by important artists including Titian, Lotto, Crivelli, Guercino. Continuing, you pass through the 16th-century Arco del Rastrello and reach Piazza del Plebiscito.',
-                  pl: 'Miejska pinakoteka z dziełami ważnych artystów, m.in. Tycjana, Lotta, Crivellego, Guercina. Idąc dalej, przechodzimy przez XVI-wieczny Arco del Rastrello i docieramy na Piazza del Plebiscito.',
-                  dist: '🚶 300 m – 4 min', mapQuery: 'Pinacoteca Civica Podesti Ancona', lat: 43.6208333, lng: 13.5122222 },
-                { order: 15, name: 'Piazza del Plebiscito', emoji: '⛲', photo: 'piazza-plebiscito.jpg', itinerario: 'centro',
-                  it: 'Nata come Piazza Nuova, le sue dimensioni la fecero subito ribattezzare Piazza Grande sino al 1860, anno in cui prende il nome dell\'attuale Piazza del Plebiscito, notoriamente chiamata Piazza del Papa per la presenza della statua di Papa Clemente XII. Su di essa si affacciano il Palazzo del Governo, sede della Prefettura, la chiesa di San Domenico e importanti palazzi storici. Oggi resta il centro nevralgico della parte antica della città e importante luogo di vita notturna e sociale di Ancona. Passando per la caratteristica via degli Orefici si torna in Corso Mazzini ed alla Fontana delle 13 Cannelle.',
-                  en: 'Originally called Piazza Nuova, its size soon earned it the name Piazza Grande until 1860, when it took its current name Piazza del Plebiscito, popularly known as Piazza del Papa due to the statue of Pope Clement XII. It is overlooked by the Palazzo del Governo, seat of the Prefecture, the church of San Domenico and important historic buildings. Today it remains the nerve centre of the old part of the city and an important venue for Ancona\'s nightlife and social life. Passing through the characteristic Via degli Orefici you return to Corso Mazzini and the Fontana delle 13 Cannelle.',
-                  pl: 'Pierwotnie nazwany Piazza Nuova, jego rozmiary szybko sprawiły, że przemianowano go na Piazza Grande aż do 1860 roku, kiedy to otrzymał obecną nazwę Piazza del Plebiscito, powszechnie zwanego Piazza del Papa ze względu na posąg papieża Klemensa XII. Znajduje się przy nim Palazzo del Governo, siedziba Prefektury, kościół San Domenico oraz ważne historyczne pałace. Dziś pozostaje nerwowym centrum starej części miasta i ważnym miejscem życia nocnego i towarzyskiego Ankony. Przechodząc przez charakterystyczną Via degli Orefici, wracamy na Corso Mazzini i do Fontanny 13 Cannelle.',
-                  dist: '🚶 200 m – 3 min', mapQuery: 'Piazza del Plebiscito Ancona', lat: 43.6195337, lng: 13.511651 },
-                { order: 16, name: 'Parco del Cardeto', emoji: '🌳', photo: '', itinerario: 'centro', isSubItinerary: true, subId: 'cardeto',
-                  it: 'Il Parco del Cardeto è il più vasto parco urbano di Ancona, aperto nel 2005. A picco sul mare, immerso nella natura, occupa le sommità di Monte Cappuccini e Monte Cardeto e si estende in un\'area di circa 35 ettari, tutti a ridosso del centro. Comprende luoghi di valore storico, un ambiente naturale di notevole interesse e numerosi punti panoramici sulla costa alta e sulla città. Fino agli anni 70 l\'area era adibita ad uso militare.',
-                  en: 'The Parco del Cardeto is Ancona\'s largest urban park, opened in 2005. Perched on the cliffs overlooking the sea and surrounded by nature, it occupies the summits of Monte Cappuccini and Monte Cardeto and covers an area of about 35 hectares, all close to the city centre. It includes sites of historical value, a natural environment of great interest, and numerous panoramic points over the high coast and the city. Until the 1970s, the area was used for military purposes.',
-                  pl: 'Parco del Cardeto to największy park miejski w Ankonie, otwarty w 2005 roku. Położony na klifach z widokiem na morze, otoczony przyrodą, zajmuje szczyty Monte Cappuccini i Monte Cardeto i rozciąga się na powierzchni około 35 hektarów, tuż przy centrum miasta. Obejmuje miejsca o wartości historycznej, środowisko naturalne o dużym znaczeniu i liczne punkty widokowe na wysokie wybrzeże i miasto. Do lat 70. XX wieku teren ten był wykorzystywany do celów wojskowych.',
-                  dist: '🌳 Parco cittadino', mapQuery: 'Parco del Cardeto Ancona', lat: 43.6222659, lng: 13.5207122 },
-                { order: 17, name: 'Porta Pia', emoji: '🚪', photo: 'porta-pia.jpg', itinerario: 'centro',
-                  it: 'Dal Teatro delle Muse, se invece di andare a destra verso la Loggia dei Mercanti si prende a sinistra e si percorre il lungomare Vanvitelli, in breve si arriva a Porta Pia. Antica porta monumentale di accesso alla città costruita tra il 1787 e il 1789 su richiesta di Papa Pio VI per realizzare una nuova strada "a mare" che evitasse lo scavalcamento disagevole del sovrastante colle Astagno.',
-                  en: 'From the Teatro delle Muse, if instead of going right towards the Loggia dei Mercanti you turn left and follow the Vanvitelli seafront, you soon reach Porta Pia. Ancient monumental gateway to the city, built between 1787 and 1789 at the request of Pope Pius VI to create a new "sea road" that would avoid the difficult climb over the Astagno hill.',
-                  pl: 'Od Teatro delle Muse, jeśli zamiast iść w prawo w kierunku Loggia dei Mercanti, skręcimy w lewo i pójdziemy wzdłuż nadmorskiej promenady Vanvitellego, wkrótce dotrzemy do Porta Pia. Starożytna monumentalna brama wjazdowa do miasta, zbudowana w latach 1787–1789 na prośbę papieża Piusa VI, aby stworzyć nową „drogę morską”, która pozwalała uniknąć trudnej wspinaczki na wzgórze Astagno.',
-                  dist: '🚶 950 m – 13 min', mapQuery: 'Porta Pia Ancona', lat: 43.6152484, lng: 13.5048966 },
-                { order: 18, name: 'Mole Vanvitelliana', emoji: '🏛️', photo: 'mole-vanvitelliana.jpg', itinerario: 'centro',
-                  it: 'Affacciandosi dalla balaustra del lungomare si può ammirare il suo ingresso principale. Vero e proprio capolavoro di edilizia ed ingegneria sull\'acqua, la Mole vanvitelliana è un ex lazzaretto costruito da Luigi Vanvitelli tra il 1733 e 1743. Sorge su di un\'isola artificiale pentagonale situata all\'interno del porto; oggi è collegato alla terraferma da tre ponti, ed occupa una superficie di 20.000 m². Attualmente al suo interno vi sono ampi spazi espositivi e il Museo Tattile Statale Omero.',
-                  en: 'Leaning over the seafront balustrade you can admire its main entrance. A true masterpiece of architecture and engineering on water, the Mole Vanvitelliana is a former lazaretto built by Luigi Vanvitelli between 1733 and 1743. It stands on a pentagonal artificial island inside the port; today it is connected to the mainland by three bridges and covers an area of 20,000 m². Inside, it now houses large exhibition spaces and the Museo Tattile Statale Omero.',
-                  pl: 'Wychylając się z balustrady nadmorskiej promenady, można podziwiać jej główne wejście. Prawdziwe arcydzieło architektury i inżynierii na wodzie, Mole Vanvitelliana to dawny lazaret zbudowany przez Luigiego Vanvitelliego w latach 1733–1743. Wznosi się na sztucznej pięciokątnej wyspie wewnątrz portu; dziś jest połączona z lądem trzema mostami i zajmuje powierzchnię 20 000 m². Obecnie mieszczą się w niej duże przestrzenie wystawowe i Museo Tattile Statale Omero.',
-                  dist: '🚶 1100 m – 14 min', mapQuery: 'Mole Vanvitelliana Ancona', lat: 43.6143735, lng: 13.504058, extraMap: { label: '🖐️ Museo Tattile Omero', query: 'Museo Tattile Statale Omero Ancona' } },
-                { order: 19, name: 'Fortezza e Parco della Cittadella', emoji: '🏰', photo: '', itinerario: 'centro', isSubItinerary: true, subId: 'cittadella',
-                  it: 'Nel quartiere Capodimonte, sulla sommità del colle Astagno e per opera dell\'architetto Antonio da Sangallo il Giovane, sorge "La Cittadella", un\'edificazione militare rinascimentale realizzata nel 1532 che si affaccia sulla città e sul porto. All\'interno dell\'antico campo trincerato si trova il Parco della Cittadella.',
-                  en: 'In the Capodimonte district, on the summit of the Astagno hill, stands "La Cittadella", a Renaissance military fortification built in 1532 by the architect Antonio da Sangallo the Younger, overlooking the city and the port. Inside the ancient entrenched field lies the Parco della Cittadella.',
-                  pl: 'W dzielnicy Capodimonte, na szczycie wzgórza Astagno, wznosi się "La Cittadella" – renesansowa fortyfikacja wojskowa zbudowana w 1532 roku przez architekta Antonia da Sangallo Młodszego, z widokiem na miasto i port. Wewnątrz starożytnego obozu warownego znajduje się Parco della Cittadella.',
-                  dist: '🚶 800 m – 11 min', mapQuery: 'Fortezza della Cittadella Ancona', lat: 43.6138415, lng: 13.5080277 },
-                { order: 20, name: 'Passetto', emoji: '🌊', photo: 'passetto.jpg', itinerario: 'centro',
-                  it: 'Arrivando da Corso Garibaldi, dopo aver attraversato piazza Cavour e percorso tutto il viale della Vittoria, si arriva al Passetto. Già da lontano si può vedere "il monumento", come lo chiamano gli anconetani, per poi ammirare il panorama dall\'ascensore (sulla sinistra), o scendere per la scalinata monumentale per scoprire le caratteristiche grotte nella falesia e fare il bagno.',
-                  en: 'Coming from Corso Garibaldi, after crossing Piazza Cavour and walking all along Viale della Vittoria, you reach the Passetto. Already from afar you can see "the monument", as the locals call it, then admire the view from the lift (on the left), or go down the monumental staircase to discover the characteristic grottoes in the cliff and take a swim.',
-                  pl: 'Przychodząc od Corso Garibaldi, po przejściu przez Piazza Cavour i przejściu całej alei Viale della Vittoria, docieramy do Passetto. Już z daleka widać "pomnik", jak nazywają go miejscowi, a następnie można podziwiać panoramę z windy (po lewej stronie) lub zejść monumentalnymi schodami, aby odkryć charakterystyczne groty w klifie i wykąpać się.',
-                  dist: '🚶 2150 m – 29 min', mapQuery: 'Spiaggia del Passetto Ancona', lat: 43.616139, lng: 13.533622 }
+                { order:1, name:'Fontana del Calamo (13 Cannelle)', emoji:'⛲', photo:'fontana-calamo.jpg',
+                  it:'Storica fontana pubblica simbolo della città detta anche delle 13 cannelle ricostruita nelle attuali forme rinascimentali a metà del 500. Una targa posta sul muro di fronte ricorda l\'adiacente Porta del Calamo, abbattuta dopo l\'unificazione d\'Italia nel 1860. Dalla Fontana del Calamo, o delle 13 Cannelle come la chiamano gli anconetani, si scende lungo Corso Mazzini e si arriva a Piazza della Repubblica, dove si affaccia il Teatro delle Muse.',
+                  en:'Historic public fountain, symbol of the city, also known as the 13 Cannelle, rebuilt in its current Renaissance form in the mid‑16th century. A plaque on the opposite wall recalls the adjacent Porta del Calamo, demolished after the unification of Italy in 1860. From the Fontana del Calamo, or "13 Cannelle" as the locals call it, walk down Corso Mazzini to Piazza della Repubblica, where the Teatro delle Muse stands.',
+                  pl:'Historyczna fontanna publiczna, symbol miasta, zwana także 13 Cannelle, odbudowana w obecnej renesansowej formie w połowie XVI wieku. Tablica na przeciwległej ścianie przypomina o sąsiedniej Porta del Calamo, zburzonej po zjednoczeniu Włoch w 1860 roku. Od Fontana del Calamo, czyli "13 Cannelle" jak nazywają ją miejscowi, schodzimy w dół Corso Mazzini i docieramy na Piazza della Repubblica, gdzie znajduje się Teatro delle Muse.',
+                  dist:'📍 0 m – Punto di partenza', mapQuery:'Fontana delle 13 Cannelle Ancona', lat:43.6184165, lng:13.5129301 },
+                { order:2, name:'Teatro delle Muse', emoji:'🎭', photo:'teatro-muse.jpg',
+                  it:'Teatro in stile neoclassico inaugurato nel 1827, danneggiato dalla seconda guerra mondiale e riaperto nel 2002. Dal Teatro delle Muse, prendendo via della Loggia, si arriva al Palazzo Benincasa e alla Loggia dei Mercanti.',
+                  en:'Neoclassical theatre inaugurated in 1827, damaged during World War II and reopened in 2002. From the Teatro delle Muse, take Via della Loggia to Palazzo Benincasa and the Loggia dei Mercanti.',
+                  pl:'Teatr neoklasyczny otwarty w 1827 roku, zniszczony podczas II wojny światowej i ponownie otwarty w 2002 roku. Z Teatro delle Muse, idąc Via della Loggia, docieramy do Palazzo Benincasa i Loggia dei Mercanti.',
+                  dist:'🚶 350 m – 4 min', mapQuery:'Teatro delle Muse Ancona', lat:43.6192483, lng:13.5099488 },
+                { order:3, name:'Loggia dei Mercanti', emoji:'🏛️', photo:'loggia-mercanti.jpg',
+                  it:'Edificio quattrocentesco progettato da Giorgio da Sebenico (come l\'adiacente Palazzo Benincasa) destinato alla compravendita delle merci che arrivavano in città dal porto. Proseguendo poco oltre per via della Loggia si arriva alla Chiesa di Santa Maria della Piazza.',
+                  en:'15th‑century building designed by Giorgio da Sebenico (like the adjacent Palazzo Benincasa), used for the trading of goods arriving in the city from the port. Continuing a little further along Via della Loggia you reach the Church of Santa Maria della Piazza.',
+                  pl:'XV‑wieczny budynek zaprojektowany przez Giorgio da Sebenico (podobnie jak sąsiedni Palazzo Benincasa), przeznaczony do handlu towarami przybywającymi do miasta z portu. Idąc nieco dalej wzdłuż Via della Loggia, docieramy do Kościoła Santa Maria della Piazza.',
+                  dist:'🚶 400 m – 5 min', mapQuery:'Loggia dei Mercanti Ancona', lat:43.6199818, lng:13.5098563 },
+                { order:4, name:'Chiesa Santa Maria della Piazza', emoji:'⛪', photo:'santa-maria-piazza.jpg',
+                  it:'Eretta tra l\'XI e il XII secolo, è un pregevole esempio di stile romanico. Costruita su una chiesa paleocristiana del IV secolo fu restaurata nel VI. Una parte del pavimento della chiesa attuale è in vetro per permettere la visione dei mosaici paleocristiani sottostanti. Si accede al porto attraversando la Portella Santa Maria collocata proprio di fronte alla chiesa. Proseguendo sulla destra dopo 300 metri si raggiunge l\'Arco di Traiano.',
+                  en:'Built between the 11th and 12th centuries, it is a fine example of Romanesque style. Constructed on a 4th‑century early Christian church, it was restored in the 6th century. Part of the current church floor is made of glass to allow a view of the early Christian mosaics underneath. The port is accessed through Portella Santa Maria, located right opposite the church. Continuing to the right after 300 metres you reach the Arch of Trajan.',
+                  pl:'Zbudowany między XI a XII wiekiem, jest to znakomity przykład stylu romańskiego. Wzniesiony na wczesnochrześcijańskim kościele z IV wieku, został odrestaurowany w VI wieku. Część obecnej podłogi kościoła jest szklana, aby umożliwić oglądanie wczesnochrześcijańskich mozaik znajdujących się poniżej. Do portu wchodzi się przez Portella Santa Maria, znajdującą się dokładnie naprzeciwko kościoła. Idąc dalej w prawo po 300 metrach docieramy do Łuku Trajana.',
+                  dist:'🚶 400 m – 5 min', mapQuery:'Santa Maria della Piazza Ancona', lat:43.6205592, lng:13.5103676 },
+                { order:5, name:'Arco di Traiano', emoji:'🏛️', photo:'arco-traiano.jpg',
+                  it:'Arco trionfale fatto costruire nel II secolo d.C. dal Senato romano per esprimere la propria riconoscenza all\'imperatore Traiano il quale aveva ampliato il porto di Ancona a proprie spese. Poco più avanti l\'Arco Clementino.',
+                  en:'Triumphal arch built in the 2nd century AD by the Roman Senate to express gratitude to Emperor Trajan, who had enlarged the port of Ancona at his own expense. A little further on, the Arco Clementino.',
+                  pl:'Łuk triumfalny wzniesiony w II wieku n.e. przez rzymski Senat, aby wyrazić wdzięczność cesarzowi Trajanowi, który na własny koszt rozbudował port w Ankonie. Nieco dalej Łuk Klementyński.',
+                  dist:'🚶 1150 m – 16 min', mapQuery:'Arco di Traiano Ancona', lat:43.6252706, lng:13.5066018 },
+                { order:6, name:'Arco Clementino', emoji:'🚪', photo:'arco-clementino.jpg',
+                  it:'Monumento progettato nel XVIII secolo dall\'architetto Luigi Vanvitelli sotto forma di arco di trionfo a un solo fornice, in pietra d\'Istria, in onore di Papa Clemente XII che concesse alla città il "porto franco" dando un notevole impulso ai traffici marittimi.',
+                  en:'Monument designed in the 18th century by the architect Luigi Vanvitelli as a single-fornix triumphal arch in Istrian stone, in honour of Pope Clement XII, who granted the city "free port" status, giving a significant boost to maritime traffic.',
+                  pl:'Monument zaprojektowany w XVIII wieku przez architekta Luigiego Vanvitellego jako jednoprzęsłowy łuk triumfalny z kamienia istryjskiego, na cześć papieża Klemensa XII, który przyznał miastu status "wolnego portu", dając znaczący impuls dla ruchu morskiego.',
+                  dist:'🚶 1250 m – 17 min', mapQuery:'Arco Clementino Ancona', lat:43.6252604, lng:13.5049529 },
+                { order:'6-bis', name:'Lanterna Rossa (facoltativo)', emoji:'🗼', photo:'lanterna-rossa.jpg',
+                  it:'(Facoltativo) Per chi vuole proseguire, andando poco avanti sulla destra, si attraversa un varco nelle mura e si arriva alla torre dei piloti del porto. Dietro di essa, poco visibile, una stretta apertura nelle mura conduce al molo in fondo al quale è collocata la lanterna rossa. Salendo per una scaletta si raggiunge la sommità del molo da dove si può ammirare uno splendido panorama sulla città e su tutta la costa.',
+                  en:'(Optional) For those who wish to continue, just ahead on the right, pass through a gap in the walls and reach the harbour pilots\' tower. Behind it, barely visible, a narrow opening in the walls leads to the pier where the red lantern stands. Climbing a short staircase you reach the top of the pier, from which you can admire a splendid view of the city and the entire coast.',
+                  pl:'(Opcjonalnie) Dla tych, którzy chcą kontynuować, nieco dalej po prawej stronie przechodzi się przez przejście w murach i dociera do wieży pilotów portowych. Za nią, ledwo widoczne, wąskie przejście w murach prowadzi na molo, na końcu którego znajduje się czerwona latarnia. Wspinając się po krótkich schodkach, można dotrzeć na szczyt mola, skąd można podziwiać wspaniały widok na miasto i całe wybrzeże.',
+                  dist:'🚶 2200 m – 29 min', mapQuery:'Lanterna Rossa Ancona', lat:43.6255485, lng:13.4942123 },
+                { order:7, name:'Resti del Porto Romano (II sec. a.C.)', emoji:'🏛️', photo:'porto-romano.jpg',
+                  it:'Tornando indietro verso la città costeggiando Fincantieri, tenendosi sulla sinistra, si percorre una passerella sui resti dell\'antico porto romano. Sulla destra la Casa del Capitano del Porto del XIII sec. Proseguendo si raggiunge largo Dante Alighieri, su cui si affaccia l\'imponente Palazzo degli Anziani.',
+                  en:'Heading back towards the city along the Fincantieri shipyard, keeping to the left, you walk along a footbridge over the remains of the ancient Roman port. On the right, the 13th-century Harbour Master\'s House. Continuing, you reach Largo Dante Alighieri, where the imposing Palazzo degli Anziani stands.',
+                  pl:'Wracając w kierunku miasta wzdłuż stoczni Fincantieri, trzymając się lewej strony, idziemy kładką nad pozostałościami starożytnego portu rzymskiego. Po prawej stronie Dom Kapitana Portu z XIII wieku. Kontynuując, docieramy do Largo Dante Alighieri, przy którym stoi okazały Palazzo degli Anziani.',
+                  dist:'🚶 800 m – 11 min', mapQuery:'Porto Traianeo Ancona', lat:43.6235224, lng:13.509572 },
+                { order:8, name:'Palazzo degli Anziani e Ascensore', emoji:'🏛️', photo:'palazzo-anziani.jpg',
+                  it:'Sulla sinistra ascensore (con accesso a bagni pubblici) che porta fino a piazza Stracca, dove si trova l\'ingresso dell\'edificio. Sede storica delle Magistrature cittadine sin dall\'Alto Medioevo e a partire dall\'XI secolo, con la nascita della Repubblica di Ancona, luogo dove si riuniva il Consiglio degli Anziani, da cui prende il nome. Il Palazzo vanta origini antichissime e travagliate con la sua costruzione attribuita a Galla Placidia (governatrice dell\'impero) nel 425 d.C. L\'edificio attuale venne eretto nel 1270 su disegno di Margaritone d\'Arezzo e poi ristrutturato nel XVI sec. da Pellegrino Tibaldi. È attualmente sede del Consiglio comunale di Ancona. Continuando in leggera salita per via Pizzecolli si arriva a Palazzo Ferretti, sede del Museo Archeologico Nazionale delle Marche.',
+                  en:'On the left, a lift (with access to public toilets) takes you up to Piazza Stracca, where the entrance to the building is located. Historic seat of the city magistrates since the Early Middle Ages and, from the 11th century with the birth of the Republic of Ancona, meeting place of the Council of Elders (Consiglio degli Anziani), from which it takes its name. The palace boasts ancient and troubled origins, with its construction attributed to Galla Placidia (governor of the empire) in 425 AD. The current building was erected in 1270 to a design by Margaritone d\'Arezzo and later renovated in the 16th century by Pellegrino Tibaldi. It is now the seat of Ancona\'s City Council. Continuing slightly uphill along Via Pizzecolli you reach Palazzo Ferretti, home of the National Archaeological Museum of the Marche.',
+                  pl:'Po lewej stronie winda (z dostępem do toalet publicznych) prowadzi na Piazza Stracca, gdzie znajduje się wejście do budynku. Historyczna siedziba miejskich magistratur od wczesnego średniowiecza, a od XI wieku, wraz z narodzinami Republiki Ankony, miejsce obrad Rady Starszych (Consiglio degli Anziani), od której pochodzi jego nazwa. Pałac ma starożytne i burzliwe dzieje – jego budowę przypisuje się Galli Placydii (namiestniczce cesarstwa) w 425 r. n.e. Obecny budynek wzniesiono w 1270 roku według projektu Margaritone d\'Arezzo, a następnie przebudowano w XVI wieku przez Pellegrina Tibaldiego. Obecnie jest siedzibą Rady Miejskiej Ankony. Kontynuując lekkim wzniesieniem wzdłuż Via Pizzecolli, docieramy do Palazzo Ferretti, siedziby Narodowego Muzeum Archeologicznego Marchii.',
+                  dist:'🚶 650 m – 9 min', mapQuery:'Palazzo degli Anziani Ancona', lat:43.6226783, lng:13.5105215, extraMap:{ label:'⬆️ Ascensore San Ciriaco', query:'Ascensore San Ciriaco Ancona' } },
+                { order:9, name:'Museo Archeologico Nazionale delle Marche', emoji:'🏺', photo:'museo-archeologico.jpg',
+                  it:'Palazzo cinquecentesco dei conti Ferretti con sale affrescate dal Tibaldi, sede del Museo Archeologico Nazionale delle Marche con ricchissima collezione di reperti dal paleolitico al periodo ellenistico romano. Proseguendo si passa davanti al Palazzo del Senato del XIII sec. per continuare per una scalinata che porta fino al Duomo.',
+                  en:'16th-century palace of the Ferretti counts with frescoed halls by Tibaldi, home of the National Archaeological Museum of the Marche with a rich collection of finds from the Palaeolithic to the Hellenistic-Roman period. Continuing, you pass the 13th-century Palazzo del Senato and then take a staircase leading up to the Cathedral.',
+                  pl:'XVI-wieczny pałac hrabiów Ferretti z salami ozdobionymi freskami przez Tibaldiego, siedziba Narodowego Muzeum Archeologicznego Marchii z bogatą kolekcją znalezisk od paleolitu po okres hellenistyczno-rzymski. Idąc dalej, mijamy XIII-wieczny Palazzo del Senato, a następnie schodami prowadzącymi do Katedry.',
+                  dist:'🚶 750 m – 10 min', mapQuery:'Museo Archeologico Nazionale Ancona', lat:43.6234656, lng:13.5109808 },
+                { order:10, name:'Cattedrale di San Ciriaco', emoji:'⛪', photo:'duomo-san-ciriaco.jpg',
+                  it:'La Cattedrale di San Ciriaco, che rappresenta l\'emblema di Ancona, sorge sull\'antico tempio dedicato a Venere Euplea, protettrice della navigazione, di cui restano parte delle fondamenta. Su di esso, nel VI secolo d.C., venne costruita la basilica paleocristiana dedicata a San Lorenzo, che divenne Cattedrale nel 1000 quando vi furono traslati i corpi di San Ciriaco e San Marcellino. Spettacolare panorama sulla città. A sinistra della facciata c\'è il Museo Diocesano. Scendendo invece sulla destra si arriva ai resti dell\'Anfiteatro romano.',
+                  en:'The Cathedral of San Ciriaco, the emblem of Ancona, stands on the ancient temple dedicated to Venus Euplea, protector of navigation, of which part of the foundations remain. On it, in the 6th century AD, the early Christian basilica dedicated to San Lorenzo was built, which became the Cathedral in the year 1000 when the bodies of Saint Cyriacus and Saint Marcellinus were transferred there. Spectacular view over the city. To the left of the façade is the Diocesan Museum. Descending to the right, instead, you reach the remains of the Roman Amphitheatre.',
+                  pl:'Katedra San Ciriaco, która jest symbolem Ankony, wznosi się na starożytnej świątyni poświęconej Wenus Euplea, opiekunce żeglugi, z której zachowała się część fundamentów. Na niej, w VI wieku n.e., zbudowano wczesnochrześcijańską bazylikę pod wezwaniem San Lorenzo, która stała się katedrą w roku 1000, kiedy przeniesiono tam ciała świętego Cyriaka i świętego Marcellina. Spektakularny widok na miasto. Na lewo od fasady znajduje się Muzeum Diecezjalne. Schodząc natomiast w prawo, docieramy do pozostałości rzymskiego Amfiteatru.',
+                  dist:'🚶 1000 m – 13 min', mapQuery:'Cattedrale di San Ciriaco Ancona', lat:43.6251216, lng:13.510037 },
+                { order:11, name:'Anfiteatro Romano', emoji:'🏟️', photo:'anfiteatro-romano.jpg',
+                  it:'Anfiteatro realizzato in età augustea (I sec. a.C.) che poteva accogliere fino a 10.000 spettatori. Dopo l\'abbandono in età antica (IV sec. d.C.) venne utilizzato come cava di materiali e, a partire dal XIII secolo, come base per nuove costruzioni che ne hanno nascosto la struttura. Fu riportato alla luce solo a partire dagli anni 70. Tornando in discesa verso piazza del Senato si possono ammirare degli splendidi mosaici. Scendendo per via Pizzecolli si torna in piazza Stracca dove, di fronte alla facciata del Palazzo degli Anziani si erge la maestosa chiesa del Gesù progettata dal Vanvitelli.',
+                  en:'Amphitheatre built in the Augustan age (1st century BC) that could hold up to 10,000 spectators. After its abandonment in ancient times (4th century AD), it was used as a quarry for building materials and, from the 13th century, as a foundation for new constructions that concealed its structure. It was brought back to light only from the 1970s onwards. Heading back down towards Piazza del Senato you can admire some splendid mosaics. Descending Via Pizzecolli you return to Piazza Stracca where, opposite the façade of Palazzo degli Anziani, stands the majestic Chiesa del Gesù designed by Vanvitelli.',
+                  pl:'Amfiteatr zbudowany w epoce augustiańskiej (I w. p.n.e.), który mógł pomieścić do 10 000 widzów. Po opuszczeniu w starożytności (IV w. n.e.) był wykorzystywany jako kamieniołom, a od XIII wieku jako podstawa dla nowych budowli, które ukryły jego strukturę. Został ponownie odsłonięty dopiero od lat 70. XX wieku. Schodząc z powrotem w kierunku Piazza del Senato, można podziwiać wspaniałe mozaiki. Idąc w dół Via Pizzecolli, wracamy na Piazza Stracca, gdzie naprzeciwko fasady Palazzo degli Anziani wznosi się majestatyczny kościół del Gesù zaprojektowany przez Vanvitellego.',
+                  dist:'🚶 900 m – 12 min', mapQuery:'Anfiteatro Romano Ancona', lat:43.6247408, lng:13.5117513 },
+                { order:12, name:'Chiesa del Gesù', emoji:'⛪', photo:'chiesa-gesu.jpg',
+                  it:'Monumento commissionato dal conte Nappi nel 1605. Nel 1733 i Gesuiti affidarono a Luigi Vanvitelli il progetto dell\'ampliamento della chiesa realizzato con la facciata concava che richiama la forma del porto. Continuando a scendere per via Pizzecolli, una delle più antiche vie della città, si raggiunge piazza San Francesco, ove si erge l\'omonima chiesa.',
+                  en:'Monument commissioned by Count Nappi in 1605. In 1733 the Jesuits entrusted Luigi Vanvitelli with the project for the enlargement of the church, carried out with a concave façade that echoes the shape of the harbour. Continuing down Via Pizzecolli, one of the oldest streets in the city, you reach Piazza San Francesco, where the church of the same name stands.',
+                  pl:'Monument zamówiony przez hrabiego Nappi w 1605 roku. W 1733 roku Jezuici powierzyli Luigiemu Vanvitellemu projekt rozbudowy kościoła, zrealizowany z wklęsłą fasadą nawiązującą do kształtu portu. Kontynuując w dół Via Pizzecolli, jedną z najstarszych ulic miasta, docieramy do Piazza San Francesco, gdzie wznosi się kościół o tej samej nazwie.',
+                  dist:'🚶 600 m – 8 min', mapQuery:'Chiesa del Gesù Ancona', lat:43.6226099, lng:13.5111676 },
+                { order:13, name:'San Francesco alle Scale', emoji:'⛪', photo:'san-francesco-scale.jpg',
+                  it:'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico. Facciata con magnifico portale gotico-veneziano a forma di tabernacolo, realizzato in pietra di Brioni da Giorgio da Sebenico, alla metà del Quattrocento (1455). All\'interno opere notevoli, dal Lotto a Tibaldi. Scendendo per via Pizzecolli si arriva alla Pinacoteca civica.',
+                  en:'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect. Façade with a magnificent Venetian-Gothic tabernacle-shaped portal, made of Brioni stone by Giorgio da Sebenico in the mid-15th century (1455). Inside, notable works from Lotto to Tibaldi. Descending Via Pizzecolli you reach the Civic Art Gallery (Pinacoteca civica).',
+                  pl:'Ze szczytu schodów kościół San Francesco delle Scale góruje nad Piazza San Francesco, tworząc niezwykły efekt scenograficzny. Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego. Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).',
+                  dist:'🚶 450 m – 6 min', mapQuery:'Chiesa di San Francesco alle Scale Ancona', lat:43.6214786, lng:13.5118841 },
+                { order:14, name:'Pinacoteca Civica F. Podesti', emoji:'🖼️', photo:'',
+                  it:'Pinacoteca civica con opere di importanti autori tra cui Tiziano, Lotto, Crivelli, Guercino. Continuando si passa per il cinquecentesco Arco del Rastrello e si arriva in Piazza del Plebiscito.',
+                  en:'Civic art gallery with works by important artists including Titian, Lotto, Crivelli, Guercino. Continuing, you pass through the 16th-century Arco del Rastrello and reach Piazza del Plebiscito.',
+                  pl:'Miejska pinakoteka z dziełami ważnych artystów, m.in. Tycjana, Lotta, Crivellego, Guercina. Idąc dalej, przechodzimy przez XVI-wieczny Arco del Rastrello i docieramy na Piazza del Plebiscito.',
+                  dist:'🚶 300 m – 4 min', mapQuery:'Pinacoteca Civica Podesti Ancona', lat:43.6208333, lng:13.5122222 },
+                { order:15, name:'Piazza del Plebiscito', emoji:'⛲', photo:'piazza-plebiscito.jpg',
+                  it:'Nata come Piazza Nuova, le sue dimensioni la fecero subito ribattezzare Piazza Grande sino al 1860, anno in cui prende il nome dell\'attuale Piazza del Plebiscito, notoriamente chiamata Piazza del Papa per la presenza della statua di Papa Clemente XII. Su di essa si affacciano il Palazzo del Governo, sede della Prefettura, la chiesa di San Domenico e importanti palazzi storici. Oggi resta il centro nevralgico della parte antica della città e importante luogo di vita notturna e sociale di Ancona. Passando per la caratteristica via degli Orefici si torna in Corso Mazzini ed alla Fontana delle 13 Cannelle.',
+                  en:'Originally called Piazza Nuova, its size soon earned it the name Piazza Grande until 1860, when it took its current name Piazza del Plebiscito, popularly known as Piazza del Papa due to the statue of Pope Clement XII. It is overlooked by the Palazzo del Governo, seat of the Prefecture, the church of San Domenico and important historic buildings. Today it remains the nerve centre of the old part of the city and an important venue for Ancona\'s nightlife and social life. Passing through the characteristic Via degli Orefici you return to Corso Mazzini and the Fontana delle 13 Cannelle.',
+                  pl:'Pierwotnie nazwany Piazza Nuova, jego rozmiary szybko sprawiły, że przemianowano go na Piazza Grande aż do 1860 roku, kiedy to otrzymał obecną nazwę Piazza del Plebiscito, powszechnie zwanego Piazza del Papa ze względu na posąg papieża Klemensa XII. Znajduje się przy nim Palazzo del Governo, siedziba Prefektury, kościół San Domenico oraz ważne historyczne pałace. Dziś pozostaje nerwowym centrum starej części miasta i ważnym miejscem życia nocnego i towarzyskiego Ankony. Przechodząc przez charakterystyczną Via degli Orefici, wracamy na Corso Mazzini i do Fontanny 13 Cannelle.',
+                  dist:'🚶 200 m – 3 min', mapQuery:'Piazza del Plebiscito Ancona', lat:43.6195337, lng:13.511651 },
+                { order:16, name:'Parco del Cardeto', emoji:'🌳', photo:'', isSubItinerary:true, subId:'cardeto',
+                  it:'Il Parco del Cardeto è il più vasto parco urbano di Ancona, aperto nel 2005. A picco sul mare, immerso nella natura, occupa le sommità di Monte Cappuccini e Monte Cardeto e si estende in un\'area di circa 35 ettari, tutti a ridosso del centro. Comprende luoghi di valore storico, un ambiente naturale di notevole interesse e numerosi punti panoramici sulla costa alta e sulla città. Fino agli anni 70 l\'area era adibita ad uso militare.',
+                  en:'The Parco del Cardeto is Ancona\'s largest urban park, opened in 2005. Perched on the cliffs overlooking the sea and surrounded by nature, it occupies the summits of Monte Cappuccini and Monte Cardeto and covers an area of about 35 hectares, all close to the city centre. It includes sites of historical value, a natural environment of great interest, and numerous panoramic points over the high coast and the city. Until the 1970s, the area was used for military purposes.',
+                  pl:'Parco del Cardeto to największy park miejski w Ankonie, otwarty w 2005 roku. Położony na klifach z widokiem na morze, otoczony przyrodą, zajmuje szczyty Monte Cappuccini i Monte Cardeto i rozciąga się na powierzchni około 35 hektarów, tuż przy centrum miasta. Obejmuje miejsca o wartości historycznej, środowisko naturalne o dużym znaczeniu i liczne punkty widokowe na wysokie wybrzeże i miasto. Do lat 70. XX wieku teren ten był wykorzystywany do celów wojskowych.',
+                  dist:'🌳 Parco cittadino', mapQuery:'Parco del Cardeto Ancona', lat:43.6222659, lng:13.5207122 },
+                { order:17, name:'Porta Pia', emoji:'🚪', photo:'porta-pia.jpg',
+                  it:'Dal Teatro delle Muse, se invece di andare a destra verso la Loggia dei Mercanti si prende a sinistra e si percorre il lungomare Vanvitelli, in breve si arriva a Porta Pia. Antica porta monumentale di accesso alla città costruita tra il 1787 e il 1789 su richiesta di Papa Pio VI per realizzare una nuova strada "a mare" che evitasse lo scavalcamento disagevole del sovrastante colle Astagno.',
+                  en:'From the Teatro delle Muse, if instead of going right towards the Loggia dei Mercanti you turn left and follow the Vanvitelli seafront, you soon reach Porta Pia. Ancient monumental gateway to the city, built between 1787 and 1789 at the request of Pope Pius VI to create a new "sea road" that would avoid the difficult climb over the Astagno hill.',
+                  pl:'Od Teatro delle Muse, jeśli zamiast iść w prawo w kierunku Loggia dei Mercanti, skręcimy w lewo i pójdziemy wzdłuż nadmorskiej promenady Vanvitellego, wkrótce dotrzemy do Porta Pia. Starożytna monumentalna brama wjazdowa do miasta, zbudowana w latach 1787–1789 na prośbę papieża Piusa VI, aby stworzyć nową „drogę morską", która pozwalała uniknąć trudnej wspinaczki na wzgórze Astagno.',
+                  dist:'🚶 950 m – 13 min', mapQuery:'Porta Pia Ancona', lat:43.6152484, lng:13.5048966 },
+                { order:18, name:'Mole Vanvitelliana', emoji:'🏛️', photo:'mole-vanvitelliana.jpg',
+                  it:'Affacciandosi dalla balaustra del lungomare si può ammirare il suo ingresso principale. Vero e proprio capolavoro di edilizia ed ingegneria sull\'acqua, la Mole vanvitelliana è un ex lazzaretto costruito da Luigi Vanvitelli tra il 1733 e 1743. Sorge su di un\'isola artificiale pentagonale situata all\'interno del porto; oggi è collegato alla terraferma da tre ponti, ed occupa una superficie di 20.000 m². Attualmente al suo interno vi sono ampi spazi espositivi e il Museo Tattile Statale Omero.',
+                  en:'Leaning over the seafront balustrade you can admire its main entrance. A true masterpiece of architecture and engineering on water, the Mole Vanvitelliana is a former lazaretto built by Luigi Vanvitelli between 1733 and 1743. It stands on a pentagonal artificial island inside the port; today it is connected to the mainland by three bridges and covers an area of 20,000 m². Inside, it now houses large exhibition spaces and the Museo Tattile Statale Omero.',
+                  pl:'Wychylając się z balustrady nadmorskiej promenady, można podziwiać jej główne wejście. Prawdziwe arcydzieło architektury i inżynierii na wodzie, Mole Vanvitelliana to dawny lazaret zbudowany przez Luigiego Vanvitelliego w latach 1733–1743. Wznosi się na sztucznej pięciokątnej wyspie wewnątrz portu; dziś jest połączona z lądem trzema mostami i zajmuje powierzchnię 20 000 m². Obecnie mieszczą się w niej duże przestrzenie wystawowe i Museo Tattile Statale Omero.',
+                  dist:'🚶 1100 m – 14 min', mapQuery:'Mole Vanvitelliana Ancona', lat:43.6143735, lng:13.504058, extraMap:{ label:'🖐️ Museo Tattile Omero', query:'Museo Tattile Statale Omero Ancona' } },
+                { order:19, name:'Fortezza e Parco della Cittadella', emoji:'🏰', photo:'', isSubItinerary:true, subId:'cittadella',
+                  it:'Nel quartiere Capodimonte, sulla sommità del colle Astagno e per opera dell\'architetto Antonio da Sangallo il Giovane, sorge "La Cittadella", un\'edificazione militare rinascimentale realizzata nel 1532 che si affaccia sulla città e sul porto. All\'interno dell\'antico campo trincerato si trova il Parco della Cittadella.',
+                  en:'In the Capodimonte district, on the summit of the Astagno hill, stands "La Cittadella", a Renaissance military fortification built in 1532 by the architect Antonio da Sangallo the Younger, overlooking the city and the port. Inside the ancient entrenched field lies the Parco della Cittadella.',
+                  pl:'W dzielnicy Capodimonte, na szczycie wzgórza Astagno, wznosi się "La Cittadella" – renesansowa fortyfikacja wojskowa zbudowana w 1532 roku przez architekta Antonia da Sangallo Młodszego, z widokiem na miasto i port. Wewnątrz starożytnego obozu warownego znajduje się Parco della Cittadella.',
+                  dist:'🚶 800 m – 11 min', mapQuery:'Fortezza della Cittadella Ancona', lat:43.6138415, lng:13.5080277 },
+                { order:20, name:'Passetto', emoji:'🌊', photo:'passetto.jpg',
+                  it:'Arrivando da Corso Garibaldi, dopo aver attraversato piazza Cavour e percorso tutto il viale della Vittoria, si arriva al Passetto. Già da lontano si può vedere "il monumento", come lo chiamano gli anconetani, per poi ammirare il panorama dall\'ascensore (sulla sinistra), o scendere per la scalinata monumentale per scoprire le caratteristiche grotte nella falesia e fare il bagno.',
+                  en:'Coming from Corso Garibaldi, after crossing Piazza Cavour and walking all along Viale della Vittoria, you reach the Passetto. Already from afar you can see "the monument", as the locals call it, then admire the view from the lift (on the left), or go down the monumental staircase to discover the characteristic grottoes in the cliff and take a swim.',
+                  pl:'Przychodząc od Corso Garibaldi, po przejściu przez Piazza Cavour i przejściu całej alei Viale della Vittoria, docieramy do Passetto. Już z daleka widać "pomnik", jak nazywają go miejscowi, a następnie można podziwiać panoramę z windy (po lewej stronie) lub zejść monumentalnymi schodami, aby odkryć charakterystyczne groty w klifie i wykąpać się.',
+                  dist:'🚶 2150 m – 29 min', mapQuery:'Spiaggia del Passetto Ancona', lat:43.616139, lng:13.533622 }
             ],
             subItineraries: {
                 cardeto: [
-                    { name: 'Ex Caserma Villarey – Partenza', emoji: '🏛️', photo: '', lat: 43.6198548, lng: 13.5176776,
-                      it: 'Imponente edificio ottocentesco fino al 1972 utilizzato come caserma ed oggi sede della Facoltà di Economia dell’Università Politecnica delle Marche. Alla sua destra si trova l’accesso al Parco del Cardeto più vicino al nostro alloggio.',
-                      en: 'Imposing 19th‑century building used as a barracks until 1972 and now home to the Faculty of Economics of the Polytechnic University of the Marche. To its right is the nearest access to Cardeto Park from our accommodation.',
-                      pl: 'Okazały XIX‑wieczny budynek, do 1972 roku użytkowany jako koszary, a obecnie siedziba Wydziału Ekonomii Politechniki Marchijskiej. Po jego prawej stronie znajduje się najbliższe wejście do Parku Cardeto od naszego zakwaterowania.',
-                      dist: '📍 Partenza', mapQuery: 'Ex Caserma Villarey Ancona' },
-                    { name: 'Piazzale delle Ginestre (Via Panoramica)', emoji: '🌿', photo: '', lat: 43.6191524, lng: 13.5209486,
-                      imgQuery: 'Piazzale delle Ginestre Parco del Cardeto Ancona',
-                      it: 'Ampio piazzale con parcheggio in via Panoramica, luogo privilegiato per l’accesso al parco arrivando con l’auto.',
-                      en: 'Large square with parking on Via Panoramica, a privileged access point to the park when arriving by car.',
-                      pl: 'Duży plac z parkingiem przy Via Panoramica, uprzywilejowane miejsce dostępu do parku dla przyjeżdżających samochodem.',
-                      dist: '🚶 200 m – 3 min', mapQuery: 'Piazzale delle Ginestre Ancona' },
-                    { name: 'Polveriera Castelfidardo', emoji: '💣', photo: '', lat: 43.6215031, lng: 13.5199464,
-                      it: 'Antica polveriera militare del XIX secolo, oggi accuratamente restaurata ospita auditorium e spazi espositivi.',
-                      en: 'Old 19th‑century military powder magazine, now carefully restored, houses an auditorium and exhibition spaces.',
-                      pl: 'Stara XIX‑wieczna wojskowa prochownia, obecnie starannie odrestaurowana, mieści audytorium i przestrzenie wystawowe.',
-                      dist: '🚶 400 m – 5 min', mapQuery: 'Polveriera Castelfidardo Ancona' },
-                    { name: 'Campo degli Ebrei', emoji: '✡️', photo: '', lat: 43.6229929, lng: 13.5177413,
-                      it: 'Antico cimitero monumentale ebraico, ospita cippi funerari con iscrizioni ebraiche che datano dal XV al XIX secolo.',
-                      en: 'Ancient monumental Jewish cemetery, housing tombstones with Hebrew inscriptions dating from the 15th to the 19th century.',
-                      pl: 'Starożytny monumentalny cmentarz żydowski, na którym znajdują się nagrobki z hebrajskimi inskrypcjami datowanymi od XV do XIX wieku.',
-                      dist: '🚶 300 m – 4 min', mapQuery: 'Campo degli Ebrei Ancona' },
-                    { name: 'Belvedere Neruda', emoji: '🌅', photo: '', lat: 43.6224803, lng: 13.5166785,
-                      it: 'Punto panoramico con vista sul Campo degli Ebrei, il colle Cardeto e il mare. Alle sue spalle l\'accesso al Bastione San Paolo, fortificazione del Colle dei Cappuccini.',
-                      en: 'Panoramic point with views over the Jewish Cemetery, Cardeto hill and the sea. Behind it, access to the San Paolo Bastion, a fortification of the Cappuccini Hill.',
-                      pl: 'Punkt panoramiczny z widokiem na Cmentarz Żydowski, wzgórze Cardeto i morze. Za nim znajduje się wejście do Bastionu San Paolo, fortyfikacji Wzgórza Kapucynów.',
-                      dist: '🚶 200 m – 3 min', mapQuery: 'Belvedere Neruda Ancona' },
-                    { name: 'Vecchio Faro', emoji: '🗼', photo: '', lat: 43.6233331, lng: 13.5144794,
-                      it: 'Storico faro del 1860 sulla sommità del promontorio. Raggiungibile tramite scalinata, regala una vista a 360° sulla città, il porto e tutta la costa nord.',
-                      en: 'Historic 1860 lighthouse on top of the promontory. Reachable via a staircase, it offers a 360° view over the city, the port and the entire northern coast.',
-                      pl: 'Historyczna latarnia morska z 1860 roku na szczycie cypla. Dostępna schodami, oferuje widok 360° na miasto, port i całe północne wybrzeże.',
-                      dist: '🚶 300 m – 4 min', mapQuery: 'Faro di Ancona' },
-                    { name: 'Ingresso Via Birarelli', emoji: '🚪', photo: '', lat: 43.6237025, lng: 13.5121530,
-                      imgQuery: 'Ingresso Via Birarelli Parco del Cardeto Ancona',
-                      it: 'Ingresso al parco in via Birarelli adiacente all\'Anfiteatro romano.',
-                      en: 'Park entrance on Via Birarelli, adjacent to the Roman Amphitheatre.',
-                      pl: 'Wejście do parku przy Via Birarelli, sąsiadujące z rzymskim Amfiteatrem.',
-                      dist: '📍 Uscita / Ingresso', mapQuery: 'Via Birarelli Ancona' }
+                    { name:'Ex Caserma Villarey – Partenza', emoji:'🏛️', photo:'', lat:43.6198548, lng:13.5176776,
+                      it:'Imponente edificio ottocentesco fino al 1972 utilizzato come caserma ed oggi sede della Facoltà di Economia dell\'Università Politecnica delle Marche. Alla sua destra si trova l\'accesso al Parco del Cardeto più vicino al nostro alloggio.',
+                      en:'Imposing 19th‑century building used as a barracks until 1972 and now home to the Faculty of Economics of the Polytechnic University of the Marche. To its right is the nearest access to Cardeto Park from our accommodation.',
+                      pl:'Okazały XIX‑wieczny budynek, do 1972 roku użytkowany jako koszary, a obecnie siedziba Wydziału Ekonomii Politechniki Marchijskiej. Po jego prawej stronie znajduje się najbliższe wejście do Parku Cardeto od naszego zakwaterowania.',
+                      dist:'📍 Partenza', mapQuery:'Ex Caserma Villarey Ancona' },
+                    { name:'Piazzale delle Ginestre (Via Panoramica)', emoji:'🌿', photo:'', lat:43.6191524, lng:13.5209486,
+                      imgQuery:'Piazzale delle Ginestre Parco del Cardeto Ancona',
+                      it:'Ampio piazzale con parcheggio in via Panoramica, luogo privilegiato per l\'accesso al parco arrivando con l\'auto.',
+                      en:'Large square with parking on Via Panoramica, a privileged access point to the park when arriving by car.',
+                      pl:'Duży plac z parkingiem przy Via Panoramica, uprzywilejowane miejsce dostępu do parku dla przyjeżdżających samochodem.',
+                      dist:'🚶 200 m – 3 min', mapQuery:'Piazzale delle Ginestre Ancona' },
+                    { name:'Polveriera Castelfidardo', emoji:'💣', photo:'', lat:43.6215031, lng:13.5199464,
+                      it:'Antica polveriera militare del XIX secolo, oggi accuratamente restaurata ospita auditorium e spazi espositivi.',
+                      en:'Old 19th‑century military powder magazine, now carefully restored, houses an auditorium and exhibition spaces.',
+                      pl:'Stara XIX‑wieczna wojskowa prochownia, obecnie starannie odrestaurowana, mieści audytorium i przestrzenie wystawowe.',
+                      dist:'🚶 400 m – 5 min', mapQuery:'Polveriera Castelfidardo Ancona' },
+                    { name:'Campo degli Ebrei', emoji:'✡️', photo:'', lat:43.6229929, lng:13.5177413,
+                      it:'Antico cimitero monumentale ebraico, ospita cippi funerari con iscrizioni ebraiche che datano dal XV al XIX secolo.',
+                      en:'Ancient monumental Jewish cemetery, housing tombstones with Hebrew inscriptions dating from the 15th to the 19th century.',
+                      pl:'Starożytny monumentalny cmentarz żydowski, na którym znajdują się nagrobki z hebrajskimi inskrypcjami datowanymi od XV do XIX wieku.',
+                      dist:'🚶 300 m – 4 min', mapQuery:'Campo degli Ebrei Ancona' },
+                    { name:'Belvedere Neruda', emoji:'🌅', photo:'', lat:43.6224803, lng:13.5166785,
+                      it:'Punto panoramico con vista sul Campo degli Ebrei, il colle Cardeto e il mare. Alle sue spalle l\'accesso al Bastione San Paolo, fortificazione del Colle dei Cappuccini.',
+                      en:'Panoramic point with views over the Jewish Cemetery, Cardeto hill and the sea. Behind it, access to the San Paolo Bastion, a fortification of the Cappuccini Hill.',
+                      pl:'Punkt panoramiczny z widokiem na Cmentarz Żydowski, wzgórze Cardeto i morze. Za nim znajduje się wejście do Bastionu San Paolo, fortyfikacji Wzgórza Kapucynów.',
+                      dist:'🚶 200 m – 3 min', mapQuery:'Belvedere Neruda Ancona' },
+                    { name:'Vecchio Faro', emoji:'🗼', photo:'', lat:43.6233331, lng:13.5144794,
+                      it:'Storico faro del 1860 sulla sommità del promontorio. Raggiungibile tramite scalinata, regala una vista a 360° sulla città, il porto e tutta la costa nord.',
+                      en:'Historic 1860 lighthouse on top of the promontory. Reachable via a staircase, it offers a 360° view over the city, the port and the entire northern coast.',
+                      pl:'Historyczna latarnia morska z 1860 roku na szczycie cypla. Dostępna schodami, oferuje widok 360° na miasto, port i całe północne wybrzeże.',
+                      dist:'🚶 300 m – 4 min', mapQuery:'Faro di Ancona' },
+                    { name:'Ingresso Via Birarelli', emoji:'🚪', photo:'', lat:43.6237025, lng:13.5121530,
+                      imgQuery:'Ingresso Via Birarelli Parco del Cardeto Ancona',
+                      it:'Ingresso al parco in via Birarelli adiacente all\'Anfiteatro romano.',
+                      en:'Park entrance on Via Birarelli, adjacent to the Roman Amphitheatre.',
+                      pl:'Wejście do parku przy Via Birarelli, sąsiadujące z rzymskim Amfiteatrem.',
+                      dist:'📍 Uscita / Ingresso', mapQuery:'Via Birarelli Ancona' }
                 ],
                 cittadella: [
-                    { name: 'Fortezza della Cittadella', emoji: '🏰', photo: '', lat: 43.6137864, lng: 13.5080029,
-                      imgQuery: 'Fortezza della Cittadella Ancona',
-                      it: 'Fortificazione rinascimentale progettata da Antonio da Sangallo il Giovane.',
-                      en: 'Renaissance fortification designed by Antonio da Sangallo the Younger.',
-                      pl: 'Renesansowa fortyfikacja zaprojektowana przez Antonia da Sangallo Młodszego.',
-                      dist: '📍 Punto principale', mapQuery: 'Fortezza della Cittadella Ancona' },
-                    { name: 'Ingresso Parco della Cittadella', emoji: '🚪', photo: '', lat: 43.6110909, lng: 13.5127611,
-                      imgQuery: 'Ingresso Parco della Cittadella Ancona',
-                      it: 'Ingresso principale al Parco della Cittadella.',
-                      en: 'Main entrance to the Parco della Cittadella.',
-                      pl: 'Główne wejście do Parco della Cittadella.',
-                      dist: '🚶 200 m – 3 min', mapQuery: 'Ingresso Parco Cittadella Ancona' },
-                    { name: 'Punto Panoramico', emoji: '🌅', photo: '', lat: 43.6119493, lng: 13.5116621,
-                      imgQuery: 'vista dalla Cittadella di Ancona',
-                      it: 'Vista spettacolare sulla città e sul porto.',
-                      en: 'Spectacular view over the city and the port.',
-                      pl: 'Spektakularny widok na miasto i port.',
-                      dist: '🚶 150 m – 2 min', mapQuery: 'Punto Panoramico Cittadella Ancona' }
+                    { name:'Fortezza della Cittadella', emoji:'🏰', photo:'', lat:43.6137864, lng:13.5080029,
+                      imgQuery:'Fortezza della Cittadella Ancona',
+                      it:'Fortificazione rinascimentale progettata da Antonio da Sangallo il Giovane.',
+                      en:'Renaissance fortification designed by Antonio da Sangallo the Younger.',
+                      pl:'Renesansowa fortyfikacja zaprojektowana przez Antonia da Sangallo Młodszego.',
+                      dist:'📍 Punto principale', mapQuery:'Fortezza della Cittadella Ancona' },
+                    { name:'Ingresso Parco della Cittadella', emoji:'🚪', photo:'', lat:43.6110909, lng:13.5127611,
+                      imgQuery:'Ingresso Parco della Cittadella Ancona',
+                      it:'Ingresso principale al Parco della Cittadella.',
+                      en:'Main entrance to the Parco della Cittadella.',
+                      pl:'Główne wejście do Parco della Cittadella.',
+                      dist:'🚶 200 m – 3 min', mapQuery:'Ingresso Parco Cittadella Ancona' },
+                    { name:'Punto Panoramico', emoji:'🌅', photo:'', lat:43.6119493, lng:13.5116621,
+                      imgQuery:'vista dalla Cittadella di Ancona',
+                      it:'Vista spettacolare sulla città e sul porto.',
+                      en:'Spectacular view over the city and the port.',
+                      pl:'Spektakularny widok na miasto i port.',
+                      dist:'🚶 150 m – 2 min', mapQuery:'Punto Panoramico Cittadella Ancona' }
                 ]
             },
             restaurants: [
-                { name: 'La Cantineta', emoji: '🍷', photo: 'rist-cantineta.jpg', it: 'Trattoria tipica, da gustare i tagliolini allo scoglio e lo stoccafisso all\'anconetana.', en: 'Typical trattoria: enjoy tagliolini allo scoglio and stockfish Ancona-style.', pl: 'Typowa trattoria: warto spróbować tagliolini allo scoglio i sztokfisza po ankońsku.', dist: '🚶 300 m – 4 min', mapQuery: 'La Cantineta Ancona', lat: 43.6192908, lng: 13.5102798 },
-                { name: 'Osteria del Pozzo', emoji: '🍲', photo: 'rist-pozzo.jpg', it: 'Ristorante tipico con un ottimo rapporto qualità prezzo.', en: 'Typical restaurant with excellent value for money.', pl: 'Typowa restauracja z doskonałym stosunkiem jakości do ceny.', dist: '🚶 350 m – 4 min', mapQuery: 'Il Pozzo Ancona', lat: 43.6199425, lng: 13.5104826 },
-                { name: 'Trattoria La Moretta', emoji: '🍸', photo: 'rist-moretta.jpg', it: 'Ristorante tipico marchigiano affacciato su Piazza del Plebiscito.', en: 'Typical restaurant from the Marche region overlooking Piazza del Plebiscito.', pl: 'Typowa restauracja marchijska z widokiem na Piazza del Plebiscito.', dist: '🚶 200 m – 3 min', mapQuery: 'La Moretta Ancona', lat: 43.6195442, lng: 13.5114100 },
-                { name: 'La Degosteria', emoji: '🍝', photo: 'degosteria.jpg', it: 'Ristorante del centro storico alle spalle della Chiesa di Santa Maria della Piazza.', en: 'Restaurant in the historic centre, behind the Church of Santa Maria della Piazza.', pl: 'Restauracja w historycznym centrum, za Kościołem Santa Maria della Piazza.', dist: '🚶 400 m – 6 min', mapQuery: 'La Degosteria Ancona', lat: 43.6202772, lng: 13.5110345 },
-                { name: 'Vino e Cucina Miscia', emoji: '🐟', photo: 'rist-miscia.jpg', it: 'Ristorante di pesce nel quartiere Archi.', en: 'Fish restaurant in the Archi district.', pl: 'Restauracja rybna w dzielnicy Archi.', dist: '🚗 1 km – 2 min', mapQuery: 'Vino e Cucina Miscia Ancona', lat: 43.6126474, lng: 13.5044134 },
-                { name: 'Amélie', emoji: '🦐', photo: 'rist-amelie.jpg', it: 'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en: 'Family-run and friendly restaurant. Excellent mixed fried fish.', pl: 'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist: '🚗 2 km – 3 min', mapQuery: 'Amelie Ancona', lat: 43.6022208, lng: 13.5060781 },
-                { name: 'Giardino', emoji: '🌿', photo: 'rist-giardino.jpg', it: 'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en: 'Elegant restaurant along Viale della Vittoria that never disappoints.', pl: 'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist: '🚶 1350 m – 18 min', mapQuery: 'Il Giardino Ancona', lat: 43.6158317, lng: 13.5257132 },
-                { name: 'Marcello (Portonovo)', emoji: '🍝', photo: 'rist-marcello.jpg', it: 'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en: 'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', pl: 'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist: '🚌 12 km – 25 min', mapQuery: 'Ristorante Marcello Portonovo Ancona', lat: 43.5641460, lng: 13.5910907 }
+                { name:'La Cantineta', emoji:'🍷', photo:'rist-cantineta.jpg', it:'Trattoria tipica, da gustare i tagliolini allo scoglio e lo stoccafisso all\'anconetana.', en:'Typical trattoria: enjoy tagliolini allo scoglio and stockfish Ancona-style.', pl:'Typowa trattoria: warto spróbować tagliolini allo scoglio i sztokfisza po ankońsku.', dist:'🚶 300 m – 4 min', mapQuery:'La Cantineta Ancona', lat:43.6192908, lng:13.5102798 },
+                { name:'Osteria del Pozzo', emoji:'🍲', photo:'rist-pozzo.jpg', it:'Ristorante tipico con un ottimo rapporto qualità prezzo.', en:'Typical restaurant with excellent value for money.', pl:'Typowa restauracja z doskonałym stosunkiem jakości do ceny.', dist:'🚶 350 m – 4 min', mapQuery:'Il Pozzo Ancona', lat:43.6199425, lng:13.5104826 },
+                { name:'Trattoria La Moretta', emoji:'🍸', photo:'rist-moretta.jpg', it:'Ristorante tipico marchigiano affacciato su Piazza del Plebiscito.', en:'Typical restaurant from the Marche region overlooking Piazza del Plebiscito.', pl:'Typowa restauracja marchijska z widokiem na Piazza del Plebiscito.', dist:'🚶 200 m – 3 min', mapQuery:'La Moretta Ancona', lat:43.6195442, lng:13.5114100 },
+                { name:'La Degosteria', emoji:'🍝', photo:'degosteria.jpg', it:'Ristorante del centro storico alle spalle della Chiesa di Santa Maria della Piazza.', en:'Restaurant in the historic centre, behind the Church of Santa Maria della Piazza.', pl:'Restauracja w historycznym centrum, za Kościołem Santa Maria della Piazza.', dist:'🚶 400 m – 6 min', mapQuery:'La Degosteria Ancona', lat:43.6202772, lng:13.5110345 },
+                { name:'Vino e Cucina Miscia', emoji:'🐟', photo:'rist-miscia.jpg', it:'Ristorante di pesce nel quartiere Archi.', en:'Fish restaurant in the Archi district.', pl:'Restauracja rybna w dzielnicy Archi.', dist:'🚗 1 km – 2 min', mapQuery:'Vino e Cucina Miscia Ancona', lat:43.6126474, lng:13.5044134 },
+                { name:'Amélie', emoji:'🦐', photo:'rist-amelie.jpg', it:'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en:'Family-run and friendly restaurant. Excellent mixed fried fish.', pl:'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist:'🚗 2 km – 3 min', mapQuery:'Amelie Ancona', lat:43.6022208, lng:13.5060781 },
+                { name:'Giardino', emoji:'🌿', photo:'rist-giardino.jpg', it:'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en:'Elegant restaurant along Viale della Vittoria that never disappoints.', pl:'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist:'🚶 1350 m – 18 min', mapQuery:'Il Giardino Ancona', lat:43.6158317, lng:13.5257132 },
+                { name:'Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg', it:'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en:'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', pl:'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona', lat:43.5641460, lng:13.5910907 }
             ],
             barpub: [
-                { name: 'Bar Torino', emoji: '☕', photo: '', it: 'Bar centrale, frequentato dagli anconetani.', en: 'Central café, popular with locals.', pl: 'Centralna kawiarnia, popularna wśród miejscowych.', dist: '🚶 100 m – 1 min', mapQuery: 'Bar Torino Ancona', lat: 43.6182553, lng: 13.5118948 },
-                { name: 'White Bakery', emoji: '🥐', photo: '', it: 'Bakery e caffetteria, ottimi dolci e brunch.', en: 'Bakery and café, excellent pastries and brunch.', pl: 'Piekarnia i kawiarnia, doskonałe ciasta i brunch.', dist: '🚶 100 m – 1 min', mapQuery: 'White Bakery Ancona', lat: 43.6172070, lng: 13.5140194 },
-                { name: 'Bar Giuliani', emoji: '☕', photo: '', it: 'Bar storico, colazioni e aperitivi.', en: 'Historic bar, breakfast and aperitifs.', pl: 'Historyczny bar, śniadania i aperitivy.', dist: '🚶 300 m – 4 min', mapQuery: 'Bar Giuliani Ancona', lat: 43.6186929, lng: 13.5101527 },
-                { name: 'Lasagneria Filotea', emoji: '🍝', photo: 'rist-filotea.jpg', it: 'Lasagne anconetane fatte a mano.', en: 'Handmade Ancona-style lasagne.', pl: 'Ręcznie robione lasagne w stylu Ankony.', dist: '🚶 200 m – 3 min', mapQuery: 'Lasagneria Filotea Ancona', lat: 43.6175592, lng: 13.5143695 },
-                { name: 'Pizzeria Domus', emoji: '🍕', photo: 'rist-domus.jpg', it: 'Pizzeria da asporto, rapida e buona.', en: 'Take-away pizzeria, fast and good.', pl: 'Pizzeria na wynos, szybka i dobra.', dist: '🚶 100 m – 1 min', mapQuery: 'Pizzeria Domus Ancona', lat: 43.6182580, lng: 13.5138206 },
-                { name: 'La Farina', emoji: '🍕', photo: '', it: 'Pizzeria al taglio, ottima pizza romana.', en: 'Pizza by the slice, excellent Roman pizza.', pl: 'Pizza na kawałki, doskonała pizza w stylu rzymskim.', dist: '🚶 300 m – 4 min', mapQuery: 'La Farina Ancona', lat: 43.6191247, lng: 13.5103683 },
-                { name: 'Il Chiosco', emoji: '🍹', photo: '', it: 'Chiosco bar, aperitivi all\'aperto.', en: 'Bar kiosk, outdoor aperitifs.', pl: 'Bar kiosk, aperitivy na świeżym powietrzu.', dist: '🚶 550 m – 7 min', mapQuery: 'Il Chiosco Ancona', lat: 43.6168065, lng: 13.5175774 },
-                { name: 'Donegal Irish Pub', emoji: '🍺', photo: '', it: 'Pub irlandese, birre alla spina e musica dal vivo.', en: 'Irish pub, draught beer and live music.', pl: 'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist: '🚶 400 m – 5 min', mapQuery: 'Donegal Irish Pub Ancona', lat: 43.6163846, lng: 13.5156090 }
+                { name:'Bar Torino', emoji:'☕', photo:'', it:'Bar centrale, frequentato dagli anconetani.', en:'Central café, popular with locals.', pl:'Centralna kawiarnia, popularna wśród miejscowych.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
+                { name:'White Bakery', emoji:'🥐', photo:'', it:'Bakery e caffetteria, ottimi dolci e brunch.', en:'Bakery and café, excellent pastries and brunch.', pl:'Piekarnia i kawiarnia, doskonałe ciasta i brunch.', dist:'🚶 100 m – 1 min', mapQuery:'White Bakery Ancona', lat:43.6172070, lng:13.5140194 },
+                { name:'Bar Giuliani', emoji:'☕', photo:'', it:'Bar storico, colazioni e aperitivi.', en:'Historic bar, breakfast and aperitifs.', pl:'Historyczny bar, śniadania i aperitivy.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
+                { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', it:'Lasagne anconetane fatte a mano.', en:'Handmade Ancona-style lasagne.', pl:'Ręcznie robione lasagne w stylu Ankony.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
+                { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', it:'Pizzeria da asporto, rapida e buona.', en:'Take-away pizzeria, fast and good.', pl:'Pizzeria na wynos, szybka i dobra.', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
+                { name:'La Farina', emoji:'🍕', photo:'', it:'Pizzeria al taglio, ottima pizza romana.', en:'Pizza by the slice, excellent Roman pizza.', pl:'Pizza na kawałki, doskonała pizza w stylu rzymskim.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
+                { name:'Il Chiosco', emoji:'🍹', photo:'', it:'Chiosco bar, aperitivi all\'aperto.', en:'Bar kiosk, outdoor aperitifs.', pl:'Bar kiosk, aperitivy na świeżym powietrzu.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
+                { name:'Donegal Irish Pub', emoji:'🍺', photo:'', it:'Pub irlandese, birre alla spina e musica dal vivo.', en:'Irish pub, draught beer and live music.', pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona', lat:43.6163846, lng:13.5156090 }
             ],
             supermarkets: [
-                { name: 'Coal – Via Podesti', emoji: '🛒', photo: '', it: 'Supermercato ben fornito, vicino.', en: 'Well-stocked supermarket, nearby.', pl: 'Dobrze zaopatrzony supermarket, blisko.', dist: '🚶 150 m – 2 min', mapQuery: 'Coal Via Podesti Ancona', lat: 43.6181806, lng: 13.5112789 },
-                { name: 'Mercato delle Erbe', emoji: '🥬', photo: 'mercato-erbe.jpg', it: 'Mercato coperto storico, frutta e verdura fresca.', en: 'Historic covered market, fresh fruit and vegetables.', pl: 'Historyczny kryty targ, świeże owoce i warzywa.', dist: '🚶 100 m – 1 min', mapQuery: 'Mercato delle Erbe Ancona', lat: 43.6182992, lng: 13.5140040 },
-                { name: 'Coal – Via San Martino', emoji: '🛒', photo: '', it: 'Aperto anche domenica mattina.', en: 'Open on Sunday mornings too.', pl: 'Czynny też w niedzielne poranki.', dist: '🚶 400 m – 5 min', mapQuery: 'Coal Via San Martino Ancona', lat: 43.6158232, lng: 13.5145948 },
-                { name: 'Sì con te – Via Matteotti', emoji: '🛒', photo: '', it: 'Via Matteotti 115.', en: 'Via Matteotti 115.', pl: 'Via Matteotti 115.', dist: '🚶 350 m – 5 min', mapQuery: 'Via Matteotti 115 Ancona', lat: 43.6186104, lng: 13.5163007 }
+                { name:'Coal – Via Podesti', emoji:'🛒', photo:'', it:'Supermercato ben fornito, vicino.', en:'Well-stocked supermarket, nearby.', pl:'Dobrze zaopatrzony supermarket, blisko.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
+                { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', it:'Mercato coperto storico, frutta e verdura fresca.', en:'Historic covered market, fresh fruit and vegetables.', pl:'Historyczny kryty targ, świeże owoce i warzywa.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
+                { name:'Coal – Via San Martino', emoji:'🛒', photo:'', it:'Aperto anche domenica mattina.', en:'Open on Sunday mornings too.', pl:'Czynny też w niedzielne poranki.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
+                { name:'Sì con te – Via Matteotti', emoji:'🛒', photo:'', it:'Via Matteotti 115.', en:'Via Matteotti 115.', pl:'Via Matteotti 115.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
             ],
             parking: [
-                { name: 'Parcheggio degli Archi', emoji: '🅿️', photo: 'parcheggio-archi.jpg', it: 'Consigliato – €6/giorno, oltre 500 posti, custodito.', en: 'Recommended – €6/day, over 500 spaces, supervised.', pl: 'Polecany – €6/dzień, ponad 500 miejsc, strzeżony.', dist: '🚗 1 km – 2 min', mapQuery: 'Parcheggio degli Archi Ancona', lat: 43.6098074, lng: 13.5032732 },
-                { name: 'Parcheggio Traiano', emoji: '🅿️', photo: '', it: 'Comodo per porto e centro storico.', en: 'Convenient for the harbour and historic centre.', pl: 'Wygodny dla portu i centrum historycznego.', dist: '🚶 550 m – 7 min', mapQuery: 'Parcheggio Traiano Ancona', lat: 43.6175179, lng: 13.5079818 },
-                { name: 'Parcheggio Stamira', emoji: '🅿️', photo: '', it: 'Più vicino, più caro.', en: 'Closer, more expensive.', pl: 'Bliżej, drożej.', dist: '🚶 400 m – 5 min', mapQuery: 'Parcheggio Stamira Ancona', lat: 43.6162329, lng: 13.5154477 },
-                { name: 'Strisce blu (zona centro)', emoji: '🅿️', photo: '', it: 'Parcheggio a pagamento su strada, posto difficile.', en: 'Pay-and-display street parking, hard to find.', pl: 'Płatny parking uliczny, trudno znaleźć miejsce.', dist: '📍 In zona centro', mapQuery: 'Parcheggio strisce blu Ancona centro', lat: 43.6184165, lng: 13.5129301 }
+                { name:'Parcheggio degli Archi', emoji:'🅿️', photo:'parcheggio-archi.jpg', it:'Consigliato – €6/giorno, oltre 500 posti, custodito.', en:'Recommended – €6/day, over 500 spaces, supervised.', pl:'Polecany – €6/dzień, ponad 500 miejsc, strzeżony.', dist:'🚗 1 km – 2 min', mapQuery:'Parcheggio degli Archi Ancona', lat:43.6098074, lng:13.5032732 },
+                { name:'Parcheggio Traiano', emoji:'🅿️', photo:'', it:'Comodo per porto e centro storico.', en:'Convenient for the harbour and historic centre.', pl:'Wygodny dla portu i centrum historycznego.', dist:'🚶 550 m – 7 min', mapQuery:'Parcheggio Traiano Ancona', lat:43.6175179, lng:13.5079818 },
+                { name:'Parcheggio Stamira', emoji:'🅿️', photo:'', it:'Più vicino, più caro.', en:'Closer, more expensive.', pl:'Bliżej, drożej.', dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona', lat:43.6162329, lng:13.5154477 },
+                { name:'Strisce blu (zona centro)', emoji:'🅿️', photo:'', it:'Parcheggio a pagamento su strada, posto difficile.', en:'Pay-and-display street parking, hard to find.', pl:'Płatny parking uliczny, trudno znaleźć miejsce.', dist:'📍 In zona centro', mapQuery:'Parcheggio strisce blu Ancona centro', lat:43.6184165, lng:13.5120000 }
             ],
             around: [
-                { name: 'Portonovo (Baia del Conero)', emoji: '🌊', photo: 'portonovo.jpg', it: 'Baia incantevole, bus 94 da Piazza Cavour.', en: 'Enchanting bay, bus 94 from Piazza Cavour.', pl: 'Urzekająca zatoka, autobus 94 z Piazza Cavour.', dist: '🚌 12 km – 25 min', mapQuery: 'Portonovo Ancona', lat: 43.5636463, lng: 13.5976903 },
-                { name: 'Sirolo e Numana', emoji: '🏖️', photo: 'sirolo.jpg', it: 'Perle del Conero, spiagge tra le più belle delle Marche.', en: 'Gems of the Conero, among the most beautiful beaches in Marche.', pl: 'Perły Conero, jedne z najpiękniejszych plaż w Marchii.', dist: '🚗 14 km – 21 min', mapQuery: 'Sirolo AN', lat: 43.5231225, lng: 13.6200824 },
-                { name: 'Offagna', emoji: '🏰', photo: 'offagna.jpg', it: 'Piccolo borgo medievale con rocca, panorama sulla campagna marchigiana.', en: 'Small medieval village with fortress, views over the Marche countryside.', pl: 'Małe średniowieczne miasteczko z zamkiem i widokiem na wieś marchijską.', dist: '🚗 12 km – 18 min', mapQuery: 'Offagna Ancona', lat: 43.5274876, lng: 13.4412360 },
-                { name: 'Loreto', emoji: '⛪', photo: 'loreto.jpg', it: 'Santuario della Santa Casa, mèta di pellegrinaggio.', en: 'Sanctuary of the Holy House, pilgrimage destination.', pl: 'Sanktuarium Świętego Domu, miejsce pielgrzymek.', dist: '🚗 21 km – 32 min', mapQuery: 'Loreto AN', lat: 43.4411021, lng: 13.6094860 },
-                { name: 'Recanati', emoji: '📖', photo: 'recanati.jpg', it: 'Città di Leopardi, centro storico intatto.', en: 'City of Leopardi, intact historic centre.', pl: 'Miasto Leopardiego, nienaruszony historyczny rynek.', dist: '🚗 25 km – 38 min', mapQuery: 'Recanati', lat: 43.3980809, lng: 13.5518423 }
+                { name:'Portonovo (Baia del Conero)', emoji:'🌊', photo:'portonovo.jpg', it:'Baia incantevole, bus 94 da Piazza Cavour.', en:'Enchanting bay, bus 94 from Piazza Cavour.', pl:'Urzekająca zatoka, autobus 94 z Piazza Cavour.', dist:'🚌 12 km – 25 min', mapQuery:'Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
+                { name:'Sirolo e Numana', emoji:'🏖️', photo:'sirolo.jpg', it:'Perle del Conero, spiagge tra le più belle delle Marche.', en:'Gems of the Conero, among the most beautiful beaches in Marche.', pl:'Perły Conero, jedne z najpiękniejszych plaż w Marchii.', dist:'🚗 14 km – 21 min', mapQuery:'Sirolo AN', lat:43.5231225, lng:13.6200824 },
+                { name:'Offagna', emoji:'🏰', photo:'offagna.jpg', it:'Piccolo borgo medievale con rocca, panorama sulla campagna marchigiana.', en:'Small medieval village with fortress, views over the Marche countryside.', pl:'Małe średniowieczne miasteczko z zamkiem i widokiem na wieś marchijską.', dist:'🚗 12 km – 18 min', mapQuery:'Offagna Ancona', lat:43.5274876, lng:13.4412360 },
+                { name:'Loreto', emoji:'⛪', photo:'loreto.jpg', it:'Santuario della Santa Casa, mèta di pellegrinaggio.', en:'Sanctuary of the Holy House, pilgrimage destination.', pl:'Sanktuarium Świętego Domu, miejsce pielgrzymek.', dist:'🚗 21 km – 32 min', mapQuery:'Loreto AN', lat:43.4411021, lng:13.6094860 },
+                { name:'Recanati', emoji:'📖', photo:'recanati.jpg', it:'Città di Leopardi, centro storico intatto.', en:'City of Leopardi, intact historic centre.', pl:'Miasto Leopardiego, nienaruszony historyczny rynek.', dist:'🚗 25 km – 38 min', mapQuery:'Recanati', lat:43.3980809, lng:13.5518423 }
             ],
             marche: [
-                { name: 'Grotte di Frasassi', emoji: '🕯️', photo: 'frasassi.jpg', it: 'Complesso carsico spettacolare, tra i più grandi d\'Europa.', en: 'Spectacular karst cave system, among the largest in Europe.', pl: 'Spektakularny system krasowy, jeden z największych w Europie.', dist: '🚗 65 km – 50 min', mapQuery: 'Grotte di Frasassi', lat: 43.3963, lng: 12.9691 },
-                { name: 'Urbino', emoji: '🏛️', photo: 'urbino.jpg', it: 'Intatta città rinascimentale Patrimonio Unesco e città natale di Raffaello. Nelle sale del Palazzo ducale di Federico da Montefeltro ha sede la Galleria Nazionale delle Marche.', en: 'Intact Renaissance city, UNESCO World Heritage site and birthplace of Raphael. The rooms of the Ducal Palace of Federico da Montefeltro house the National Gallery of the Marche.', pl: 'Nienaruszone renesansowe miasto, wpisane na listę UNESCO i miejsce urodzenia Rafaela. W salach Pałacu Książęcego Federica da Montefeltro mieści się Galeria Narodowa Marchii.', dist: '🚗 100 km – 1h20', mapQuery: 'Urbino PU', lat: 43.7262, lng: 12.6363 },
-                { name: 'Ascoli Piceno', emoji: '⛲', photo: 'ascoli.jpg', it: 'Città del travertino che conserva un centro storico intatto con la stupenda Piazza del Popolo, una delle più belle d\'Italia. Imperdibili le olive all\'ascolana.', en: 'City of travertine, preserving an intact historic centre with the stunning Piazza del Popolo, one of the most beautiful squares in Italy. Not to be missed: the olive all\'ascolana.', pl: 'Miasto trawertynu, zachowujące nienaruszone historyczne centrum ze wspaniałym Piazza del Popolo, jednym z najpiękniejszych placów we Włoszech. Nie można przegapić: oliwki po ascolańsku.', dist: '🚗 90 km – 1h', mapQuery: 'Ascoli Piceno AP', lat: 42.8534, lng: 13.5741 }
+                { name:'Grotte di Frasassi', emoji:'🕯️', photo:'frasassi.jpg', it:'Complesso carsico spettacolare, tra i più grandi d\'Europa.', en:'Spectacular karst cave system, among the largest in Europe.', pl:'Spektakularny system krasowy, jeden z największych w Europie.', dist:'🚗 65 km – 50 min', mapQuery:'Grotte di Frasassi', lat:43.3963, lng:12.9691 },
+                { name:'Urbino', emoji:'🏛️', photo:'urbino.jpg', it:'Intatta città rinascimentale Patrimonio Unesco e città natale di Raffaello. Nelle sale del Palazzo ducale di Federico da Montefeltro ha sede la Galleria Nazionale delle Marche.', en:'Intact Renaissance city, UNESCO World Heritage site and birthplace of Raphael. The rooms of the Ducal Palace of Federico da Montefeltro house the National Gallery of the Marche.', pl:'Nienaruszone renesansowe miasto, wpisane na listę UNESCO i miejsce urodzenia Rafaela. W salach Pałacu Książęcego Federica da Montefeltro mieści się Galeria Narodowa Marchii.', dist:'🚗 100 km – 1h20', mapQuery:'Urbino PU', lat:43.7262, lng:12.6363 },
+                { name:'Ascoli Piceno', emoji:'⛲', photo:'ascoli.jpg', it:'Città del travertino che conserva un centro storico intatto con la stupenda Piazza del Popolo, una delle più belle d\'Italia. Imperdibili le olive all\'ascolana.', en:'City of travertine, preserving an intact historic centre with the stunning Piazza del Popolo, one of the most beautiful squares in Italy. Not to be missed: the olive all\'ascolana.', pl:'Miasto trawertynu, zachowujące nienaruszone historyczne centrum ze wspaniałym Piazza del Popolo, jednym z najpiękniejszych placów we Włoszech. Nie można przegapić: oliwki po ascolańsku.', dist:'🚗 90 km – 1h', mapQuery:'Ascoli Piceno AP', lat:42.8534, lng:13.5741 }
             ],
             transport: {
-                bus: { it: 'Linee 1 e 4 da Piazza Roma (sotto casa). Per Portonovo: bus 94 da Piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/wp-content/uploads/2026/05/AnconaFerialeEstivogiugnosettembre2026_06_08-1.pdf" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Orari estivi Conerobus →</a>', en: 'Lines 1 and 4 from Piazza Roma (right below). For Portonovo: bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/wp-content/uploads/2026/05/AnconaFerialeEstivogiugnosettembre2026_06_08-1.pdf" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Summer timetables →</a>', pl: 'Linie 1 i 4 z Piazza Roma (pod domem). Do Portonovo: autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/wp-content/uploads/2026/05/AnconaFerialeEstivogiugnosettembre2026_06_08-1.pdf" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład letni Conerobus →</a>' },
-                train: { it: 'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en: 'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', pl: 'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
-                taxi: { it: 'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', en: 'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', pl: 'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)' },
-                ferry: { it: 'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en: 'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl: 'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
-                airport: { it: 'Aeroporto Falconara "Raffaello Sanzio": 15 km – 30 min in auto, bus o treno.', en: 'Falconara Airport "Raffaello Sanzio": 15 km – 30 min by car, bus or train.', pl: 'Lotnisko Falconara "Raffaello Sanzio": 15 km – 30 min samochodem, autobusem lub pociągiem.' }
+                // FIX #12: link stabile alla pagina orari Conerobus invece del PDF stagionale
+                bus: { it:'Linee 1 e 4 da Piazza Roma (sotto casa). Per Portonovo: bus 94 da Piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'Lines 1 and 4 from Piazza Roma (right below). For Portonovo: bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', pl:'Linie 1 i 4 z Piazza Roma (pod domem). Do Portonovo: autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
+                train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
+                taxi: { it:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', en:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', pl:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)' },
+                ferry: { it:'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en:'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl:'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
+                airport: { it:'Aeroporto Falconara "Raffaello Sanzio": 15 km – 30 min in auto, bus o treno.', en:'Falconara Airport "Raffaello Sanzio": 15 km – 30 min by car, bus or train.', pl:'Lotnisko Falconara "Raffaello Sanzio": 15 km – 30 min samochodem, autobusem lub pociągiem.' }
             }
         };
 
         var sections = [
-            { id: 'mustsee', icon: '🚶', it: 'Tour a piedi - Itinerari consigliati', en: 'Walking Tour - Recommended Itineraries', pl: 'Wycieczka piesza - Polecane trasy' },
-            { id: 'around', icon: '🌊', it: 'Dintorni', en: 'Around Ancona', pl: 'Okolice' },
-            { id: 'marche', icon: '🏛️', it: 'Nelle Marche', en: 'Marche Region', pl: 'Region Marche' },
-            { id: 'restaurants', icon: '🍽️', it: 'Ristoranti', en: 'Restaurants', pl: 'Restauracje' },
-            { id: 'barpub', icon: '🍕', it: 'Bar & Pizzerie', en: 'Bars & Pizzerias', pl: 'Bary i pizzerie' },
-            { id: 'supermarkets', icon: '🛒', it: 'Supermercati', en: 'Supermarkets', pl: 'Supermarkety' },
-            { id: 'parking', icon: '🅿️', it: 'Parcheggi', en: 'Parking', pl: 'Parkingi' },
-            { id: 'transport', icon: '🚌', it: 'Trasporti', en: 'Transport', pl: 'Transport' },
-            { id: 'rules', icon: '📋', it: 'Regole', en: 'House Rules', pl: 'Zasady domu' },
-            { id: 'contact', icon: '📞', it: 'Contatti & Emergenze', en: 'Contacts & Emergency', pl: 'Kontakt i alarmy' }
+            { id:'mustsee', icon:'🚶', it:'Tour a piedi - Itinerari consigliati', en:'Walking Tour - Recommended Itineraries', pl:'Wycieczka piesza - Polecane trasy' },
+            { id:'around', icon:'🌊', it:'Dintorni', en:'Around Ancona', pl:'Okolice' },
+            { id:'marche', icon:'🏛️', it:'Nelle Marche', en:'Marche Region', pl:'Region Marche' },
+            { id:'restaurants', icon:'🍽️', it:'Ristoranti', en:'Restaurants', pl:'Restauracje' },
+            { id:'barpub', icon:'🍕', it:'Bar & Pizzerie', en:'Bars & Pizzerias', pl:'Bary i pizzerie' },
+            { id:'supermarkets', icon:'🛒', it:'Supermercati', en:'Supermarkets', pl:'Supermarkety' },
+            { id:'parking', icon:'🅿️', it:'Parcheggi', en:'Parking', pl:'Parkingi' },
+            { id:'transport', icon:'🚌', it:'Trasporti', en:'Transport', pl:'Transport' },
+            { id:'rules', icon:'📋', it:'Regole', en:'House Rules', pl:'Zasady domu' },
+            { id:'contact', icon:'📞', it:'Contatti & Emergenze', en:'Contacts & Emergency', pl:'Kontakt i alarmy' }
         ];
 
         function openSubItinerary(subId) {
             currentSubItinerary = subId;
             currentPlaceDetail = -1;
+            placeDataMap = {}; // FIX #1: reset mappa foto
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0); // FIX #8
         }
         function closeSubItinerary() {
             currentSubItinerary = null;
             currentPlaceDetail = -1;
+            placeDataMap = {}; // FIX #1
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
         }
         function goTo(i) {
             currentSection = i;
             currentPlaceDetail = -1;
             currentSubItinerary = null;
+            placeDataMap = {}; // FIX #1
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
         }
         function selectPlaceDetail(i) {
-            var items = currentSubItinerary ? (appData.subItineraries[currentSubItinerary] || []) : currentSectionPlaces;
+            var items = currentSubItinerary ? (appData.subItineraries[currentSubItinerary]||[]) : currentSectionPlaces;
             var p = items[i];
-            if (p && p.isSubItinerary && p.subId) {
-                openSubItinerary(p.subId);
-                return;
-            }
+            if (p && p.isSubItinerary && p.subId) { openSubItinerary(p.subId); return; }
             currentPlaceDetail = i;
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0); // FIX #8
         }
         function backToMap() {
             currentPlaceDetail = -1;
             renderAll();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
+        }
+
+        // FIX #6: panTo con zoom fisso 15 per centrare correttamente la stellina
+        function panToHome() {
+            if (leafletMap) { leafletMap.setView([HOME_COORDS.lat, HOME_COORDS.lng], 15); }
         }
 
         function initSectionMap() {
@@ -488,218 +499,190 @@
             var el = document.getElementById('sectionMap');
             if (!el || !currentSectionPlaces.length) return;
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
-            var valid = currentSectionPlaces.filter(function(p) { return p.lat && p.lng; });
+            var valid = currentSectionPlaces.filter(function(p){ return p.lat && p.lng; });
             if (!valid.length) return;
-            leafletMap = L.map('sectionMap', { zoomControl: true, attributionControl: false });
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
-            L.control.attribution({ prefix: '© <a href="https://openstreetmap.org">OSM</a>' }).addTo(leafletMap);
+            leafletMap = L.map('sectionMap', { zoomControl:true, attributionControl:false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(leafletMap);
+            L.control.attribution({ prefix:'© <a href="https://openstreetmap.org">OSM</a>' }).addTo(leafletMap);
 
-            var homeIcon = L.divIcon({ html: '<div class="map-marker-star">★</div>', className: '', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14] });
-            L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { icon: homeIcon }).addTo(leafletMap)
-                .bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
-
-            var bounds = [ [HOME_COORDS.lat, HOME_COORDS.lng] ];
+            // FIX #5: fitBounds calcolato SOLO sui punti della sezione, NON sulla stellina
+            var bounds = [];
             valid.forEach(function(p, idx) {
                 var displayNum = getDisplayNumber(p, idx);
                 var markerClass = 'map-marker-num';
-                if (currentSubItinerary === 'cardeto' || currentSubItinerary === 'cittadella') markerClass += ' ' + currentSubItinerary;
-                var icon = L.divIcon({ html: '<div class="'+markerClass+'" aria-label="'+p.name+'">'+displayNum+'</div>', className: '', iconSize: [24,24], iconAnchor: [12,12], popupAnchor: [0,-14] });
-                var m = L.marker([p.lat, p.lng], { icon: icon }).addTo(leafletMap);
+                if (currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella') markerClass+=' '+currentSubItinerary;
+                var icon = L.divIcon({ html:'<div class="'+markerClass+'" aria-label="'+p.name+'">'+displayNum+'</div>', className:'', iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-14] });
+                var m = L.marker([p.lat, p.lng], { icon:icon }).addTo(leafletMap);
                 m.bindPopup('<b style="font-size:.78rem;">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888;">'+p.dist+'</span>');
-                m.on('click', function() { selectPlaceDetail(idx); });
+                m.on('click', function(){ selectPlaceDetail(idx); });
                 bounds.push([p.lat, p.lng]);
             });
-            leafletMap.fitBounds(bounds, { padding: [22,22] });
+            leafletMap.fitBounds(bounds, { padding:[22,22] });
+
+            // Stellina aggiunta DOPO fitBounds, non altera il viewport
+            var starIcon = L.divIcon({ html:'<div class="map-marker-star">★</div>', className:'', iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-16] });
+            L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { icon:starIcon, zIndexOffset:1000 })
+                .addTo(leafletMap)
+                .bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
         }
 
         function getDisplayNumber(p, index) {
-            if (currentSubItinerary) return String.fromCharCode(65 + index);
-            if (typeof p.order === 'string' && p.order.indexOf('bis') > -1) return p.order.replace('-bis', 'b');
-            return index + 1;
+            if (currentSubItinerary) return String.fromCharCode(65+index);
+            if (typeof p.order==='string' && p.order.indexOf('bis')>-1) return p.order.replace('-bis','b');
+            return index+1;
         }
+        // FIX #2: guard su lista vuota
         function getTotalDisplay(items, total) {
-            if (currentSubItinerary) return String.fromCharCode(64 + total);
-            var last = items[total - 1];
-            if (last && typeof last.order === 'string' && last.order.indexOf('bis') > -1) return last.order.replace('-bis', 'b');
+            if (!total || !items || !items.length) return 0;
+            if (currentSubItinerary) return String.fromCharCode(64+total);
+            var last = items[total-1];
+            if (last && typeof last.order==='string' && last.order.indexOf('bis')>-1) return last.order.replace('-bis','b');
             return total;
         }
         function sortMustSee(a, b) {
-            function toNum(val) { if (typeof val === 'string' && val.indexOf('bis') > -1) return parseFloat(val.split('-')[0]) + 0.5; return Number(val); }
-            return toNum(a.order) - toNum(b.order);
+            function toNum(val){ if(typeof val==='string'&&val.indexOf('bis')>-1) return parseFloat(val.split('-')[0])+0.5; return Number(val); }
+            return toNum(a.order)-toNum(b.order);
         }
 
         function renderAll() {
-            var hero = document.getElementById('hero');
-            var nav = document.getElementById('nav');
-            var cont = document.getElementById('content');
-            if (currentSection === -1 && leafletMap) { leafletMap.remove(); leafletMap = null; }
-            hero.classList.toggle('section-mode', currentSection !== -1);
-            if (currentSection === -1) { nav.style.display = 'none'; cont.innerHTML = renderHome(); return; }
-            nav.style.display = 'flex';
-            nav.innerHTML = sections.map(function(s, i) {
+            var hero=document.getElementById('hero');
+            var nav=document.getElementById('nav');
+            var cont=document.getElementById('content');
+            if (currentSection===-1&&leafletMap){ leafletMap.remove(); leafletMap=null; }
+            hero.classList.toggle('section-mode', currentSection!==-1);
+            if (currentSection===-1){ nav.style.display='none'; cont.innerHTML=renderHome(); return; }
+            nav.style.display='flex';
+            nav.innerHTML=sections.map(function(s,i){
                 return '<button class="nav-pill'+(i===currentSection?' active':'')+'" onclick="goTo('+i+')" role="tab" aria-selected="'+(i===currentSection?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.pl)+'</button>';
             }).join('');
-            var s = sections[currentSection];
-            var body = renderSection(s.id);
-            cont.innerHTML = '<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div></div></section>';
-            if (currentPlaceDetail < 0) { setTimeout(initSectionMap, 0); }
+            var s=sections[currentSection];
+            var body=renderSection(s.id);
+            cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div></div></section>';
+            if (currentPlaceDetail<0){ setTimeout(initSectionMap, 0); }
         }
 
         function renderHome() {
-            var checkinLabel = tr('Check-in','Check-in','Zameldowanie');
-            var checkoutLabel = tr('Check-out','Check-out','Wymeldowanie');
-            var tiles = sections.map(function(s,i) {
+            var checkinLabel=tr('Check-in','Check-in','Zameldowanie');
+            var checkoutLabel=tr('Check-out','Check-out','Wymeldowanie');
+            var tiles=sections.map(function(s,i){
                 return '<button class="nav-tile" onclick="goTo('+i+')" aria-label="'+tr(s.it,s.en,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.pl)+'</div></button>';
             }).join('');
-            var socialHtml = '<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" class="home-social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" class="home-social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div></div>';
+            var socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" class="home-social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" class="home-social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div></div>';
             return '<section class="section active"><div class="home-welcome"><div style="font-family:\'Cormorant Garamond\',serif;font-size:1.1rem;font-weight:600;color:var(--navy);margin-bottom:10px;">'+tr('Benvenuti!','Welcome!','Witamy!')+'</div><div class="home-checkin-grid"><div class="checkin-tile"><div class="checkin-label">'+checkinLabel+'</div><div class="checkin-val">'+tr('da concordare','on request','do ustalenia')+'</div></div><div class="checkin-tile"><div class="checkin-label">'+checkoutLabel+'</div><div class="checkin-val">11:00</div></div></div>'+socialHtml+'</div><div class="nav-grid">'+tiles+'</div></section>';
         }
 
         function renderSection(id) {
-            if (id === 'contact') return renderContact();
-            if (id === 'rules') return renderRules();
-            if (id === 'transport') return renderTransport();
+            if (id==='contact') return renderContact();
+            if (id==='rules') return renderRules();
+            if (id==='transport') return renderTransport();
             var map = {
-                mustsee: function() {
-                    if (currentSubItinerary) return appData.subItineraries[currentSubItinerary] || [];
-                    return appData.mustsee.slice().sort(sortMustSee);
-                },
-                restaurants: function() { return appData.restaurants; },
-                barpub: function() { return appData.barpub; },
-                supermarkets: function() { return appData.supermarkets; },
-                parking: function() { return appData.parking; },
-                around: function() { return appData.around; },
-                marche: function() { return appData.marche; }
+                mustsee: function(){ if(currentSubItinerary) return appData.subItineraries[currentSubItinerary]||[]; return appData.mustsee.slice().sort(sortMustSee); },
+                restaurants: function(){ return appData.restaurants; },
+                barpub: function(){ return appData.barpub; },
+                supermarkets: function(){ return appData.supermarkets; },
+                parking: function(){ return appData.parking; },
+                around: function(){ return appData.around; },
+                marche: function(){ return appData.marche; }
             };
             if (map[id]) return renderPlaceSection(map[id]());
             return '';
         }
 
+        // Pulsante stellina con FIX #3 (button accessibile) e FIX #6 (setView con zoom)
+        function starBtnHtml() {
+            return '<button class="star-list-btn" onclick="panToHome()" aria-label="Centra la mappa su Ancona Centro">★ Ancona Centro</button>';
+        }
+
         function renderPlaceSection(items) {
             currentSectionPlaces = items;
             if (currentSubItinerary) {
-                var parent = appData.mustsee.find(function(p) { return p.subId === currentSubItinerary; });
-                var descHtml = '';
-                if (parent) {
-                    descHtml = '<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+parent.emoji+'</div><div><div class="place-name">'+parent.name+'</div><div class="place-desc" style="margin-top:5px;">'+tr(parent.it, parent.en, parent.pl)+'</div></div></div></div>';
+                var parent = null;
+                for (var k=0; k<appData.mustsee.length; k++) { if (appData.mustsee[k].subId===currentSubItinerary){ parent=appData.mustsee[k]; break; } }
+                var descHtml = parent ? '<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+parent.emoji+'</div><div><div class="place-name">'+parent.name+'</div><div class="place-desc" style="margin-top:5px;">'+tr(parent.it,parent.en,parent.pl)+'</div></div></div></div>' : '';
+                if (currentPlaceDetail>=0 && currentPlaceDetail<items.length) {
+                    return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, true);
                 }
-                if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) {
-                    return renderSubPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length);
-                }
-                var btns = items.map(function(p, i) {
-                    var displayNum = getDisplayNumber(p, i);
-                    return '<button class="place-btn-mini" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+displayNum+'. '+p.name+'</button>';
-                }).join('');
-                return '<button class="back-btn" onclick="closeSubItinerary()">← '+tr('Torna al tour principale','Back to main tour','Powrót do głównej trasy')+'</button>'
-                    + descHtml
-                    + '<div class="map-list-wrap">'
-                    + '<div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div>'
-                    + '<div class="place-btn-col"><div class="star-list-item" onclick="if(leafletMap) leafletMap.panTo([43.6181895,13.5129489])">★ Ancona Centro</div>'+btns+'</div>'
-                    + '</div>';
+                var btns=items.map(function(p,i){ var dn=getDisplayNumber(p,i); var sel=(i===currentPlaceDetail)?' selected':''; return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>'; }).join('');
+                return '<button class="back-btn" onclick="closeSubItinerary()">← '+tr('Torna al tour principale','Back to main tour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
             }
-            if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) {
-                var p = items[currentPlaceDetail];
-                return renderPlaceDetail(p, currentPlaceDetail, items.length);
+            if (currentPlaceDetail>=0 && currentPlaceDetail<items.length) {
+                return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, false);
             }
-            var btns = items.map(function(p, i) {
-                var displayNum = getDisplayNumber(p, i);
-                return '<button class="place-btn-mini" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+displayNum+'. '+p.name+'</button>';
-            }).join('');
-            return '<div class="map-list-wrap">'
-                + '<div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div>'
-                + '<div class="place-btn-col"><div class="star-list-item" onclick="if(leafletMap) leafletMap.panTo([43.6181895,13.5129489])">★ Ancona Centro</div>'+btns+'</div>'
-                + '</div>';
+            var btns=items.map(function(p,i){ var dn=getDisplayNumber(p,i); var sel=(i===currentPlaceDetail)?' selected':''; return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>'; }).join('');
+            return '<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         }
 
-        function renderPlaceDetail(p, index, total) {
+        // FIX #9: renderPlaceDetail e renderSubPlaceDetail unificati in renderAnyPlaceDetail
+        function renderAnyPlaceDetail(p, index, total, isSubMode) {
             var wrapId = 'photowrap_'+index;
-            placeDataMap[wrapId] = p;
+            placeDataMap[wrapId] = p; // salva riferimento per photoFallback
             var desc = tr(p.it, p.en, p.pl);
-            var photoHtml = '';
+            var photoHtml;
             if (p.photo) {
-                var src = PHOTO_BASE + p.photo;
-                photoHtml = '<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" onload="this.classList.add(\'loaded\');var e=document.getElementById(\'ph_'+index+'\');if(e)e.classList.add(\'hidden\');" onerror="photoFallback(\''+wrapId+'\')" loading="lazy"></div>';
+                var src = PHOTO_BASE+p.photo;
+                photoHtml = '<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div>'
+                    +'<img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" '
+                    +'onload="this.classList.add(\'loaded\');var e=document.getElementById(\'ph_'+index+'\');if(e)e.classList.add(\'hidden\');" '
+                    +'onerror="photoFallback(\''+wrapId+'\')" loading="lazy"></div>';
             } else {
                 photoHtml = '<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
             }
             var btns = '<a href="'+getMapLink(p.mapQuery||p.name)+'" target="_blank" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Otwórz mapę')+'</a>';
-            if (p.extraMap) { btns += ' <a href="'+getMapLink(p.extraMap.query)+'" target="_blank" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>'; }
+            if (!isSubMode && p.extraMap) { btns+=' <a href="'+getMapLink(p.extraMap.query)+'" target="_blank" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>'; }
             var displayNum = getDisplayNumber(p, index);
             var totalDisplay = getTotalDisplay(currentSectionPlaces, total);
-            var prev = index > 0 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index-1)+')" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Poprz.')+'</button>' : '<span></span>';
-            var next = index < total-1 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index+1)+')" aria-label="Luogo successivo">'+tr('Succ.','Next','Nast.')+' ▶</button>' : '<span></span>';
-            return '<button class="back-btn" onclick="backToMap()" aria-label="Torna alla lista dei luoghi">← '+tr('Tutti i luoghi','All places','Wszystkie miejsca')+'</button>'
-                + '<div class="place-card">'+photoHtml
-                + '<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+'</div><div class="place-desc" style="margin-top:5px;">'+desc+'</div></div></div>'
-                + '<div class="place-actions">'+btns+'</div></div>'
-                + '<div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
-        }
-
-        function renderSubPlaceDetail(p, index, total) {
-            var wrapId = 'photowrap_'+index;
-            placeDataMap[wrapId] = p;
-            var desc = tr(p.it, p.en, p.pl);
-            var photoHtml = '';
-            if (p.photo) {
-                var src = PHOTO_BASE + p.photo;
-                photoHtml = '<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" onload="this.classList.add(\'loaded\');var e=document.getElementById(\'ph_'+index+'\');if(e)e.classList.add(\'hidden\');" onerror="photoFallback(\''+wrapId+'\')" loading="lazy"></div>';
-            } else {
-                photoHtml = '<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
-            }
-            var btns = '<a href="'+getMapLink(p.mapQuery||p.name)+'" target="_blank" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Otwórz mapę')+'</a>';
-            var displayNum = getDisplayNumber(p, index);
-            var totalDisplay = getTotalDisplay(currentSectionPlaces, total);
-            var prev = index > 0 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index-1)+')" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Poprz.')+'</button>' : '<span></span>';
-            var next = index < total-1 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index+1)+')" aria-label="Luogo successivo">'+tr('Succ.','Next','Nast.')+' ▶</button>' : '<span></span>';
-            return '<button class="back-btn" onclick="backToMap()">← '+tr('Tutti i luoghi','All places','Wszystkie miejsca')+'</button>'
-                + '<div class="place-card">'+photoHtml
-                + '<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+'</div><div class="place-desc" style="margin-top:5px;">'+desc+'</div></div></div>'
-                + '<div class="place-actions">'+btns+'</div></div>'
-                + '<div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
+            var backFn = isSubMode ? 'backToMap()' : 'backToMap()';
+            var backLabel = tr('Tutti i luoghi','All places','Wszystkie miejsca');
+            var prev = index>0 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index-1)+')" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Poprz.')+'</button>' : '<span></span>';
+            var next = index<total-1 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index+1)+')" aria-label="Luogo successivo">'+tr('Succ.','Next','Nast.')+' ▶</button>' : '<span></span>';
+            return '<button class="back-btn" onclick="'+backFn+'" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button>'
+                +'<div class="place-card">'+photoHtml
+                +'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+'</div><div class="place-desc" style="margin-top:5px;">'+desc+'</div></div></div>'
+                +'<div class="place-actions">'+btns+'</div></div>'
+                +'<div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
         }
 
         function renderTransport() {
-            var td = appData.transport;
-            var items = [
-                { icon: '🚌', label: tr('Bus','Bus','Autobus'), text: tr(td.bus.it, td.bus.en, td.bus.pl) },
-                { icon: '🚂', label: tr('Treno','Train','Pociąg'), text: tr(td.train.it, td.train.en, td.train.pl) },
-                { icon: '🚕', label: tr('Taxi','Taxi','Taxi'), text: tr(td.taxi.it, td.taxi.en, td.taxi.pl) },
-                { icon: '⛴️', label: tr('Traghetti','Ferries','Promy'), text: tr(td.ferry.it, td.ferry.en, td.ferry.pl) },
-                { icon: '✈️', label: tr('Aeroporto','Airport','Lotnisko'), text: tr(td.airport.it, td.airport.en, td.airport.pl) }
+            var td=appData.transport;
+            var items=[
+                { icon:'🚌', label:tr('Bus','Bus','Autobus'), text:tr(td.bus.it,td.bus.en,td.bus.pl) },
+                { icon:'🚂', label:tr('Treno','Train','Pociąg'), text:tr(td.train.it,td.train.en,td.train.pl) },
+                { icon:'🚕', label:tr('Taxi','Taxi','Taxi'), text:tr(td.taxi.it,td.taxi.en,td.taxi.pl) },
+                { icon:'⛴️', label:tr('Traghetti','Ferries','Promy'), text:tr(td.ferry.it,td.ferry.en,td.ferry.pl) },
+                { icon:'✈️', label:tr('Aeroporto','Airport','Lotnisko'), text:tr(td.airport.it,td.airport.en,td.airport.pl) }
             ];
-            var cardsHtml = items.map(function(item) {
+            var cardsHtml=items.map(function(item){
                 return '<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+item.icon+'</span><span class="card-title">'+item.label+'</span></div><div class="card-body"><p>'+item.text+'</p></div></div>';
             }).join('');
-            var portalLabel = tr('Portale turistico ufficiale','Official tourism portal','Oficjalny portal turystyczny');
-            cardsHtml += '<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+portalLabel+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px;" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
+            var portalLabel=tr('Portale turistico ufficiale','Official tourism portal','Oficjalny portal turystyczny');
+            cardsHtml+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+portalLabel+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px;" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
             return cardsHtml;
         }
 
         function renderRules() {
-            var rulesHtml = appData.rules.map(function(r) { return '<div class="rule-row"><span class="rule-icon" aria-hidden="true">'+r.icon+'</span><span class="rule-text">'+tr(r.it, r.en, r.pl)+'</span></div>'; }).join('');
+            var rulesHtml=appData.rules.map(function(r){ return '<div class="rule-row"><span class="rule-icon" aria-hidden="true">'+r.icon+'</span><span class="rule-text">'+tr(r.it,r.en,r.pl)+'</span></div>'; }).join('');
             return '<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span><span class="card-title">'+tr('Regole della casa','House rules','Zasady domu')+'</span></div><div class="card-body">'+rulesHtml+'</div></div>';
         }
 
         function renderContact() {
-            var fp = HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
-            var waLabel = tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gospodarz dostępny na WhatsAppie');
-            var emergTitle = tr('Numeri di emergenza','Emergency numbers','Numery alarmowe');
-            var usefulTitle = tr('Link utili','Useful links','Przydatne linky');
-            var socialLinks = '<div style="margin-top:14px;display:flex;justify-content:center;gap:20px;"><a href="'+appData.social.instagram+'" target="_blank" class="btn-call" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" class="btn-call" aria-label="Pagina Facebook">📘 Facebook</a></div>';
+            var fp=HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
+            var waLabel=tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gospodarz dostępny na WhatsAppie');
+            var emergTitle=tr('Numeri di emergenza','Emergency numbers','Numery alarmowe');
+            var usefulTitle=tr('Link utili','Useful links','Przydatne linky');
+            var socialLinks='<div style="margin-top:14px;display:flex;justify-content:center;gap:20px;"><a href="'+appData.social.instagram+'" target="_blank" class="btn-call" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" class="btn-call" aria-label="Pagina Facebook">📘 Facebook</a></div>';
             return '<div class="contact-card"><div class="contact-label">📞 '+waLabel+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div>'+socialLinks+'</div>'
-                + '<div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+emergTitle+'</span></div>'
-                + '<div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Ogólne zagrożenie')+'</span></div>'
-                + '<div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Policja')+'</span></div>'
-                + '<div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Nagły wypadek medyczny')+'</span></div>'
-                + '<div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Szpital Riuniti – Izba przyjęć')+'</span></div>'
-                + '<div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div>'
-                + '<div class="card" style="margin-top:10px;"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+usefulTitle+'</span></div><div class="card-body" style="padding:0;">'
-                + '<div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona')+'" target="_blank" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Mapa')+'</a></div>'
-                + '<div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
+                +'<div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+emergTitle+'</span></div>'
+                +'<div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Ogólne zagrożenie')+'</span></div>'
+                +'<div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Policja')+'</span></div>'
+                +'<div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Nagły wypadek medyczny')+'</span></div>'
+                +'<div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Szpital Riuniti – Izba przyjęć')+'</span></div>'
+                +'<div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div>'
+                +'<div class="card" style="margin-top:10px;"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+usefulTitle+'</span></div><div class="card-body" style="padding:0;">'
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona')+'" target="_blank" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Mapa')+'</a></div>'
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
         }
 
         renderAll();
     </script>
 </body>
 </html>
-```
