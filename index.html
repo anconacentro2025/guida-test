@@ -38,7 +38,6 @@
         .lang-btn.active { background: var(--gold); color: var(--navy); font-weight: 600 }
         .hero { width: 100%; height: 320px; overflow: hidden; position: relative; background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy-3) 100%); transition: height .3s ease }
         .hero.section-mode { height: 68px }
-        /* FIX #7: nasconde la caption hero in modalità sezione */
         .hero.section-mode .hero-caption { visibility: hidden }
         .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .55 }
         .hero-overlay { position: absolute; inset: 0; background: rgba(11,31,51,.45); pointer-events: none }
@@ -78,7 +77,6 @@
         .card-body { padding: 12px 14px 14px; font-size: .82rem; line-height: 1.6; color: var(--text) }
         .card-body a { color: var(--navy-3); font-weight: 500; text-decoration: underline; text-decoration-color: rgba(30,74,112,.3) }
         .map-list-wrap { display: flex; height: 340px; border-radius: 13px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow) }
-        /* FIX #11: sfondo di attesa mappa */
         .section-map-el { flex: 1; min-width: 0; z-index: 1; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%) }
         .place-btn-col { width: 142px; overflow-y: auto; padding: 5px 5px; display: flex; flex-direction: column; gap: 4px; background: var(--white); border-left: 1px solid var(--bg-2); -webkit-overflow-scrolling: touch; scrollbar-width: thin }
         .place-btn-col::-webkit-scrollbar { width: 3px }
@@ -89,7 +87,6 @@
         .map-marker-num.cardeto, .map-marker-num.cittadella { background: #2E7D32 }
         .map-marker-num.selected { background: var(--gold); color: var(--navy); transform: scale(1.25); z-index: 999!important }
         .map-marker-star { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FFD700; border: 2px solid var(--white); color: var(--navy); font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40) }
-        /* FIX #3: star-list-item come button */
         .star-list-btn { width: 100%; text-align: left; padding: 7px 8px; border-radius: 8px; border: 1.5px solid #FFD700; background: #FFD700; font-size: .65rem; font-weight: 700; color: var(--navy); line-height: 1.3; cursor: pointer; transition: all .15s }
         .star-list-btn:active { background: #e6c200; border-color: #e6c200 }
         .back-btn { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; color: var(--navy-3); font-size: .82rem; font-weight: 500; padding: 6px 0 4px }
@@ -188,9 +185,6 @@
         var HOST_EMAIL = 'anconacentro@yahoo.com';
         var PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/';
         var HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
-
-        // FIX #1: placeDataMap viene resettato a ogni cambio sezione/sotto-itinerario
-        // La chiave include la sezione corrente per evitare collisioni
         var placeDataMap = {};
 
         function tr(it, en, pl) { if (currentLang==='it') return it; if (currentLang==='en') return en||it; if (currentLang==='pl') return pl||it; return it; }
@@ -198,8 +192,6 @@
         function showToast(msg) { var el=document.getElementById('toastEl'); el.textContent=msg; el.classList.add('show'); setTimeout(function(){ el.classList.remove('show'); },3000); }
         function getMapLink(query) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query+', Ancona Italia'); }
         function getImgSearchUrl(p) { var q=p.imgQuery||(p.name+' Ancona'); return 'https://www.google.com/search?tbm=isch&q='+encodeURIComponent(q); }
-
-        // photoFallback usa placeDataMap con chiave sicura
         function photoFallback(wrapId) {
             var el=document.getElementById(wrapId);
             var p=placeDataMap[wrapId];
@@ -393,25 +385,24 @@
                 { name:'Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg', it:'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en:'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', pl:'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona', lat:43.5641460, lng:13.5910907 }
             ],
             barpub: [
-                { name:'Bar Torino', emoji:'☕', photo:'', it:'Bar centrale, frequentato dagli anconetani.', en:'Central café, popular with locals.', pl:'Centralna kawiarnia, popularna wśród miejscowych.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
-                { name:'White Bakery', emoji:'🥐', photo:'', it:'Bakery e caffetteria, ottimi dolci e brunch.', en:'Bakery and café, excellent pastries and brunch.', pl:'Piekarnia i kawiarnia, doskonałe ciasta i brunch.', dist:'🚶 100 m – 1 min', mapQuery:'White Bakery Ancona', lat:43.6172070, lng:13.5140194 },
-                { name:'Bar Giuliani', emoji:'☕', photo:'', it:'Bar storico, colazioni e aperitivi.', en:'Historic bar, breakfast and aperitifs.', pl:'Historyczny bar, śniadania i aperitivy.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
-                { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', it:'Lasagne anconetane fatte a mano.', en:'Handmade Ancona-style lasagne.', pl:'Ręcznie robione lasagne w stylu Ankony.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
-                { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', it:'Pizzeria da asporto, rapida e buona.', en:'Take-away pizzeria, fast and good.', pl:'Pizzeria na wynos, szybka i dobra.', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
-                { name:'La Farina', emoji:'🍕', photo:'', it:'Pizzeria al taglio, ottima pizza romana.', en:'Pizza by the slice, excellent Roman pizza.', pl:'Pizza na kawałki, doskonała pizza w stylu rzymskim.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
-                { name:'Il Chiosco', emoji:'🍹', photo:'', it:'Chiosco bar, aperitivi all\'aperto.', en:'Bar kiosk, outdoor aperitifs.', pl:'Bar kiosk, aperitivy na świeżym powietrzu.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
+                { name:'Bar Torino', emoji:'☕', photo:'', it:'Storico bar di Corso Garibaldi famoso per cocktail e aperitivi.', en:'Historic bar on Corso Garibaldi famous for cocktails and aperitifs.', pl:'Historyczny bar przy Corso Garibaldi słynący z koktajli i aperitifów.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
+                { name:'Bar Giuliani', emoji:'☕', photo:'', it:'Bar, tabacchi, gelateria, ristorante, pizzeria. L\'unico bar del centro aperto anche la domenica. Aperto fino a tarda ora.', en:'Bar, tobacconist, ice cream parlour, restaurant, pizzeria. The only bar in the centre open on Sundays too. Open until late.', pl:'Bar, tytoń, lodziarnia, restauracja, pizzeria. Jedyny bar w centrum otwarty również w niedziele. Czynny do późna.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
+                { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', it:'Ottime lasagne da asporto a due passi da casa.', en:'Excellent takeaway lasagne just a stone\'s throw from home.', pl:'Doskonałe lasagne na wynos o rzut kamieniem od domu.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
+                { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', it:'Ottima pizzeria a pochi passi da casa. Consigliata la pizza regina 😉', en:'Great pizzeria just a few steps from home. The "pizza regina" is highly recommended 😉', pl:'Doskonała pizzeria o kilka kroków od domu. Polecana pizza regina 😉', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
+                { name:'La Farina', emoji:'🍕', photo:'', it:'Buona pizzeria al taglio.', en:'Good pizza by the slice.', pl:'Dobra pizzeria na kawałki.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
+                { name:'Il Chiosco', emoji:'🍹', photo:'', it:'Bar all\'aperto in piazza Cavour con nuova gestione giovane e pimpante.', en:'Open-air bar in Piazza Cavour with new, young and lively management.', pl:'Bar na świeżym powietrzu na Piazza Cavour z nowym, młodym i energicznym kierownictwem.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
                 { name:'Donegal Irish Pub', emoji:'🍺', photo:'', it:'Pub irlandese, birre alla spina e musica dal vivo.', en:'Irish pub, draught beer and live music.', pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona', lat:43.6163846, lng:13.5156090 }
             ],
             supermarkets: [
-                { name:'Coal – Via Podesti', emoji:'🛒', photo:'', it:'Supermercato ben fornito, vicino.', en:'Well-stocked supermarket, nearby.', pl:'Dobrze zaopatrzony supermarket, blisko.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
-                { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', it:'Mercato coperto storico, frutta e verdura fresca.', en:'Historic covered market, fresh fruit and vegetables.', pl:'Historyczny kryty targ, świeże owoce i warzywa.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
-                { name:'Coal – Via San Martino', emoji:'🛒', photo:'', it:'Aperto anche domenica mattina.', en:'Open on Sunday mornings too.', pl:'Czynny też w niedzielne poranki.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
-                { name:'Sì con te – Via Matteotti', emoji:'🛒', photo:'', it:'Via Matteotti 115.', en:'Via Matteotti 115.', pl:'Via Matteotti 115.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
+                { name:'Coal – Via Podesti', emoji:'🛒', photo:'', it:'Supermercato ben fornito. Il più vicino a casa.', en:'Well-stocked supermarket. The closest one to home.', pl:'Dobrze zaopatrzony supermarket. Najbliższy domu.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
+                { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', it:'Storico mercato coperto aperto solo la mattina con frutta e verdura di produzione locale, banchi di pesce fresco, forno, stoccafisso, macelleria.', en:'Historic covered market open only in the morning with locally produced fruit and vegetables, fresh fish stalls, bakery, stockfish, butcher\'s.', pl:'Historyczny kryty targ otwarty tylko rano z lokalnie produkowanymi owocami i warzywami, straganami ze świeżymi rybami, piekarnią, sztokfiszem, masarnią.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
+                { name:'Coal – Via San Martino', emoji:'🛒', photo:'', it:'Supermercato aperto anche la mattina di domenica e festivi.', en:'Supermarket open also on Sunday mornings and public holidays.', pl:'Supermarket otwarty również w niedzielne poranki i święta.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
+                { name:'Sì con te', emoji:'🛒', photo:'', it:'Supermercato in via Matteotti.', en:'Supermarket in Via Matteotti.', pl:'Supermarket przy Via Matteotti.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
             ],
             parking: [
                 { name:'Parcheggio degli Archi', emoji:'🅿️', photo:'parcheggio-archi.jpg', it:'Consigliato – €6/giorno, oltre 500 posti, custodito.', en:'Recommended – €6/day, over 500 spaces, supervised.', pl:'Polecany – €6/dzień, ponad 500 miejsc, strzeżony.', dist:'🚗 1 km – 2 min', mapQuery:'Parcheggio degli Archi Ancona', lat:43.6098074, lng:13.5032732 },
                 { name:'Parcheggio Traiano', emoji:'🅿️', photo:'', it:'Comodo per porto e centro storico.', en:'Convenient for the harbour and historic centre.', pl:'Wygodny dla portu i centrum historycznego.', dist:'🚶 550 m – 7 min', mapQuery:'Parcheggio Traiano Ancona', lat:43.6175179, lng:13.5079818 },
-                { name:'Parcheggio Stamira', emoji:'🅿️', photo:'', it:'Più vicino, più caro.', en:'Closer, more expensive.', pl:'Bliżej, drożej.', dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona', lat:43.6162329, lng:13.5154477 },
+                { name:'Parcheggio Stamira', emoji:'🅿️', photo:'', it:'Parcheggio sotterraneo, il più vicino, il più caro.', en:'Underground car park, the closest, the most expensive.', pl:'Parking podziemny, najbliższy, najdroższy.', dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona', lat:43.6162329, lng:13.5154477 },
                 { name:'Strisce blu (zona centro)', emoji:'🅿️', photo:'', it:'Parcheggio a pagamento su strada, posto difficile.', en:'Pay-and-display street parking, hard to find.', pl:'Płatny parking uliczny, trudno znaleźć miejsce.', dist:'📍 In zona centro', mapQuery:'Parcheggio strisce blu Ancona centro', lat:43.6184165, lng:13.5120000 }
             ],
             around: [
@@ -427,9 +418,8 @@
                 { name:'Ascoli Piceno', emoji:'⛲', photo:'ascoli.jpg', it:'Città del travertino che conserva un centro storico intatto con la stupenda Piazza del Popolo, una delle più belle d\'Italia. Imperdibili le olive all\'ascolana.', en:'City of travertine, preserving an intact historic centre with the stunning Piazza del Popolo, one of the most beautiful squares in Italy. Not to be missed: the olive all\'ascolana.', pl:'Miasto trawertynu, zachowujące nienaruszone historyczne centrum ze wspaniałym Piazza del Popolo, jednym z najpiękniejszych placów we Włoszech. Nie można przegapić: oliwki po ascolańsku.', dist:'🚗 90 km – 1h', mapQuery:'Ascoli Piceno AP', lat:42.8534, lng:13.5741 }
             ],
             transport: {
-                // FIX #12: link stabile alla pagina orari Conerobus invece del PDF stagionale
-                bus: { it:'Linee 1 e 4 da Piazza Roma (sotto casa). Per Portonovo: bus 94 da Piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'Lines 1 and 4 from Piazza Roma (right below). For Portonovo: bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', pl:'Linie 1 i 4 z Piazza Roma (pod domem). Do Portonovo: autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
-                train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
+                bus: { it:'Per la stazione bus 1/4 a pochi metri da casa. Per Portonovo bus 94 da piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'For bus 1/4 stop, just a few metres from home. For Portonovo, bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', pl:'Przystanek autobusów 1/4 kilka metrów od domu. Do Portonovo autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
+                train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara e per/da l\'aeroporto.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara and to/from the airport.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary oraz do/z lotniska.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
                 taxi: { it:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', en:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', pl:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)' },
                 ferry: { it:'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en:'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl:'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
                 airport: { it:'Aeroporto Falconara "Raffaello Sanzio": 15 km – 30 min in auto, bus o treno.', en:'Falconara Airport "Raffaello Sanzio": 15 km – 30 min by car, bus or train.', pl:'Lotnisko Falconara "Raffaello Sanzio": 15 km – 30 min samochodem, autobusem lub pociągiem.' }
@@ -452,15 +442,15 @@
         function openSubItinerary(subId) {
             currentSubItinerary = subId;
             currentPlaceDetail = -1;
-            placeDataMap = {}; // FIX #1: reset mappa foto
+            placeDataMap = {};
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
-            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0); // FIX #8
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
         }
         function closeSubItinerary() {
             currentSubItinerary = null;
             currentPlaceDetail = -1;
-            placeDataMap = {}; // FIX #1
+            placeDataMap = {};
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
             setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
@@ -469,7 +459,7 @@
             currentSection = i;
             currentPlaceDetail = -1;
             currentSubItinerary = null;
-            placeDataMap = {}; // FIX #1
+            placeDataMap = {};
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
             setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
@@ -481,15 +471,13 @@
             currentPlaceDetail = i;
             if (leafletMap) { leafletMap.remove(); leafletMap = null; }
             renderAll();
-            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0); // FIX #8
+            setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
         }
         function backToMap() {
             currentPlaceDetail = -1;
             renderAll();
             setTimeout(function(){ window.scrollTo({ top:0, behavior:'smooth' }); }, 0);
         }
-
-        // FIX #6: panTo con zoom fisso 15 per centrare correttamente la stellina
         function panToHome() {
             if (leafletMap) { leafletMap.setView([HOME_COORDS.lat, HOME_COORDS.lng], 15); }
         }
@@ -505,7 +493,6 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(leafletMap);
             L.control.attribution({ prefix:'© <a href="https://openstreetmap.org">OSM</a>' }).addTo(leafletMap);
 
-            // FIX #5: fitBounds calcolato SOLO sui punti della sezione, NON sulla stellina
             var bounds = [];
             valid.forEach(function(p, idx) {
                 var displayNum = getDisplayNumber(p, idx);
@@ -519,7 +506,6 @@
             });
             leafletMap.fitBounds(bounds, { padding:[22,22] });
 
-            // Stellina aggiunta DOPO fitBounds, non altera il viewport
             var starIcon = L.divIcon({ html:'<div class="map-marker-star">★</div>', className:'', iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-16] });
             L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { icon:starIcon, zIndexOffset:1000 })
                 .addTo(leafletMap)
@@ -531,7 +517,6 @@
             if (typeof p.order==='string' && p.order.indexOf('bis')>-1) return p.order.replace('-bis','b');
             return index+1;
         }
-        // FIX #2: guard su lista vuota
         function getTotalDisplay(items, total) {
             if (!total || !items || !items.length) return 0;
             if (currentSubItinerary) return String.fromCharCode(64+total);
@@ -588,7 +573,6 @@
             return '';
         }
 
-        // Pulsante stellina con FIX #3 (button accessibile) e FIX #6 (setView con zoom)
         function starBtnHtml() {
             return '<button class="star-list-btn" onclick="panToHome()" aria-label="Centra la mappa su Ancona Centro">★ Ancona Centro</button>';
         }
@@ -602,20 +586,19 @@
                 if (currentPlaceDetail>=0 && currentPlaceDetail<items.length) {
                     return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, true);
                 }
-                var btns=items.map(function(p,i){ var dn=getDisplayNumber(p,i); var sel=(i===currentPlaceDetail)?' selected':''; return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>'; }).join('');
+                var btns=items.map(function(p,i){ var dn=getDisplayNumber(p,i); return '<button class="place-btn-mini" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>'; }).join('');
                 return '<button class="back-btn" onclick="closeSubItinerary()">← '+tr('Torna al tour principale','Back to main tour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
             }
             if (currentPlaceDetail>=0 && currentPlaceDetail<items.length) {
                 return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, false);
             }
-            var btns=items.map(function(p,i){ var dn=getDisplayNumber(p,i); var sel=(i===currentPlaceDetail)?' selected':''; return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>'; }).join('');
+            var btns=items.map(function(p,i){ var dn=getDisplayNumber(p,i); return '<button class="place-btn-mini" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>'; }).join('');
             return '<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         }
 
-        // FIX #9: renderPlaceDetail e renderSubPlaceDetail unificati in renderAnyPlaceDetail
         function renderAnyPlaceDetail(p, index, total, isSubMode) {
             var wrapId = 'photowrap_'+index;
-            placeDataMap[wrapId] = p; // salva riferimento per photoFallback
+            placeDataMap[wrapId] = p;
             var desc = tr(p.it, p.en, p.pl);
             var photoHtml;
             if (p.photo) {
@@ -631,7 +614,7 @@
             if (!isSubMode && p.extraMap) { btns+=' <a href="'+getMapLink(p.extraMap.query)+'" target="_blank" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>'; }
             var displayNum = getDisplayNumber(p, index);
             var totalDisplay = getTotalDisplay(currentSectionPlaces, total);
-            var backFn = isSubMode ? 'backToMap()' : 'backToMap()';
+            var backFn = 'backToMap()';
             var backLabel = tr('Tutti i luoghi','All places','Wszystkie miejsca');
             var prev = index>0 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index-1)+')" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Poprz.')+'</button>' : '<span></span>';
             var next = index<total-1 ? '<button class="nav-detail-btn" onclick="selectPlaceDetail('+(index+1)+')" aria-label="Luogo successivo">'+tr('Succ.','Next','Nast.')+' ▶</button>' : '<span></span>';
@@ -679,7 +662,9 @@
                 +'<div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div>'
                 +'<div class="card" style="margin-top:10px;"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+usefulTitle+'</span></div><div class="card-body" style="padding:0;">'
                 +'<div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona')+'" target="_blank" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Mapa')+'</a></div>'
-                +'<div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" class="link-action" aria-label="Apri portale turistico">↗</a></div>'
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="https://www.google.com/maps/search/?api=1&query=43.6182699,13.5171214" target="_blank" class="link-action" aria-label="Mappa Lavanderia">🗺️ '+tr('Mappa','Map','Mapa')+'</a></div>'
+                +'</div></div>';
         }
 
         renderAll();
