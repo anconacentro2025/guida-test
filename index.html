@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V3.6</title>
+    <title>Ancona Centro · Guida Ospiti V3.8</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -23,7 +22,6 @@
             --text: #1A2332;
             --border: rgba(200, 164, 90, .22);
             --shadow: 0 2px 16px rgba(11, 31, 51, .10);
-            --shadow-lg: 0 6px 32px rgba(11, 31, 51, .16);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent }
         html { scroll-behavior: smooth }
@@ -56,9 +54,9 @@
         .home-social { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 10px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(200,164,90,.25); color: var(--white) }
         .home-social-label { color: rgba(255,255,255,.6); font-size: .65rem; text-transform: uppercase; letter-spacing: .08em }
         .home-social-links { display: flex; gap: 14px; align-items: center }
-        .home-social-link { color: var(--gold-2); font-size: .85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color .2s }
-        .home-social-link:hover { color: var(--gold-3) }
-        .home-social-link:active { color: var(--gold) }
+        .social-link { color: var(--gold-2); font-size: .85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color .2s }
+        .social-link:hover { color: var(--gold-3) }
+        .social-link:active { color: var(--gold) }
         .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 16px 20px }
         .nav-tile { background: var(--white); border-radius: 14px; padding: 16px 14px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; transition: transform .15s, box-shadow .15s; border-left: 3px solid var(--gold) }
         .nav-tile:active { transform: scale(.97); box-shadow: none }
@@ -85,6 +83,7 @@
         .map-marker-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--navy); border: 2px solid var(--white); color: var(--white); font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40) }
         .map-marker-num.cardeto, .map-marker-num.cittadella { background: #2E7D32 }
         .map-marker-num.selected { background: var(--gold); color: var(--navy); transform: scale(1.25); z-index: 999!important }
+        .map-marker-num.has-sub { border-color: var(--gold); border-width: 3px }
         .map-marker-star { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FFD700; border: 2px solid var(--white); color: var(--navy); font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40) }
         .star-list-btn { width: 100%; text-align: left; padding: 7px 8px; border-radius: 8px; border: 1.5px solid #FFD700; background: #FFD700; font-size: .65rem; font-weight: 700; color: var(--navy); line-height: 1.3; cursor: pointer; transition: all .15s }
         .star-list-btn:active { background: #e6c200; border-color: #e6c200 }
@@ -170,10 +169,36 @@
     <div class="gold-bar" aria-hidden="true"></div>
     <nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V3.6 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V3.8 · All rights reserved</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        /* ============================================================================
+           Affittacamere Ancona Centro — Guida Ospiti
+           Versione: V3.8
+           Generata: 15/06/2026 13:06 (Europe/Rome)
+           ----------------------------------------------------------------------------
+           Modifiche V3.8 (rispetto a V3.7) - migliorie di coerenza/UX:
+           - Link social Home e Contatti ora condividono lo stesso stile testuale
+             dorato (.social-link, ex .home-social-link); in Contatti non riusano
+             più .btn-call.
+           - Tutti i link target="_blank" rel="noopener" hanno ora rel="noopener".
+           - Le tappe 16 (Cardeto) e 19 (Cittadella), che aprono un sotto-itinerario,
+             ora hanno badge 🔀 nella lista, hint nell'aria-label e bordo dorato
+             sul marker mappa (has-sub).
+           - getMapLink per l'Edicola non duplica più "Ancona" nella query.
+           - Rimossa variabile CSS --shadow-lg (inutilizzata).
+           ----------------------------------------------------------------------------
+           Modifiche V3.7 (rispetto a V3.6) - bugfix:
+           - Fix numerazione Tour a piedi: getDisplayNumber/getTotalDisplay ora usano
+             p.order quando numerico (prima: index+1, sfasava di +1 le tappe 7-20
+             dopo "6-bis" e il totale mostrava 21 invece di 20).
+           - Fix numero Radiotaxi nel link tel: (era tel:+390714321, mancava una
+             cifra rispetto al testo "+39 071 43321" -> ora tel:+3907143321).
+           - Sottotitolo header ora tradotto in IT/EN/DE/PL (prima restava sempre
+             "Guest Guide · Piazza Roma 3"); aggiornato anche <html lang> al cambio
+             lingua.
+           ============================================================================ */
         var currentLang = 'it';
         var currentSection = -1;
         var currentPlaceDetail = -1;
@@ -186,6 +211,7 @@
         var HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
         var placeDataMap = {};
         var _mapRetryCount = 0;
+        var headerSubTr = { it:'Guida Ospiti · Piazza Roma 3', en:'Guest Guide · Piazza Roma 3', de:'Gästeführer · Piazza Roma 3', pl:'Przewodnik dla gości · Piazza Roma 3' };
 
         function tr(it, en, de, pl) { if (currentLang==='it') return it; if (currentLang==='en') return en||it; if (currentLang==='de') return de||en||it; if (currentLang==='pl') return pl||en||it; return it; }
         function setLang(lang) { currentLang=lang; ['it','en','de','pl'].forEach(function(l){ var el=document.getElementById('btn-'+l); if(el){ el.classList.toggle('active',l===lang); el.setAttribute('aria-checked',l===lang?'true':'false'); } }); renderAll(); }
@@ -195,7 +221,7 @@
             var el=document.getElementById(wrapId);
             var p=placeDataMap[wrapId];
             if(el&&p) {
-                el.innerHTML='<a href="'+getImgSearchUrl(p)+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>';
+                el.innerHTML='<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>';
             }
         }
         function calcDistance(lat1, lon1, lat2, lon2) {
@@ -473,10 +499,10 @@
                 { name:'Ascoli Piceno', emoji:'⛲', photo:'ascoli.jpg', it:'Città del travertino che conserva un centro storico intatto con la stupenda Piazza del Popolo, una delle più belle d\'Italia. Imperdibili le olive all\'ascolana.', en:'City of travertine, preserving an intact historic centre with the stunning Piazza del Popolo, one of the most beautiful squares in Italy. Not to be missed: the olive all\'ascolana.', de:'Stadt aus Travertin, mit einem unversehrten historischen Zentrum und der herrlichen Piazza del Popolo, einem der schönsten Plätze Italiens. Unbedingt probieren: die Olive all\'ascolana.', pl:'Miasto trawertynu, zachowujące nienaruszone historyczne centrum ze wspaniałym Piazza del Popolo, jednym z najpiękniejszych placów we Włoszech. Nie można przegapić: oliwki po ascolańsku.', dist:'🚗 90 km – 1h', mapQuery:'Ascoli Piceno AP', lat:42.8534, lng:13.5741 }
             ],
             transport: {
-                bus: { it:'Per la stazione bus 1/4 a pochi metri da casa. Per Portonovo bus 94 da piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'For bus 1/4 stop, just a few metres from home. For Portonovo, bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', de:'Zur Bushaltestelle 1/4 nur wenige Meter vom Haus entfernt. Nach Portonovo Bus 94 ab Piazza Cavour. Fahrkarte €1,30 (70 Min.).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus Fahrpläne →</a>', pl:'Przystanek autobusów 1/4 kilka metrów od domu. Do Portonovo autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
-                train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara e per/da l\'aeroporto.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara and to/from the airport.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', de:'Hauptbahnhof: 1 km – 15 Min. zu Fuß. Züge nach Rom, Bologna, Pescara und zum/vom Flughafen.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia Fahrpläne →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary oraz do/z lotniska.<br><a href="https://www.trenitalia.com" target="_blank" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
-                taxi: { it:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', en:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', de:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', pl:'Radiotaxi Ancona: <a href="tel:+390714321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)' },
-                ferry: { it:'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en:'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', de:'Fährhafen: 2 km – 10 Min. mit dem Taxi. Fähren nach Kroatien, Griechenland, Albanien.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl:'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
+                bus: { it:'Per la stazione bus 1/4 a pochi metri da casa. Per Portonovo bus 94 da piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'For bus 1/4 stop, just a few metres from home. For Portonovo, bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', de:'Zur Bushaltestelle 1/4 nur wenige Meter vom Haus entfernt. Nach Portonovo Bus 94 ab Piazza Cavour. Fahrkarte €1,30 (70 Min.).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus Fahrpläne →</a>', pl:'Przystanek autobusów 1/4 kilka metrów od domu. Do Portonovo autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
+                train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara e per/da l\'aeroporto.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara and to/from the airport.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', de:'Hauptbahnhof: 1 km – 15 Min. zu Fuß. Züge nach Rom, Bologna, Pescara und zum/vom Flughafen.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia Fahrpläne →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary oraz do/z lotniska.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
+                taxi: { it:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', en:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', de:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', pl:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)' },
+                ferry: { it:'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en:'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', de:'Fährhafen: 2 km – 10 Min. mit dem Taxi. Fähren nach Kroatien, Griechenland, Albanien.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl:'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
                 airport: { it:'Aeroporto Falconara "Raffaello Sanzio": 15 km – 30 min in auto, bus o treno.', en:'Falconara Airport "Raffaello Sanzio": 15 km – 30 min by car, bus or train.', de:'Flughafen Falconara "Raffaello Sanzio": 15 km – 30 Min. mit Auto, Bus oder Zug.', pl:'Lotnisko Falconara "Raffaello Sanzio": 15 km – 30 min samochodem, autobusem lub pociągiem.' }
             }
         };
@@ -563,6 +589,7 @@
                 var displayNum = getDisplayNumber(p, idx);
                 var markerClass = 'map-marker-num';
                 if (currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella') markerClass+=' '+currentSubItinerary;
+                if (p.isSubItinerary) markerClass+=' has-sub';
                 var icon = L.divIcon({ html:'<div class="'+markerClass+'" aria-label="'+p.name+'">'+displayNum+'</div>', className:'', iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-14] });
                 var m = L.marker([p.lat, p.lng], { icon:icon }).addTo(leafletMap);
                 m.bindPopup('<b style="font-size:.78rem;">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888;">'+p.dist+'</span>');
@@ -580,6 +607,7 @@
         function getDisplayNumber(p, index) {
             if (currentSubItinerary) return String.fromCharCode(65+index);
             if (typeof p.order==='string' && p.order.indexOf('bis')>-1) return p.order.replace('-bis','b');
+            if (typeof p.order==='number') return p.order;
             return index+1;
         }
         function getTotalDisplay(items, total) {
@@ -587,6 +615,7 @@
             if (currentSubItinerary) return String.fromCharCode(64+total);
             var last = items[total-1];
             if (last && typeof last.order==='string' && last.order.indexOf('bis')>-1) return last.order.replace('-bis','b');
+            if (last && typeof last.order==='number') return last.order;
             return total;
         }
         function sortMustSee(a, b) {
@@ -595,6 +624,8 @@
         }
 
         function renderAll() {
+            document.getElementById('header-sub').textContent = tr(headerSubTr.it, headerSubTr.en, headerSubTr.de, headerSubTr.pl);
+            document.documentElement.lang = currentLang;
             var hero=document.getElementById('hero');
             var nav=document.getElementById('nav');
             var cont=document.getElementById('content');
@@ -612,7 +643,7 @@
         }
 
         function renderHome() {
-            var socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" class="home-social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" class="home-social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div></div>';
+            var socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div></div>';
             var tiles=sections.map(function(s,i){
                 return '<button class="nav-tile" onclick="goTo('+i+')" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
             }).join('');
@@ -674,7 +705,9 @@
             var btns=items.map(function(p,i){
                 var dn=getDisplayNumber(p,i);
                 var sel = (i===currentPlaceDetail) ? ' selected' : '';
-                return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';
+                var subBadge = p.isSubItinerary ? ' 🔀' : '';
+                var subHint = p.isSubItinerary ? ' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa') : '';
+                return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';
             }).join('');
             return '<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         }
@@ -691,10 +724,10 @@
                     +'onload="this.classList.add(\'loaded\');var e=document.getElementById(\'ph_'+index+'\');if(e)e.classList.add(\'hidden\');" '
                     +'onerror="photoFallback(\''+wrapId+'\')" loading="lazy"></div>';
             } else {
-                photoHtml = '<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
+                photoHtml = '<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
             }
-            var btns = '<a href="'+getMapLink(p.mapQuery||p.name, !!p.mapQuery)+'" target="_blank" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
-            if (!isSubMode && p.extraMap) { btns+=' <a href="'+getMapLink(p.extraMap.query, true)+'" target="_blank" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>'; }
+            var btns = '<a href="'+getMapLink(p.mapQuery||p.name, !!p.mapQuery)+'" target="_blank" rel="noopener" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
+            if (!isSubMode && p.extraMap) { btns+=' <a href="'+getMapLink(p.extraMap.query, true)+'" target="_blank" rel="noopener" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>'; }
             var displayNum = getDisplayNumber(p, index);
             var totalDisplay = getTotalDisplay(currentSectionPlaces, total);
             var backFn = isSubMode ? 'backToMap()' : 'backToMap()';
@@ -721,7 +754,7 @@
                 return '<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+item.icon+'</span><span class="card-title">'+item.label+'</span></div><div class="card-body"><p>'+item.text+'</p></div></div>';
             }).join('');
             var portalLabel=tr('Portale turistico ufficiale','Official tourism portal','Offizielles Tourismusportal','Oficjalny portal turystyczny');
-            cardsHtml+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+portalLabel+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px;" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
+            cardsHtml+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+portalLabel+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" rel="noopener" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px;" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
             return cardsHtml;
         }
 
@@ -753,8 +786,8 @@
             var waLabel=tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie');
             var emergTitle=tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe');
             var usefulTitle=tr('Link utili','Useful links','Nützliche Links','Przydatne linky');
-            var socialLinks='<div style="margin-top:14px;display:flex;justify-content:center;gap:20px;"><a href="'+appData.social.instagram+'" target="_blank" class="btn-call" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" class="btn-call" aria-label="Pagina Facebook">📘 Facebook</a></div>';
-            return '<div class="contact-card"><div class="contact-label">📞 '+waLabel+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div>'+socialLinks+'</div>'
+            var socialLinks='<div style="margin-top:14px;display:flex;justify-content:center;gap:20px;"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a></div>';
+            return '<div class="contact-card"><div class="contact-label">📞 '+waLabel+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div>'+socialLinks+'</div>'
                 +'<div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+emergTitle+'</span></div>'
                 +'<div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div>'
                 +'<div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div>'
@@ -762,9 +795,9 @@
                 +'<div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div>'
                 +'<div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div>'
                 +'<div class="card" style="margin-top:10px;"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+usefulTitle+'</span></div><div class="card-body" style="padding:0;">'
-                +'<div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona')+'" target="_blank" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div>'
-                +'<div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" class="link-action" aria-label="Apri portale turistico">↗</a></div>'
-                +'<div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="https://www.google.com/maps/search/?api=1&query=43.6182699,13.5171214" target="_blank" class="link-action" aria-label="Mappa Lavanderia">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div>'
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona', true)+'" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div>'
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener" class="link-action" aria-label="Apri portale turistico">↗</a></div>'
+                +'<div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="https://www.google.com/maps/search/?api=1&query=43.6182699,13.5171214" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Lavanderia">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div>'
                 +'</div></div>';
         }
 
