@@ -1,3 +1,10 @@
+Ecco il file index.html completo e aggiornato con il box GPS migliorato, chiaro e visibile in tutte le sezioni con mappa.
+
+---
+
+📁 index.html – Versione definitiva V3.9
+
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -157,44 +164,58 @@
         .link-desc { font-size: .7rem; color: var(--muted); margin-top: 1px }
         .link-action { font-size: .68rem; color: var(--navy-3); background: var(--bg); padding: 4px 9px; border-radius: 14px; border: 1px solid var(--border); white-space: nowrap }
 
-        /* GPS UI */
+        /* ===== GPS UI MIGLIORATA ===== */
         .map-gps-container {
-            background: var(--white);
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            font-size: .8rem;
-            color: var(--text);
+            background: #FFF8E7;
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
         }
         .map-gps-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .map-gps-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
         }
         .map-gps-text {
-            line-height: 1.4;
-            color: var(--muted);
             flex: 1;
+            font-size: .85rem;
+            line-height: 1.5;
+            color: var(--text);
+        }
+        .map-gps-text strong {
+            color: var(--navy);
+            font-weight: 600;
         }
         .btn-gps-toggle {
             background: var(--navy);
             color: var(--white);
             border: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: .75rem;
-            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: .85rem;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             white-space: nowrap;
-            transition: all .2s;
+            transition: all .25s;
+            box-shadow: 0 2px 8px rgba(11,31,51,.25);
         }
         .btn-gps-toggle.active {
             background: var(--gold);
             color: var(--navy);
-            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(200,164,90,.4);
+        }
+        .btn-gps-toggle:active {
+            transform: scale(.95);
         }
         .gps-blue-dot-wrap {
             position: relative;
@@ -260,7 +281,7 @@
     <script>
         /* ============================================================
            AFFITTACAMERE ANCONA CENTRO — GUIDA OSPITI V3.9
-           Versione completa con PWA, GPS e tutte le sezioni
+           Versione completa con PWA, GPS migliorato e tutte le sezioni
            ============================================================ */
 
         var currentLang = 'it';
@@ -695,28 +716,32 @@
         }
 
         // ============================================================
-        // GPS FUNCTIONS
+        // GPS FUNCTIONS – MIGLIORATE CON BOX CHIARO
         // ============================================================
 
         function renderGpsUI() {
             var container = document.getElementById('gps-ui-container');
             if (!container) return;
+            
             var infoText = tr(
-                "Attiva la tua posizione per seguire i tour passo-passo sulla mappa o calcolare il percorso più veloce per raggiungere i ristoranti, i bar e i punti consigliati.",
-                "Activate your location to follow the tours step-by-step on the map or find the fastest route to recommended restaurants, bars, and sights.",
-                "Aktivieren Sie Ihren Standort, um den Touren Schritt für Schritt auf der Karte zu folgen oder den schnellsten Weg zu empfohlenen Restaurants, Bars und Sehenswürdigkeiten zu finden.",
-                "Włącz swoją lokalizację, aby śledzić trasy krok po kroku na mapie lub znaleźć najszybszą drogę do polecanych restauracji, barów i atrakcji."
+                "🧭 <strong>Navigazione in tempo reale</strong><br>Attiva la geolocalizzazione per vedere la tua posizione sulla mappa e seguire l'itinerario passo dopo passo. La mappa si centrerà automaticamente su di te mentre ti sposti.",
+                "🧭 <strong>Real-time navigation</strong><br>Enable geolocation to see your position on the map and follow the route step by step. The map will automatically center on you as you move.",
+                "🧭 <strong>Echtzeit-Navigation</strong><br>Aktivieren Sie die Standortermittlung, um Ihre Position auf der Karte zu sehen und der Route Schritt für Schritt zu folgen. Die Karte zentriert sich automatisch auf Sie, während Sie sich bewegen.",
+                "🧭 <strong>Nawigacja w czasie rzeczywistym</strong><br>Włącz geolokalizację, aby zobaczyć swoją pozycję na mapie i podążać trasą krok po kroku. Mapa będzie automatycznie centrować się na Tobie podczas poruszania się."
             );
+            
             var btnText = isGpsTracking ? 
                 '🎯 ' + tr('Spegni GPS', 'Disable GPS', 'GPS deaktivieren', 'Wyłącz GPS') : 
                 '📍 ' + tr('Mostrami sulla mappa', 'Show me on map', 'Auf Karte zeigen', 'Pokaż na mapie');
 
-            container.innerHTML = '<div class="map-gps-container">' +
-                       '  <div class="map-gps-row">' +
-                       '  <div class="map-gps-text">' + infoText + '</div>' +
-                       '  <button id="btn-gps" class="btn-gps-toggle ' + (isGpsTracking ? 'active' : '') + '" onclick="toggleGpsTracking()">' + btnText + '</button>' +
-                       '  </div>' +
-                       '</div>';
+            container.innerHTML = 
+                '<div class="map-gps-container">' +
+                '  <div class="map-gps-row">' +
+                '    <div class="map-gps-icon">📍</div>' +
+                '    <div class="map-gps-text">' + infoText + '</div>' +
+                '    <button id="btn-gps" class="btn-gps-toggle ' + (isGpsTracking ? 'active' : '') + '" onclick="toggleGpsTracking()">' + btnText + '</button>' +
+                '  </div>' +
+                '</div>';
         }
 
         function toggleGpsTracking() {
@@ -780,7 +805,7 @@
         }
 
         // ============================================================
-        // RENDER FUNCTIONS (come V3.8)
+        // RENDER FUNCTIONS
         // ============================================================
 
         function renderAll() {
@@ -846,6 +871,7 @@
         function renderPlaceSection(items) {
             currentSectionPlaces = items;
             var gpsHtml = '<div id="gps-ui-container"></div>';
+            
             if (currentSubItinerary) {
                 var parent = null;
                 for (var k=0; k<appData.mustsee.length; k++) { if (appData.mustsee[k].subId===currentSubItinerary){ parent=appData.mustsee[k]; break; } }
@@ -858,11 +884,16 @@
                     var sel = (i===currentPlaceDetail) ? ' selected' : '';
                     return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';
                 }).join('');
-                return '<button class="back-btn" onclick="closeSubItinerary()">← '+tr('Torna al tour principale','Back to main tour','Zurück zur Haupttour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+subBtns+'</div></div>';
+                return gpsHtml + 
+                    '<button class="back-btn" onclick="closeSubItinerary()">← '+tr('Torna al tour principale','Back to main tour','Zurück zur Haupttour','Powrót do głównej trasy')+'</button>'+
+                    descHtml+
+                    '<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+subBtns+'</div></div>';
             }
+            
             if (currentPlaceDetail>=0 && currentPlaceDetail<items.length) {
                 return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, false);
             }
+            
             var btns=items.map(function(p,i){
                 var dn=getDisplayNumber(p,i);
                 var sel = (i===currentPlaceDetail) ? ' selected' : '';
@@ -870,7 +901,9 @@
                 var subHint = p.isSubItinerary ? ' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa') : '';
                 return '<button class="place-btn-mini'+sel+'" onclick="selectPlaceDetail('+i+')" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';
             }).join('');
-            return gpsHtml + '<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
+            
+            return gpsHtml + 
+                '<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         }
 
         function renderAnyPlaceDetail(p, index, total, isSubMode) {
@@ -1005,13 +1038,16 @@
                 .addTo(leafletMap)
                 .bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
 
-            // Riapplica lo stato GPS se attivo
+            // Se il GPS era attivo, ripristina la posizione
             if (isGpsTracking && userLocationMarker && userLocationCircle) {
-                // il marker è già presente, non facciamo nulla
+                // già presente
             } else if (isGpsTracking) {
-                // il GPS era attivo ma la mappa è stata ricaricata, riattivalo
+                // riattiva il GPS se era attivo prima del refresh della mappa
                 toggleGpsTracking();
             }
+            
+            // Assicura che il GPS UI sia renderizzato
+            renderGpsUI();
         }
 
         // ============================================================
@@ -1037,3 +1073,107 @@
     </script>
 </body>
 </html>
+```
+
+---
+
+📁 manifest.json (stesso di prima)
+
+```json
+{
+  "name": "Ancona Centro · Guida Ospiti",
+  "short_name": "Ancona Guide",
+  "description": "Guida digitale per l'Affittacamere Ancona Centro con tour, mappe e info utili.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0B1F33",
+  "background_color": "#F3F0EA",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+```
+
+---
+
+📁 sw.js (stesso di prima)
+
+```javascript
+const CACHE_NAME = 'ancona-guide-v3.9';
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('✅ Cache aperta');
+        return cache.addAll(urlsToCache);
+      })
+      .catch(err => console.error('❌ Errore cache:', err))
+  );
+});
+
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            console.log('🗑️ Rimossa cache obsoleta:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request).catch(() => {
+          return new Response('Contenuto non disponibile offline', { status: 404 });
+        });
+      })
+  );
+});
+```
+
+---
+
+📂 Struttura finale
+
+```
+/ (root)
+├── index.html
+├── manifest.json
+├── sw.js
+└── (eventuali immagini o sottocartelle)
+```
+
+---
+
+Ora il box GPS è chiaro, visibile e presente in tutte le sezioni con mappa. Il pulsante spiega esattamente cosa fa e, una volta attivato, si trasforma in "Spegni GPS" con colore oro per indicare che è attivo.
+
+Se hai bisogno di altre modifiche, fammi sapere!
