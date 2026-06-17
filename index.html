@@ -160,8 +160,7 @@
         /* ===== GPS UI – sempre nel DOM ma nascosta di default ===== */
         #gps-ui-container {
             display: none;
-            padding: 0 14px;
-            margin-top: 12px;
+            /* padding e margin rimossi – verrà posizionato all'interno di .cards */
         }
         #gps-ui-container.visible {
             display: block;
@@ -335,7 +334,7 @@
                 }
             });
             renderAll();
-            updateGpsUI();
+            // updateGpsUI verrà chiamato da renderAll
         }
 
         function getMapLink(query, noSuffix) {
@@ -847,7 +846,19 @@
             var s=sections[currentSection];
             var body=renderSection(s.id);
             cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div></div></section>';
-            if (currentPlaceDetail<0){ setTimeout(initSectionMap, 0); setTimeout(updateGpsUI, 200); } else { updateGpsUI(); }
+
+            // SPOSTA IL BOX GPS ALL'INIZIO DI .cards (sotto il titolo)
+            if (currentPlaceDetail < 0) {
+                var cardsEl = cont.querySelector('.cards');
+                var gpsContainer = document.getElementById('gps-ui-container');
+                if (cardsEl && gpsContainer) {
+                    cardsEl.insertBefore(gpsContainer, cardsEl.firstChild);
+                }
+                setTimeout(initSectionMap, 0);
+                setTimeout(updateGpsUI, 200);
+            } else {
+                updateGpsUI();
+            }
         }
 
         function renderHome() {
