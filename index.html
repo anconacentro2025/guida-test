@@ -314,7 +314,7 @@
                 }
             });
             renderAll();
-            renderGpsUI();
+            // La UI GPS verrà ricreata da renderAll() tramite setTimeout
         }
 
         function getMapLink(query, noSuffix) {
@@ -715,6 +715,7 @@
 
         function renderGpsUI() {
             var container = document.getElementById('gps-ui-container');
+            // Se il contenitore non esiste, esci (verrà chiamato dopo)
             if (!container) return;
             
             var infoText = tr(
@@ -787,7 +788,7 @@
                     alert(tr(
                         "Impossibile accedere alla tua posizione. Controlla i permessi GPS del tuo browser.",
                         "Unable to access your location. Please check your browser's GPS permissions.",
-                        "Standortzugriff nicht möglich. Bitte überprüfen Sie die GPS-Berechtigungen Ihres Browsers.",
+                        "Standortzugriff nicht möglich. Bitte überprüfen Sie die GPS-Berechtigungen Ihres Browser`s.",
                         "Nie można uzyskać dostępu do lokalizacji. Sprawdź uprawnienia GPS w przeglądarce."
                     ));
                     isGpsTracking = false;
@@ -818,7 +819,17 @@
             var s=sections[currentSection];
             var body=renderSection(s.id);
             cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div></div></section>';
-            if (currentPlaceDetail<0){ setTimeout(initSectionMap, 0); }
+            
+            // Inizializza la mappa e poi la UI GPS
+            if (currentPlaceDetail<0){ 
+                setTimeout(initSectionMap, 0); 
+                // Diamo tempo alla mappa per crearsi e poi disegniamo la UI GPS
+                setTimeout(renderGpsUI, 200);
+            } else {
+                // Se siamo in dettaglio, non c'è mappa, ma per sicurezza nascondiamo la UI GPS
+                var container = document.getElementById('gps-ui-container');
+                if (container) container.innerHTML = '';
+            }
         }
 
         function renderHome() {
@@ -864,6 +875,7 @@
 
         function renderPlaceSection(items) {
             currentSectionPlaces = items;
+            // Contenitore per la UI GPS (verrà riempito da renderGpsUI)
             var gpsHtml = '<div id="gps-ui-container"></div>';
             
             if (currentSubItinerary) {
@@ -1039,9 +1051,6 @@
                 // riattiva il GPS se era attivo prima del refresh della mappa
                 toggleGpsTracking();
             }
-            
-            // Assicura che il GPS UI sia renderizzato
-            renderGpsUI();
         }
 
         // ============================================================
@@ -1063,9 +1072,8 @@
         // ============================================================
 
         renderAll();
-        renderGpsUI();
+        // La UI GPS verrà disegnata dopo il caricamento della prima sezione
+        setTimeout(renderGpsUI, 300);
     </script>
 </body>
 </html>
-
-    
