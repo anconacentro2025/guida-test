@@ -596,6 +596,14 @@
     };
 
     // ---- APP.JS (logica) ----
+        (function() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const dateStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${String(now.getFullYear()).slice(2)}`;
+    const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const el = document.getElementById('release-time');
+    if (el) el.textContent = `${dateStr} ${timeStr}`;
+})();
     let currentLang = 'it';
     let currentSection = -1;
     let currentPlaceDetail = -1;
