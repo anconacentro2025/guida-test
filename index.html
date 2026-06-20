@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.2 | 20/06/26 12:00 -->
 <html lang="it">
@@ -307,9 +306,7 @@
 
     <script>
     // ============================================================
-    // V4.1.2 · FIX: defer rimosso da Leaflet, renderHome sincrono,
-    //               GPS leak, SW offline fallback, consent GPS a 3 stati,
-    //               alert GPS inline, cache name allineato, orario release corretto
+    // V4.1.2 · FIX: renderHome scope cont, getMapLink domain, link lavanderia
     // ============================================================
 
     // ---- DATA.JS ----
@@ -1003,6 +1000,7 @@
     }
 
     function renderHome() {
+        const cont = document.getElementById('content');
         const hostImgSrc = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg';
         const socialHtml = `<div class="home-social">
             <div>
@@ -1332,7 +1330,7 @@
             <div class="card" style="margin-top:10px;"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">${usefulTitle}</span></div><div class="card-body" style="padding:0;">
             <div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">${tr('Proprio davanti al portone', 'Right in front of the entrance', 'Direkt vor dem Eingang', 'Tuż przed wejściem')}</div></div><a href="${getMapLink('Edicola Piazza Roma Ancona', true)}" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Edicola">🗺️ ${tr('Mappa', 'Map', 'Karte', 'Mapa')}</a></div>
             <div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">${tr('Portale turistico ufficiale di Ancona', 'Official Ancona tourism portal', 'Offizielles Tourismusportal von Ancona', 'Oficjalny portal turystyczny Ankony')}</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener" class="link-action" aria-label="Apri portale turistico">↗</a></div>
-            <div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="https://www.google.com/maps/search/?api=1&query=43.6182699,13.5171214" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Lavanderia">🗺️ ${tr('Mappa', 'Map', 'Karte', 'Mapa')}</a></div>
+            <div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="${getMapLink('Lavanderia self service Via Matteotti 137 Ancona', true)}" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Lavanderia">🗺️ ${tr('Mappa', 'Map', 'Karte', 'Mapa')}</a></div>
             </div></div>`;
     }
 
@@ -1400,7 +1398,7 @@
                     console.log('✅ Service Worker registrato (cache offline abilitata)');
                 })
                 .catch(err => {
-                    console.log('ℹ️ Service Worker non disponibile');
+                    console.log('ℹ️ Service Worker non disponibile (Safari iOS, cache offline disabilitata)');
                 });
         });
     }
