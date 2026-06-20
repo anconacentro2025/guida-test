@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.2 | 20/06/26 15:00 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.2 | 20/06/26 12:00 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -22,6 +22,7 @@
     <meta property="og:type" content="website">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
@@ -305,8 +306,9 @@
 
     <script>
     // ============================================================
-    // V4.1.2 · FIX: GPS leak, SW offline fallback, setTimeout rimossi,
-    //               consent GPS a 3 stati, alert GPS inline, cache name allineato
+    // V4.1.2 · FIX: renderHome sincrono, GPS leak, SW offline fallback,
+    //               consent GPS a 3 stati, alert GPS inline, cache name allineato,
+    //               orario release corretto
     // ============================================================
 
     // ---- DATA.JS ----
@@ -613,15 +615,14 @@
     let gpsWatchId = null;
     let gpsMarker = null;
     let gpsCircle = null;
-    // GPS consent: null = non risposto, 'true' = accettato, 'false' = negato
-    let gpsConsentGiven = sessionStorage.getItem('gpsConsent'); // null | 'true' | 'false'
+    let gpsConsentGiven = sessionStorage.getItem('gpsConsent');
     let gpsBoxCollapsed = false;
 
     let deferredPrompt;
 
     // Ora di rilascio
     (function() {
-        const RELEASE_TIME = '20/06/26 15:00';
+        const RELEASE_TIME = '20/06/26 12:00';
         document.getElementById('release-time').textContent = RELEASE_TIME;
     })();
 
@@ -685,7 +686,7 @@
         placeDataMap = {};
         if (leafletMap) { leafletMap.remove(); leafletMap = null; }
         renderAll();
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function closeSubItinerary() {
@@ -694,11 +695,10 @@
         placeDataMap = {};
         if (leafletMap) { leafletMap.remove(); leafletMap = null; }
         renderAll();
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function goTo(i) {
-        // FIX CRIT-1: ferma GPS watch se si naviga verso sezione senza mappa
         const noGpsSections = ['apartment', 'contact', 'transport'];
         const targetId = i >= 0 && sections[i] ? sections[i].id : null;
         if ((i === -1 || (targetId && noGpsSections.includes(targetId))) && gpsWatchId !== null) {
@@ -717,7 +717,7 @@
         placeDataMap = {};
         if (leafletMap) { leafletMap.remove(); leafletMap = null; }
         renderAll();
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function selectPlaceDetail(i) {
@@ -727,13 +727,13 @@
         currentPlaceDetail = i;
         if (leafletMap) { leafletMap.remove(); leafletMap = null; }
         renderAll();
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function backToMap() {
         currentPlaceDetail = -1;
         renderAll();
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function panToHome() {
@@ -776,21 +776,16 @@
 
         if (gpsWatchId !== null) {
             overlay.classList.add('active');
-            overlay.innerHTML = '📍';
         } else {
             overlay.classList.remove('active');
-            overlay.innerHTML = '📍';
         }
 
-        const iconEl = box.querySelector('.gps-icon');
         const textEl = box.querySelector('.gps-text');
         const btnsEl = box.querySelector('.gps-buttons');
-        if (iconEl) iconEl.textContent = '🧭';
         if (textEl) {
             if (gpsWatchId !== null) {
                 textEl.innerHTML = `<strong>${tr('GPS attivo', 'GPS active', 'GPS aktiv', 'GPS aktywny')}</strong> – ${tr('La tua posizione viene aggiornata in tempo reale.', 'Your position is updating in real time.', 'Ihre Position wird in Echtzeit aktualisiert.', 'Twoja pozycja jest aktualizowana w czasie rzeczywistym.')}`;
             } else if (gpsConsentGiven === null) {
-                // FIX CRIT-10: stato "non ha ancora risposto"
                 textEl.innerHTML = tr(
                     '🧭 <strong>Navigazione in tempo reale</strong><br>Attiva la geolocalizzazione per vedere la tua posizione sulla mappa e seguire l\'itinerario passo dopo passo.',
                     '🧭 <strong>Real-time navigation</strong><br>Enable geolocation to see your position on the map and follow the route step by step.',
@@ -798,7 +793,6 @@
                     '🧭 <strong>Nawigacja w czasie rzeczywistym</strong><br>Włącz geolokalizację, aby zobaczyć swoją pozycję na mapie i podążać trasą krok po kroku.'
                 );
             } else {
-                // FIX CRIT-10: stato "ha già risposto" (true=accettato, false=negato ma può riattivare)
                 textEl.innerHTML = tr(
                     'GPS non attivo. Clicca su "Riattiva" per attivarlo.',
                     'GPS not active. Click "Reactivate" to enable it.',
@@ -815,7 +809,6 @@
                     toggleGpsTracking();
                 });
             } else if (gpsConsentGiven === null) {
-                // FIX CRIT-10: stato "non ha ancora risposto" → mostra Accetta/Nega
                 btnsEl.innerHTML = `
                     <button class="btn-gps-accept" id="btn-gps-accept">✅ ${tr('Accetta', 'Accept', 'Akzeptieren', 'Akceptuj')}</button>
                     <button class="btn-gps-deny" id="btn-gps-deny">❌ ${tr('Nega', 'Deny', 'Ablehnen', 'Odrzuć')}</button>
@@ -834,7 +827,6 @@
                     updateGpsUI();
                 });
             } else {
-                // FIX CRIT-10: stato "ha già risposto" → mostra solo Riattiva
                 btnsEl.innerHTML = `<button class="btn-gps-accept" id="btn-gps-accept">✅ ${tr('Riattiva GPS', 'Reactivate GPS', 'GPS reaktivieren', 'Ponownie włącz GPS')}</button>`;
                 document.getElementById('btn-gps-accept')?.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -866,7 +858,6 @@
         }
 
         if (!navigator.geolocation) {
-            // FIX CRIT-9: sostituisce alert() con messaggio inline multilingue
             const textEl = document.querySelector('.gps-box .gps-text');
             const btnsEl = document.querySelector('.gps-box .gps-buttons');
             if (textEl) textEl.innerHTML = `<strong>⚠️ ${tr('GPS non supportato', 'GPS not supported', 'GPS nicht unterstützt', 'GPS nieobsługiwany')}</strong><br>${tr('Il tuo dispositivo non supporta la geolocalizzazione.', 'Your device does not support geolocation.', 'Ihr Gerät unterstützt keine Geolokalisierung.', 'Twoje urządzenie nie obsługuje geolokalizacji.')}`;
@@ -910,7 +901,6 @@
             (error) => {
                 console.warn("⚠️ Errore GPS temporaneo:", error.message);
                 if (error.code === error.PERMISSION_DENIED) {
-                    // FIX CRIT-9: sostituisce alert() con messaggio inline multilingue
                     const textEl = document.querySelector('.gps-box .gps-text');
                     const btnsEl = document.querySelector('.gps-box .gps-buttons');
                     if (textEl) textEl.innerHTML = `<strong>🔒 ${tr('Accesso GPS negato', 'GPS access denied', 'GPS-Zugriff verweigert', 'Odmowa dostępu GPS')}</strong><br>${tr('Abilita i permessi di localizzazione nelle impostazioni del browser.', 'Enable location permissions in your browser settings.', 'Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.', 'Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.')}`;
@@ -951,9 +941,7 @@
 
         if (currentSection === -1) {
             nav.style.display = 'none';
-            renderHome(); // FIX CRIT-3: renderHome ora scrive direttamente in cont, non ritorna html
-            const gpsContainer = document.querySelector('.gps-container');
-            if (gpsContainer) gpsContainer.style.display = 'none';
+            renderHome();
             return;
         }
 
@@ -982,11 +970,9 @@
             <div class="cards">${body}<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div>
         </section>`;
 
-        // FIX CRIT-3: tutti i listener attaccati in modo sincrono dopo innerHTML
         document.getElementById('home-btn')?.addEventListener('click', function() {
             goTo(-1);
         });
-        // Listener per nav-pill, detail e place section
         document.getElementById('sub-back-btn')?.addEventListener('click', closeSubItinerary);
         attachDetailListeners();
         attachPlaceSectionListeners();
@@ -1000,11 +986,8 @@
                 <div class="gps-box">
                     <div class="gps-row">
                         <div class="gps-icon">🧭</div>
-                        <div class="gps-text">${tr('🧭 <strong>Navigazione in tempo reale</strong><br>Attiva la geolocalizzazione per vedere la tua posizione sulla mappa e seguire l\'itinerario passo dopo passo.', '🧭 <strong>Real-time navigation</strong><br>Enable geolocation to see your position on the map and follow the route step by step.', '🧭 <strong>Echtzeit-Navigation</strong><br>Aktivieren Sie die Standortermittlung, um Ihre Position auf der Karte zu sehen und der Route Schritt für Schritt zu folgen.', '🧭 <strong>Nawigacja w czasie rzeczywistym</strong><br>Włącz geolokalizację, aby zobaczyć swoją pozycję na mapie i podążać trasą krok po kroku.')}</div>
-                        <div class="gps-buttons">
-                            <button class="btn-gps-accept" id="btn-gps-accept">✅ ${tr('Accetta', 'Accept', 'Akzeptieren', 'Akceptuj')}</button>
-                            <button class="btn-gps-deny" id="btn-gps-deny">❌ ${tr('Nega', 'Deny', 'Ablehnen', 'Odrzuć')}</button>
-                        </div>
+                        <div class="gps-text"></div>
+                        <div class="gps-buttons"></div>
                     </div>
                 </div>
                 <div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>
@@ -1012,13 +995,9 @@
             if (cardsEl) {
                 cardsEl.insertBefore(gpsContainer, cardsEl.firstChild);
             }
-            // FIX CRIT-3: listener sincrono, DOM già aggiornato
             document.getElementById('gps-overlay-icon')?.addEventListener('click', toggleGpsBox);
             updateGpsUI();
-            setTimeout(initSectionMap, 0); // initSectionMap usa setTimeout legittimamente (attende Leaflet)
-        } else {
-            const gpsContainer = document.querySelector('.gps-container');
-            if (gpsContainer) gpsContainer.style.display = 'none';
+            setTimeout(initSectionMap, 0);
         }
     }
 
@@ -1065,7 +1044,6 @@
             <div class="nav-grid">${tiles}</div>
         </section>`;
 
-        // FIX CRIT-3: innerHTML è sincrono, listener attaccati direttamente senza setTimeout
         cont.innerHTML = html;
         document.querySelectorAll('.nav-tile').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1089,7 +1067,6 @@
                 installBtn.style.display = 'none';
             }
         }
-        return; // renderHome ora scrive direttamente nel DOM
     }
 
     function renderSection(id) {
@@ -1154,12 +1131,9 @@
                 const sel = (i === currentPlaceDetail) ? ' selected' : '';
                 return `<button class="place-btn-mini${sel}" data-index="${i}" aria-label="${p.name}">${dn}. ${p.name}</button>`;
             }).join('');
-            const html = `<button class="back-btn" id="sub-back-btn">← ${tr('Torna al tour principale', 'Back to main tour', 'Zurück zur Haupttour', 'Powrót do głównej trasy')}</button>
+            return `<button class="back-btn" id="sub-back-btn">← ${tr('Torna al tour principale', 'Back to main tour', 'Zurück zur Haupttour', 'Powrót do głównej trasy')}</button>
                 ${descHtml}
                 <div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${subBtns}</div></div>${parkingInfoBox}`;
-
-            // FIX CRIT-3: listener attaccati in modo sincrono da renderAll
-            return html;
         }
 
         if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) {
@@ -1174,10 +1148,7 @@
             return `<button class="place-btn-mini${sel}" data-index="${i}" aria-label="${p.name}${subHint}">${dn}. ${p.name}${subBadge}</button>`;
         }).join('');
 
-        const html = `<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${btns}</div></div>${parkingInfoBox}`;
-
-        // FIX CRIT-3: listener sincroni dopo innerHTML in renderAll
-        return html;
+        return `<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${btns}</div></div>${parkingInfoBox}`;
     }
 
     function attachPlaceSectionListeners() {
@@ -1214,14 +1185,11 @@
         const prev = index > 0 ? `<button class="nav-detail-btn" data-prev="${index - 1}" aria-label="Luogo precedente">◀ ${tr('Prec.', 'Prev', 'Vor.', 'Poprz.')}</button>` : '<span></span>';
         const next = index < total - 1 ? `<button class="nav-detail-btn" data-next="${index + 1}" aria-label="Luogo successivo">${tr('Succ.', 'Next', 'Näch.', 'Nast.')} ▶</button>` : '<span></span>';
 
-        const html = `<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← ${backLabel}</button>
+        return `<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← ${backLabel}</button>
             <div class="place-card">${photoHtml}
                 <div class="place-body"><div class="place-emoji-sm" aria-hidden="true">${p.emoji}</div><div><div class="place-name">${p.name}</div><div class="place-dist">${p.dist}</div><div class="place-desc" style="margin-top:5px;">${desc}</div></div></div>
                 <div class="place-actions">${btns}</div></div>
             <div class="detail-nav">${prev}<span class="detail-counter">${displayNum} / ${totalDisplay}</span>${next}</div>`;
-
-        // FIX CRIT-3: listener attaccati in modo sincrono da renderAll dopo innerHTML
-        return html;
     }
 
     function attachDetailListeners() {
@@ -1258,7 +1226,6 @@
     function renderApartment() {
         const a = appData.apartment;
         
-        // Testi aggiornati per "Come raggiungerci" - Versione 4.1.1
         const reachData = {
             title: tr('📍 Come raggiungerci', '📍 How to reach us', '📍 Anreise', '📍 Jak do nas dotrzeć'),
             autoLabel: tr('🚗 In auto', '🚗 By car', '🚗 Mit dem Auto', '🚗 Samochodem'),
@@ -1321,7 +1288,6 @@
         </div>
         `;
 
-        // Schede informazioni appartamento
         const cards = [
             { icon: '📶', title: tr('Wi‑Fi', 'Wi‑Fi', 'WLAN', 'Wi‑Fi'), body: tr(a.wifi.it, a.wifi.en, a.wifi.de, a.wifi.pl) },
             { icon: '🚪', title: tr('Citofono', 'Intercom', 'Gegensprechanlage', 'Domofon'), body: tr(a.access.it, a.access.en, a.access.de, a.access.pl) },
@@ -1336,7 +1302,6 @@
             html += `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">${cards[i].icon}</span><span class="card-title">${cards[i].title}</span></div><div class="card-body">${cards[i].body}</div></div>`;
         }
 
-        // Aggiunge la sezione regole della casa
         const rulesTitle = tr('📋 Regole della casa', '📋 House rules', '📋 Hausregeln', '📋 Zasady domu');
         let rulesHtml = `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span><span class="card-title">${rulesTitle}</span></div><div class="card-body">`;
         for (let i = 0; i < appData.rules.length; i++) {
