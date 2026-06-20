@@ -6,7 +6,7 @@
 
 const CACHE_NAME = 'ancona-guida-v4.1.2';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
-const MAX_TILES = 200; // Limite massimo tile in cache
+const MAX_TILES = 200;
 
 const ASSETS_TO_CACHE = [
     './',
@@ -27,7 +27,6 @@ function offlineFallback() {
     );
 }
 
-// Pulizia cache tile: mantiene solo gli ultimi MAX_TILES
 async function trimTilesCache() {
     const cache = await caches.open(TILES_CACHE_NAME);
     const keys = await cache.keys();
@@ -83,7 +82,6 @@ self.addEventListener('fetch', (event) => {
     if (url.hostname.includes('google-analytics.com') ||
         url.hostname.includes('facebook.com/tr')) return;
 
-    // FIX CRIT-2: HTML con Stale-While-Revalidate (cache immediata, aggiornamento in background)
     if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname === './') {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
@@ -102,7 +100,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Tile mappe: Cache First con limite
     if (url.hostname.includes('tile.openstreetmap.org')) {
         event.respondWith(
             caches.match(event.request)
@@ -123,7 +120,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // GitHub raw images: Cache First
     if (url.hostname.includes('raw.githubusercontent.com')) {
         event.respondWith(
             caches.match(event.request)
@@ -142,7 +138,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // FIX CRIT-5b: Google Fonts e gstatic (woff2)
     if (url.hostname.includes('fonts.googleapis.com') ||
         url.hostname.includes('fonts.gstatic.com')) {
         event.respondWith(
@@ -162,7 +157,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // CDN (unpkg): Cache First
     if (url.hostname.includes('unpkg.com')) {
         event.respondWith(
             caches.match(event.request)
@@ -181,7 +175,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Tutto il resto: Network First con fallback cache
     event.respondWith(
         fetch(event.request)
             .then((response) => {
