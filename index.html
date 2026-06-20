@@ -284,7 +284,7 @@
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
                 <div class="version-info">
-                    V4.1.2 · <span id="release-time"></span>
+                    V4.1.2 · <span id="release-time">20/06/26 15:50</span>
                 </div>
             </div>
         </div>
@@ -618,11 +618,7 @@
 
     let deferredPrompt;
 
-    // Ora di rilascio
-    (function() {
-        const RELEASE_TIME = '20/06/26 15:44';
-        document.getElementById('release-time').textContent = RELEASE_TIME;
-    })();
+   
 
     function tr(it, en, de, pl) {
         if (currentLang === 'en') return en || it;
