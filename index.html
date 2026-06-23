@@ -1,203 +1,217 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.5 | 21/06/26 18:40 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.0 | 23/06/26 13:35 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.1.5</title>
-
-    <!-- PWA -->
+    <title>Ancona Centro · Guida Ospiti V4.2.0</title>
     <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0B1F33">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
-<meta name="apple-mobile-web-app-title" content="Ancona Guide">
-<link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.5">
+    <meta name="theme-color" content="#0B1F33">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
+    <meta name="apple-mobile-web-app-title" content="Ancona Guide">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.0">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
-        :root {
-            --navy: #0B1F33;
-            --navy-2: #163350;
-            --navy-3: #1E4A70;
-            --gold: #C8A45A;
-            --gold-2: #E2C07A;
-            --gold-3: #F5E6C0;
-            --white: #FFFFFF;
-            --bg: #F3F0EA;
-            --bg-2: #EAE6DD;
-            --muted: #6B7280;
-            --text: #1A2332;
-            --border: rgba(200, 164, 90, .22);
-            --shadow: 0 2px 16px rgba(11, 31, 51, .10);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-        a { color: inherit; text-decoration: none; }
-        button { font-family: 'Outfit', sans-serif; cursor: pointer; }
-        .header { background: var(--navy); color: var(--white); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 20px rgba(0,0,0,.30); }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 13px max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-left: max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-right: max(28px, calc(env(safe-area-inset-right, 0px) + 18px)); border-bottom: 1px solid rgba(200,164,90,.18); }
-        .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.15; color: var(--white); }
-        .header-sub { font-size: .65rem; font-weight: 300; opacity: .6; letter-spacing: .1em; text-transform: uppercase; margin-top: 1px; }
-        .header-cin { font-size: .6rem; font-weight: 300; opacity: .5; letter-spacing: .05em; margin-top: 2px; color: var(--gold-3); }
-        .header-right { text-align: center; }
-        .lang-toggle { display: flex; background: rgba(255,255,255,.08); border-radius: 22px; overflow: hidden; border: 1px solid rgba(200,164,90,.30); justify-content: center; }
-        .lang-btn { padding: 5px 11px; font-size: .68rem; font-weight: 500; border: none; background: transparent; color: rgba(255,255,255,.55); transition: all .2s; }
-        .lang-btn.active { background: var(--gold); color: var(--navy); font-weight: 600; }
-        .version-info { font-size:0.55rem; color:var(--gold-3); text-align:center; margin-top:4px; opacity:0.6; letter-spacing:0.05em; }
-        .hero { width: 100%; height: 320px; overflow: hidden; position: relative; background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy-3) 100%); transition: height .3s ease; }
-        .hero.section-mode { height: 68px; }
-        @media (max-height: 700px) { .hero.section-mode { height: 48px; } }
-        .hero.section-mode .hero-caption { visibility: hidden; }
-        .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .55; }
-        .hero-overlay { position: absolute; inset: 0; background: rgba(11,31,51,.45); pointer-events: none; }
-        .hero-caption { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--white); text-align: center; padding: 0 24px; }
-        .hero-caption-title { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 600; line-height: 1.1; letter-spacing: .02em; text-shadow: 0 2px 12px rgba(0,0,0,.65); }
-        .gold-bar { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-        .nav-scroll { display: flex; gap: 7px; padding: 11px 16px; overflow-x: auto; background: var(--navy-2); -webkit-overflow-scrolling: touch; scrollbar-width: none; white-space: nowrap; }
-        .nav-scroll::-webkit-scrollbar { display: none; }
-        .nav-pill { flex-shrink: 0; padding: 6px 13px; border-radius: 22px; font-size: .68rem; font-weight: 500; border: 1.5px solid rgba(200,164,90,.35); background: transparent; color: rgba(255,255,255,.60); transition: all .2s; white-space: nowrap; }
-        .nav-pill.active { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 600; }
-        .nav-pill:active { transform: scale(.95); }
-        .home-welcome { padding: 16px 16px 12px; background: var(--white); border-bottom: 1px solid var(--bg-2); display: flex; align-items: center; gap: 16px; }
-        .home-welcome-left { flex-shrink: 0; }
-        .host-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); display: block; }
-        .host-photo-placeholder { width: 70px; height: 70px; border-radius: 50%; background: var(--bg-2); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--gold); border: 2px solid var(--gold); }
-        .home-welcome-right { flex: 1; }
-        .home-welcome-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
-        .home-welcome-sub { font-size: .75rem; color: var(--muted); }
-        .home-social { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 10px; padding: 10px 14px; margin: 8px 16px 0; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(200,164,90,.25); color: var(--white); }
-        .home-social-label { color: rgba(255,255,255,.6); font-size: .65rem; text-transform: uppercase; letter-spacing: .08em; }
-        .home-social-links { display: flex; gap: 14px; align-items: center; margin-top: 4px; }
-        .social-link { color: var(--gold-2); font-size: .85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color .2s; }
-        .social-link:hover { color: var(--gold-3); }
-        .social-link:active { color: var(--gold); }
-        .home-social-text { font-size: .7rem; color: rgba(255,255,255,.5); margin-top: 6px; line-height: 1.4; }
-        .install-btn { display: none; background: var(--gold); color: var(--navy); border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: .82rem; margin: 12px 16px 0; box-shadow: var(--shadow); width: calc(100% - 32px); text-align: center; }
-        .install-btn:hover { background: var(--gold-2); }
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 16px 20px; }
-        .nav-tile { background: var(--white); border-radius: 14px; padding: 16px 14px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; transition: transform .15s, box-shadow .15s; border-left: 3px solid var(--gold); }
-        .nav-tile:active { transform: scale(.97); box-shadow: none; }
-        .nav-tile-icon { font-size: 1.4rem; line-height: 1; }
-        .nav-tile-label { font-size: .8rem; font-weight: 500; color: var(--navy); line-height: 1.2; }
-        .section-header { background: var(--navy); padding: 16px 18px 14px; border-bottom: 2px solid var(--gold); }
-        .section-header-inner { display: flex; align-items: center; gap: 12px; }
-        .section-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: rgba(200,164,90,.18); flex-shrink: 0; }
-        .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: var(--white); line-height: 1.1; }
-        .cards { padding: 14px 14px 0; display: flex; flex-direction: column; gap: 10px; }
-        .card { background: var(--white); border-radius: 13px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,.05); }
-        .card-header { padding: 12px 14px; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-bottom: 1px solid var(--border); }
-        .card-header-icon { font-size: 1rem; }
-        .card-title { font-weight: 500; font-size: .85rem; color: var(--white); }
-        .card-body { padding: 12px 14px 14px; font-size: .82rem; line-height: 1.6; color: var(--text); }
-        .card-body a { color: var(--navy-3); font-weight: 500; text-decoration: underline; text-decoration-color: rgba(30,74,112,.3); }
-        .map-list-wrap { display: flex; height: min(340px, 50vh); border-radius: 13px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .section-map-el { flex: 1; min-width: 0; z-index: 1; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); }
-        .place-btn-col { width: 142px; overflow-y: auto; padding: 5px 5px; display: flex; flex-direction: column; gap: 4px; background: var(--white); border-left: 1px solid var(--bg-2); -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-        .place-btn-col::-webkit-scrollbar { width: 3px; }
-        .place-btn-col::-webkit-scrollbar-thumb { background: var(--bg-2); border-radius: 3px; }
-        .place-btn-mini { width: 100%; text-align: left; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--bg-2); background: transparent; font-size: .65rem; color: var(--text); line-height: 1.3; white-space: normal; transition: all .15s; }
-        .place-btn-mini.selected, .place-btn-mini:active { background: var(--navy); color: var(--white); border-color: var(--navy); border-left: 3px solid var(--gold); }
-        .map-marker-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--navy); border: 2px solid var(--white); color: var(--white); font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40); }
-        .map-marker-num.cardeto, .map-marker-num.cittadella { background: #2E7D32; }
-        .map-marker-num.selected { background: var(--gold); color: var(--navy); transform: scale(1.25); z-index: 999!important; }
-        .map-marker-num.has-sub { border-color: var(--gold); border-width: 3px; cursor: pointer; }
-        .map-marker-star { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FFD700; border: 2px solid var(--white); color: var(--navy); font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.40); }
-        .star-list-btn { width: 100%; text-align: left; padding: 7px 8px; border-radius: 8px; border: 1.5px solid #FFD700; background: #FFD700; font-size: .65rem; font-weight: 700; color: var(--navy); line-height: 1.3; cursor: pointer; transition: all .15s; }
-        .star-list-btn:active { background: #e6c200; border-color: #e6c200; }
-        .back-btn { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; color: var(--navy-3); font-size: .82rem; font-weight: 500; padding: 6px 0 4px; }
-        .back-btn:active { opacity: .6; }
-        .detail-photo-wrap { width: 100%; height: 200px; overflow: hidden; position: relative; background: var(--bg-2); }
-        .detail-photo { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; display: block; }
-        .detail-photo.loaded { opacity: 1; }
-        .detail-photo-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; background: linear-gradient(135deg, var(--bg-2), var(--bg)); transition: opacity .3s; flex-direction: column; gap: 6px; animation: shimmerPulse 1.8s ease-in-out infinite; }
-        .detail-photo-placeholder.hidden { opacity: 0; pointer-events: none; animation: none; }
-        .detail-photo-link { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; text-decoration: none; color: inherit; }
-        .placeholder-emoji { font-size: 2.5rem; margin-bottom: 4px; }
-        .placeholder-text { font-size: 0.75rem; font-weight: 500; color: var(--navy-3); text-align: center; }
-        @keyframes shimmerPulse { 0% { opacity: 0.4; } 50% { opacity: 0.8; } 100% { opacity: 0.4; } }
-        .place-card { background: var(--white); border-radius: 13px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .place-body { padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
-        .place-emoji-sm { font-size: 1.1rem; min-width: 22px; margin-top: 2px; }
-        .place-name { font-weight: 600; font-size: .9rem; margin-bottom: 2px; color: var(--navy); }
-        .place-desc { font-size: .77rem; color: var(--muted); line-height: 1.45; }
-        .place-dist { font-size: .68rem; color: var(--gold); font-weight: 600; margin-top: 4px; }
-        .place-actions { padding: 0 14px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
-        .map-button { display: inline-block; font-size: .68rem; color: var(--navy); background: var(--bg); padding: 4px 10px; border-radius: 16px; border: 1px solid var(--border); font-weight: 500; }
-        .map-button:active { background: var(--bg-2); }
-        .detail-nav { display: flex; justify-content: space-between; align-items: center; padding: 8px 2px 4px; }
-        .nav-detail-btn { background: var(--navy); color: var(--white); border: none; padding: 8px 16px; border-radius: 20px; font-size: .75rem; font-weight: 500; transition: background .15s; }
-        .nav-detail-btn:active { background: var(--navy-3); }
-        .detail-counter { font-size: .70rem; color: var(--muted); }
-        .contact-card { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 13px; padding: 20px; color: var(--white); text-align: center; border: 1px solid rgba(200,164,90,.20); }
-        .contact-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; opacity: .5; }
-        .contact-number { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: var(--gold-2); margin: 10px 0 12px; letter-spacing: .04em; }
-        .contact-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .btn-wa { display: inline-flex; align-items: center; gap: 6px; background: #25D366; color: var(--white); padding: 9px 18px; border-radius: 24px; font-size: .8rem; font-weight: 500; text-decoration: none; }
-        .btn-call { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); color: var(--white); padding: 9px 18px; border-radius: 24px; font-size: .8rem; font-weight: 500; text-decoration: none; border: 1px solid rgba(255,255,255,.2); }
-        .contact-email { font-size: .78rem; opacity: .65; margin-top: 6px; }
-        .contact-email a { color: var(--gold-2); }
-        .emerg-card { background: var(--white); border-radius: 13px; overflow: hidden; margin-top: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .emerg-row { display: flex; align-items: center; padding: 12px 14px; gap: 12px; border-bottom: 1px solid var(--bg-2); }
-        .emerg-row:last-child { border-bottom: none; }
-        .emerg-num { font-size: .8rem; font-weight: 700; color: var(--navy-3); min-width: 110px; }
-        .emerg-desc { font-size: .8rem; color: var(--text); }
-        .rule-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--bg-2); }
-        .rule-row:last-child { border-bottom: none; }
-        .rule-icon { font-size: 1.1rem; }
-        .rule-text { font-size: .8rem; line-height: 1.4; }
-        .goto-home { display: flex; justify-content: center; margin: 20px 0 30px; }
-        .home-btn { background: var(--navy); color: var(--white); border: none; padding: 10px 22px; border-radius: 30px; font-size: .78rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow); }
-        .home-btn:active { transform: scale(.95); }
-        .copyright-footer { text-align: center; padding: 12px 16px; font-size: .62rem; color: var(--muted); border-top: 1px solid var(--bg-2); margin-top: 8px; }
-        .content { padding-bottom: 40px; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .section { display: none; }
-        .section.active { display: block; animation: fadeUp .28s ease; }
-        .link-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--bg-2); }
-        .link-row:last-child { border-bottom: none; }
-        .link-icon { font-size: 1.2rem; min-width: 24px; }
-        .link-info { flex: 1; }
-        .link-name { font-size: .82rem; font-weight: 500; color: var(--navy); }
-        .link-desc { font-size: .7rem; color: var(--muted); margin-top: 1px; }
-        .link-action { font-size: .68rem; color: var(--navy-3); background: var(--bg); padding: 4px 9px; border-radius: 14px; border: 1px solid var(--border); white-space: nowrap; }
-        .gps-container { position: relative; }
-        .gps-box { background: #FFF8E7; border: 2px solid var(--gold); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: all 0.3s ease; }
-        .gps-box.collapsed { display: none; }
-        .gps-box .gps-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-        .gps-box .gps-icon { font-size: 2rem; flex-shrink: 0; }
-        .gps-box .gps-text { flex: 1; font-size: .85rem; line-height: 1.5; color: var(--text); }
-        .gps-box .gps-text strong { color: var(--navy); font-weight: 600; }
-        .gps-box .gps-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-gps-accept, .btn-gps-deny, .btn-gps-toggle { background: var(--navy); color: var(--white); border: none; padding: 8px 16px; border-radius: 30px; font-size: .8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all .25s; box-shadow: 0 2px 8px rgba(11,31,51,.2); }
-        .btn-gps-accept:hover, .btn-gps-toggle:hover { background: var(--navy-3); }
-        .btn-gps-deny { background: transparent; color: var(--muted); box-shadow: none; border: 1px solid var(--border); }
-        .btn-gps-deny:hover { background: var(--bg-2); }
-        .btn-gps-toggle.active { background: var(--gold); color: var(--navy); box-shadow: 0 2px 8px rgba(200,164,90,.4); }
-        .btn-gps-toggle:active, .btn-gps-accept:active, .btn-gps-deny:active { transform: scale(.95); }
-        .gps-icon-overlay { position: absolute; bottom: 20px; right: 20px; z-index: 1000; background: var(--white); border: 2px solid var(--gold); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 2px 12px rgba(0,0,0,.15); cursor: pointer; transition: all .2s; }
-        .gps-icon-overlay:hover { transform: scale(1.05); }
-        .gps-icon-overlay.active { background: var(--gold); border-color: var(--gold); }
-        .gps-blue-dot-wrap { position: relative; width: 20px; height: 20px; }
-        .gps-blue-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid var(--white); border-radius: 50%; position: absolute; top: 3px; left: 3px; box-shadow: 0 0 6px rgba(0,0,0,.3); z-index: 2; }
-        .gps-blue-dot-pulse { width: 20px; height: 20px; background: rgba(0,122,255,0.4); border-radius: 50%; position: absolute; top: 0; left: 0; animation: gpsPulse 2s infinite ease-out; z-index: 1; }
-        @keyframes gpsPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.9); opacity: 0; } }
-        .reach-sub-btn { flex: 1; border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; font-weight: 500; transition: all 0.2s; outline: none; background: var(--bg); color: var(--text); }
-        .reach-sub-btn.active { background: var(--navy); color: var(--white); font-weight: 600; }
-        .reach-content { font-size: 0.82rem; line-height: 1.6; color: var(--text); }
+        :root{--navy:#0B1F33;--navy-2:#163350;--navy-3:#1E4A70;--gold:#C8A45A;--gold-2:#E2C07A;--gold-3:#F5E6C0;--white:#FFFFFF;--bg:#F3F0EA;--bg-2:#EAE6DD;--muted:#6B7280;--text:#1A2332;--border:rgba(200,164,90,.22);--shadow:0 2px 16px rgba(11,31,51,.10)}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        html{scroll-behavior:smooth}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        a{color:inherit;text-decoration:none}
+        button{font-family:'Outfit',sans-serif;cursor:pointer}
+        .header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.30)}
+        .header-inner{display:flex;align-items:center;justify-content:space-between;padding:13px max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-left:max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-right:max(28px,calc(env(safe-area-inset-right,0px)+18px));border-bottom:1px solid rgba(200,164,90,.18)}
+        .header-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;line-height:1.15;color:var(--white)}
+        .header-sub{font-size:.65rem;font-weight:300;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+        .header-cin{font-size:.6rem;font-weight:300;opacity:.5;letter-spacing:.05em;margin-top:2px;color:var(--gold-3)}
+        .header-right{text-align:center}
+        .lang-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:22px;overflow:hidden;border:1px solid rgba(200,164,90,.30);justify-content:center}
+        .lang-btn{padding:5px 11px;font-size:.68rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,.55);transition:all .2s}
+        .lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600}
+        .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em}
+        .hero{width:100%;height:320px;overflow:hidden;position:relative;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 50%,var(--navy-3) 100%);transition:height .3s ease}
+        .hero.section-mode{height:68px}
+        @media(max-height:700px){.hero.section-mode{height:48px}}
+        .hero.section-mode .hero-caption{visibility:hidden}
+        .hero-img{width:100%;height:100%;object-fit:cover;display:block;opacity:.55}
+        .hero-overlay{position:absolute;inset:0;background:rgba(11,31,51,.45);pointer-events:none}
+        .hero-caption{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--white);text-align:center;padding:0 24px}
+        .hero-caption-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;line-height:1.1;letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.65)}
+        .gold-bar{height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+        .nav-scroll{display:flex;gap:7px;padding:11px 16px;overflow-x:auto;background:var(--navy-2);-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap}
+        .nav-scroll::-webkit-scrollbar{display:none}
+        .nav-pill{flex-shrink:0;padding:6px 13px;border-radius:22px;font-size:.68rem;font-weight:500;border:1.5px solid rgba(200,164,90,.35);background:transparent;color:rgba(255,255,255,.60);transition:all .2s;white-space:nowrap}
+        .nav-pill.active{background:var(--gold);border-color:var(--gold);color:var(--navy);font-weight:600}
+        .nav-pill:active{transform:scale(.95)}
+        .home-welcome{padding:16px 16px 12px;background:var(--white);border-bottom:1px solid var(--bg-2);display:flex;align-items:center;gap:16px}
+        .home-welcome-left{flex-shrink:0}
+        .host-photo{width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);display:block}
+        .host-photo-placeholder{width:70px;height:70px;border-radius:50%;background:var(--bg-2);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--gold);border:2px solid var(--gold)}
+        .home-welcome-right{flex:1}
+        .home-welcome-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--navy);margin-bottom:4px}
+        .home-welcome-sub{font-size:.75rem;color:var(--muted)}
+        .home-social{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white)}
+        .home-social-label{color:rgba(255,255,255,.6);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em}
+        .home-social-links{display:flex;gap:14px;align-items:center;margin-top:4px}
+        .social-link{color:var(--gold-2);font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:4px;transition:color .2s}
+        .social-link:hover{color:var(--gold-3)}
+        .social-link:active{color:var(--gold)}
+        .home-social-text{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.4}
+        .install-btn{display:none;background:var(--gold);color:var(--navy);border:none;padding:10px 20px;border-radius:30px;font-weight:600;font-size:.82rem;margin:12px 16px 0;box-shadow:var(--shadow);width:calc(100% - 32px);text-align:center}
+        .install-btn:hover{background:var(--gold-2)}
+        .nav-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 20px}
+        .nav-tile{background:var(--white);border-radius:14px;padding:16px 14px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:flex-start;gap:6px;transition:transform .15s,box-shadow .15s;border-left:3px solid var(--gold)}
+        .nav-tile:active{transform:scale(.97);box-shadow:none}
+        .nav-tile-icon{font-size:1.4rem;line-height:1}
+        .nav-tile-label{font-size:.8rem;font-weight:500;color:var(--navy);line-height:1.2}
+        .section-header{background:var(--navy);padding:16px 18px 14px;border-bottom:2px solid var(--gold)}
+        .section-header-inner{display:flex;align-items:center;gap:12px}
+        .section-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:rgba(200,164,90,.18);flex-shrink:0}
+        .section-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--white);line-height:1.1}
+        .cards{padding:14px 14px 0;display:flex;flex-direction:column;gap:10px}
+        .card{background:var(--white);border-radius:13px;overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05)}
+        .card-header{padding:12px 14px;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);border-bottom:1px solid var(--border)}
+        .card-header-icon{font-size:1rem}
+        .card-title{font-weight:500;font-size:.85rem;color:var(--white)}
+        .card-body{padding:12px 14px 14px;font-size:.82rem;line-height:1.6;color:var(--text)}
+        .card-body a{color:var(--navy-3);font-weight:500;text-decoration:underline;text-decoration-color:rgba(30,74,112,.3)}
+        .map-list-wrap{display:flex;height:min(340px,50vh);border-radius:13px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)}
+        .section-map-el{flex:1;min-width:0;z-index:1;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%)}
+        .place-btn-col{width:142px;overflow-y:auto;padding:5px;display:flex;flex-direction:column;gap:4px;background:var(--white);border-left:1px solid var(--bg-2);-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+        .place-btn-col::-webkit-scrollbar{width:3px}
+        .place-btn-col::-webkit-scrollbar-thumb{background:var(--bg-2);border-radius:3px}
+        .place-btn-mini{width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1px solid var(--bg-2);background:transparent;font-size:.65rem;color:var(--text);line-height:1.3;white-space:normal;transition:all .15s}
+        .place-btn-mini.selected,.place-btn-mini:active{background:var(--navy);color:var(--white);border-color:var(--navy);border-left:3px solid var(--gold)}
+        .map-marker-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--navy);border:2px solid var(--white);color:var(--white);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.40)}
+        .map-marker-num.cardeto,.map-marker-num.cittadella{background:#2E7D32}
+        .map-marker-num.selected{background:var(--gold);color:var(--navy);transform:scale(1.25);z-index:999!important}
+        .map-marker-num.has-sub{border-color:var(--gold);border-width:3px;cursor:pointer}
+        .map-marker-star{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#FFD700;border:2px solid var(--white);color:var(--navy);font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.40)}
+        .star-list-btn{width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1.5px solid #FFD700;background:#FFD700;font-size:.65rem;font-weight:700;color:var(--navy);line-height:1.3;cursor:pointer;transition:all .15s}
+        .star-list-btn:active{background:#e6c200;border-color:#e6c200}
+        .back-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:var(--navy-3);font-size:.82rem;font-weight:500;padding:6px 0 4px}
+        .back-btn:active{opacity:.6}
+        .detail-photo-wrap{width:100%;height:200px;overflow:hidden;position:relative;background:var(--bg-2)}
+        .detail-photo{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s;display:block}
+        .detail-photo.loaded{opacity:1}
+        .detail-photo-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,var(--bg-2),var(--bg));transition:opacity .3s;flex-direction:column;gap:6px;animation:shimmerPulse 1.8s ease-in-out infinite}
+        .detail-photo-placeholder.hidden{opacity:0;pointer-events:none;animation:none}
+        .detail-photo-link{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;text-decoration:none;color:inherit}
+        .placeholder-emoji{font-size:2.5rem;margin-bottom:4px}
+        .placeholder-text{font-size:.75rem;font-weight:500;color:var(--navy-3);text-align:center}
+        @keyframes shimmerPulse{0%{opacity:.4}50%{opacity:.8}100%{opacity:.4}}
+        .place-card{background:var(--white);border-radius:13px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)}
+        .place-body{padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+        .place-emoji-sm{font-size:1.1rem;min-width:22px;margin-top:2px}
+        .place-name{font-weight:600;font-size:.9rem;margin-bottom:2px;color:var(--navy)}
+        .place-desc{font-size:.77rem;color:var(--muted);line-height:1.45}
+        .place-dist{font-size:.68rem;color:var(--gold);font-weight:600;margin-top:4px}
+        .place-actions{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px}
+        .map-button{display:inline-block;font-size:.68rem;color:var(--navy);background:var(--bg);padding:4px 10px;border-radius:16px;border:1px solid var(--border);font-weight:500}
+        .map-button:active{background:var(--bg-2)}
+        .detail-nav{display:flex;justify-content:space-between;align-items:center;padding:8px 2px 4px}
+        .nav-detail-btn{background:var(--navy);color:var(--white);border:none;padding:8px 16px;border-radius:20px;font-size:.75rem;font-weight:500;transition:background .15s}
+        .nav-detail-btn:active{background:var(--navy-3)}
+        .detail-counter{font-size:.70rem;color:var(--muted)}
+        .contact-card{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);border-radius:13px;padding:20px;color:var(--white);text-align:center;border:1px solid rgba(200,164,90,.20)}
+        .contact-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;opacity:.5}
+        .contact-number{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--gold-2);margin:10px 0 12px;letter-spacing:.04em}
+        .contact-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+        .btn-wa{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:var(--white);padding:9px 18px;border-radius:24px;font-size:.8rem;font-weight:500;text-decoration:none}
+        .btn-call{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);color:var(--white);padding:9px 18px;border-radius:24px;font-size:.8rem;font-weight:500;text-decoration:none;border:1px solid rgba(255,255,255,.2)}
+        .contact-email{font-size:.78rem;opacity:.65;margin-top:6px}
+        .contact-email a{color:var(--gold-2)}
+        .emerg-card{background:var(--white);border-radius:13px;overflow:hidden;margin-top:10px;box-shadow:var(--shadow);border:1px solid var(--border)}
+        .emerg-row{display:flex;align-items:center;padding:12px 14px;gap:12px;border-bottom:1px solid var(--bg-2)}
+        .emerg-row:last-child{border-bottom:none}
+        .emerg-num{font-size:.8rem;font-weight:700;color:var(--navy-3);min-width:110px}
+        .emerg-desc{font-size:.8rem;color:var(--text)}
+        .rule-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bg-2)}
+        .rule-row:last-child{border-bottom:none}
+        .rule-icon{font-size:1.1rem}
+        .rule-text{font-size:.8rem;line-height:1.4}
+        .goto-home{display:flex;justify-content:center;margin:20px 0 30px}
+        .home-btn{background:var(--navy);color:var(--white);border:none;padding:10px 22px;border-radius:30px;font-size:.78rem;font-weight:500;display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow)}
+        .home-btn:active{transform:scale(.95)}
+        .copyright-footer{text-align:center;padding:12px 16px;font-size:.62rem;color:var(--muted);border-top:1px solid var(--bg-2);margin-top:8px}
+        .content{padding-bottom:40px}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .section{display:none}
+        .section.active{display:block;animation:fadeUp .28s ease}
+        .link-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--bg-2)}
+        .link-row:last-child{border-bottom:none}
+        .link-icon{font-size:1.2rem;min-width:24px}
+        .link-info{flex:1}
+        .link-name{font-size:.82rem;font-weight:500;color:var(--navy)}
+        .link-desc{font-size:.7rem;color:var(--muted);margin-top:1px}
+        .link-action{font-size:.68rem;color:var(--navy-3);background:var(--bg);padding:4px 9px;border-radius:14px;border:1px solid var(--border);white-space:nowrap}
+        .gps-container{position:relative}
+        .gps-box{background:#FFF8E7;border:2px solid var(--gold);border-radius:12px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .3s ease}
+        .gps-box.collapsed{display:none}
+        .gps-box .gps-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+        .gps-box .gps-icon{font-size:2rem;flex-shrink:0}
+        .gps-box .gps-text{flex:1;font-size:.85rem;line-height:1.5;color:var(--text)}
+        .gps-box .gps-text strong{color:var(--navy);font-weight:600}
+        .gps-box .gps-buttons{display:flex;gap:8px;flex-wrap:wrap}
+        .btn-gps-accept,.btn-gps-deny,.btn-gps-toggle{background:var(--navy);color:var(--white);border:none;padding:8px 16px;border-radius:30px;font-size:.8rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:all .25s;box-shadow:0 2px 8px rgba(11,31,51,.2)}
+        .btn-gps-accept:hover,.btn-gps-toggle:hover{background:var(--navy-3)}
+        .btn-gps-deny{background:transparent;color:var(--muted);box-shadow:none;border:1px solid var(--border)}
+        .btn-gps-deny:hover{background:var(--bg-2)}
+        .btn-gps-toggle.active{background:var(--gold);color:var(--navy);box-shadow:0 2px 8px rgba(200,164,90,.4)}
+        .btn-gps-toggle:active,.btn-gps-accept:active,.btn-gps-deny:active{transform:scale(.95)}
+        .gps-icon-overlay{position:absolute;bottom:20px;right:20px;z-index:1000;background:var(--white);border:2px solid var(--gold);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 2px 12px rgba(0,0,0,.15);cursor:pointer;transition:all .2s}
+        .gps-icon-overlay:hover{transform:scale(1.05)}
+        .gps-icon-overlay.active{background:var(--gold);border-color:var(--gold)}
+        .gps-blue-dot-wrap{position:relative;width:20px;height:20px}
+        .gps-blue-dot{width:14px;height:14px;background:#007AFF;border:2px solid var(--white);border-radius:50%;position:absolute;top:3px;left:3px;box-shadow:0 0 6px rgba(0,0,0,.3);z-index:2}
+        .gps-blue-dot-pulse{width:20px;height:20px;background:rgba(0,122,255,.4);border-radius:50%;position:absolute;top:0;left:0;animation:gpsPulse 2s infinite ease-out;z-index:1}
+        @keyframes gpsPulse{0%{transform:scale(.5);opacity:1}100%{transform:scale(1.9);opacity:0}}
+        .reach-sub-btn{flex:1;border:1px solid var(--border);padding:8px 4px;border-radius:8px;font-size:.72rem;font-weight:500;transition:all .2s;outline:none;background:var(--bg);color:var(--text)}
+        .reach-sub-btn.active{background:var(--navy);color:var(--white);font-weight:600}
+        .reach-content{font-size:.82rem;line-height:1.6;color:var(--text)}
+        .hours-badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:4px}
+        .hours-badge.open{background:#D1FAE5;color:#065F46}
+        .hours-badge.closed{background:#FEE2E2;color:#991B1B}
+        .hours-badge.holiday{background:#FEF3C7;color:#92400E}
+        .hours-text{font-size:.68rem;color:var(--muted);margin-top:2px}
+        .meteo-widget{background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px}
+        .meteo-left{display:flex;align-items:center;gap:10px}
+        .meteo-icon{font-size:1.6rem}
+        .meteo-temp{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold-2)}
+        .meteo-desc{font-size:.65rem;color:rgba(255,255,255,.6);margin-top:1px;text-transform:capitalize}
+        .meteo-right{text-align:right;font-size:.62rem;color:rgba(255,255,255,.45)}
+        .dist-sort-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:14px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+        .dist-sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+        .phrase-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-2)}
+        .phrase-row:last-child{border-bottom:none}
+        .phrase-it{font-size:.8rem;font-weight:600;color:var(--navy);flex:1}
+        .phrase-tr{font-size:.75rem;color:var(--muted);flex:1;font-style:italic}
+        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+        .home-map-wrap:hover{transform:scale(1.01)}
+        .home-map-wrap:active{transform:scale(.98)}
+        .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:12px}
+        .countdown-icon{font-size:1.4rem}
+        .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
+        .countdown-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:#78350F}
+
+        /* === MAPPA FULL-SCREEN OVERLAY === */
+        .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
+        .map-fullscreen-overlay.active{display:flex;opacity:1}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:10}
+        .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
+        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s}
+        .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
+        .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
+        .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
     </style>
 </head>
 <body>
@@ -215,27 +229,49 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.1.5 · <span id="release-time">21/06/26 18:40</span></div>
+                <div class="version-info">V4.2.0 · <span id="release-time">23/06/26 13:35</span></div>
             </div>
         </div>
     </header>
-
     <div class="hero" id="hero">
         <img class="hero-img" id="heroImg" src="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg" alt="Ancona Centro" fetchpriority="high" onerror="this.style.display='none'">
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-caption"><div class="hero-caption-title">Affittacamere<br>Ancona Centro</div></div>
     </div>
     <div class="gold-bar" aria-hidden="true"></div>
-
-    <nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
+    <nav class="nav-scroll" id="nav" style="display:none" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.1.5 · All rights reserved</div>
+    <!-- FULLSCREEN MAP OVERLAY -->
+    <div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
+        <div class="map-fs-header">
+            <span class="map-fs-title" id="map-fs-title">🗺️ Mappa</span>
+            <button class="map-fs-close" id="map-fs-close">✕ Chiudi</button>
+        </div>
+        <div id="fullscreenMap"></div>
+    </div>
+
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.0 · All rights reserved</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script>
-    // V4.1.5 · Fix: reach tab state on lang change, photoFallback async guard, sectionHashMap completo, fetchpriority hero, onclick reach → addEventListener
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'transport'];
+    const HOST_PHONE = '3356750269';
+    const HOST_EMAIL = 'anconacentro@yahoo.com';
+    const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
+    const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
+    const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik für Gäste · Piazza Roma 3' };
+    const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
+    let distSortActive = false;
+    let homeStaticMap = null;
+
+    // === FULLSCREEN MAP VARIABLES ===
+    let fullscreenMapInstance = null;
+    let fsStoredPlaces = [];
+    let fsIsHome = false;
+    let fsSubItineraryId = null;
+    let fsListenersInitialized = false;
+
     const appData = {
         apartment: {
             wifi: { it: 'Rete: anconacentro | Password: la troverete nell\'appartamento', en: 'Network: anconacentro | Password: you will find it in the apartment', de: 'Netzwerk: anconacentro | Passwort: finden Sie in der Wohnung', pl: 'Sieć: anconacentro | Hasło: znajdziecie je w mieszkaniu' },
@@ -293,61 +329,36 @@
             ]
         },
         restaurants: [
-            { name:'La Cantineta', emoji:'🍷', photo:'rist-cantineta.jpg', it:'Trattoria tipica, da gustare i tagliolini allo scoglio e lo stoccafisso all\'anconetana.', en:'Typical trattoria: enjoy tagliolini allo scoglio and stockfish Ancona-style.', de:'Typische Trattoria: genießen Sie tagliolini allo scoglio und Stockfisch nach Ancona-Art.', pl:'Typowa trattoria: warto spróbować tagliolini allo scoglio i sztokfisza po ankońsku.', dist:'🚶 300 m – 4 min', mapQuery:'La Cantineta Ancona', lat:43.6192908, lng:13.5102798 },
-            { name:'Osteria del Pozzo', emoji:'🍲', photo:'rist-pozzo.jpg', it:'Ristorante tipico con un ottimo rapporto qualità prezzo.', en:'Typical restaurant with excellent value for money.', de:'Typisches Restaurant mit ausgezeichnetem Preis-Leistungs-Verhältnis.', pl:'Typowa restauracja z doskonałym stosunkiem jakości do ceny.', dist:'🚶 350 m – 4 min', mapQuery:'Il Pozzo Ancona', lat:43.6199425, lng:13.5104826 },
-            { name:'Trattoria La Moretta', emoji:'🍸', photo:'rist-moretta.jpg', it:'Ristorante tipico marchigiano affacciato su Piazza del Plebiscito.', en:'Typical restaurant from the Marche region overlooking Piazza del Plebiscito.', de:'Typisches Restaurant aus den Marken mit Blick auf die Piazza del Plebiscito.', pl:'Typowa restauracja marchijska z widokiem na Piazza del Plebiscito.', dist:'🚶 200 m – 3 min', mapQuery:'La Moretta Ancona', lat:43.6195442, lng:13.5114100 },
-            { name:'La Degosteria', emoji:'🍝', photo:'degosteria.jpg', it:'Ristorante del centro storico alle spalle della Chiesa di Santa Maria della Piazza.', en:'Restaurant in the historic centre, behind the Church of Santa Maria della Piazza.', de:'Restaurant im historischen Zentrum, hinter der Kirche Santa Maria della Piazza.', pl:'Restauracja w historycznym centrum, za Kościołem Santa Maria della Piazza.', dist:'🚶 400 m – 6 min', mapQuery:'La Degosteria Ancona', lat:43.6202772, lng:13.5110345 },
-            { name:'Vino e Cucina Miscia', emoji:'🐟', photo:'rist-miscia.jpg', it:'Ristorante di pesce nel quartiere Archi.', en:'Fish restaurant in the Archi district.', de:'Fischrestaurant im Archi-Viertel.', pl:'Restauracja rybna w dzielnicy Archi.', dist:'🚗 1 km – 2 min', mapQuery:'Vino e Cucina Miscia Ancona', lat:43.6126474, lng:13.5044134 },
-            { name:'Amélie', emoji:'🦐', photo:'rist-amelie.jpg', it:'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en:'Family-run and friendly restaurant. Excellent mixed fried fish.', de:'Familiengeführtes und freundliches Restaurant. Ausgezeichnete gemischte frittierte Fischgerichte.', pl:'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist:'🚗 2 km – 3 min', mapQuery:'Amelie Ancona', lat:43.6022208, lng:13.5060781 },
-            { name:'Giardino', emoji:'🌿', photo:'rist-giardino.jpg', it:'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en:'Elegant restaurant along Viale della Vittoria that never disappoints.', de:'Elegantes Restaurant entlang der Viale della Vittoria, das nie enttäuscht.', pl:'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist:'🚶 1350 m – 18 min', mapQuery:'Il Giardino Ancona', lat:43.6158317, lng:13.5257132 },
-            { name:'Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg', it:'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en:'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', de:'Historisches Fischrestaurant mit Blick auf das Meer der Bucht von Portonovo. An Sommerabenden speist man direkt am Strand.', pl:'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona', lat:43.5641460, lng:13.5910907 }
+            { name:'La Cantineta', emoji:'🍷', photo:'rist-cantineta.jpg', hours:'12:30–14:30, 19:30–22:30', closedOn:[0,1], it:'Trattoria tipica, da gustare i tagliolini allo scoglio e lo stoccafisso all\'anconetana.', en:'Typical trattoria: enjoy tagliolini allo scoglio and stockfish Ancona-style.', de:'Typische Trattoria: genießen Sie tagliolini allo scoglio und Stockfisch nach Ancona-Art.', pl:'Typowa trattoria: warto spróbować tagliolini allo scoglio i sztokfisza po ankońsku.', dist:'🚶 300 m – 4 min', mapQuery:'La Cantineta Ancona', lat:43.6192908, lng:13.5102798 },
+            { name:'Osteria del Pozzo', emoji:'🍲', photo:'rist-pozzo.jpg', hours:'12:30–14:30, 19:30–22:00', closedOn:[0], it:'Ristorante tipico con un ottimo rapporto qualità prezzo.', en:'Typical restaurant with excellent value for money.', de:'Typisches Restaurant mit ausgezeichnetem Preis-Leistungs-Verhältnis.', pl:'Typowa restauracja z doskonałym stosunkiem jakości do ceny.', dist:'🚶 350 m – 4 min', mapQuery:'Il Pozzo Ancona', lat:43.6199425, lng:13.5104826 },
+            { name:'Trattoria La Moretta', emoji:'🍸', photo:'rist-moretta.jpg', hours:'12:00–15:00, 19:00–23:00', closedOn:[2], it:'Ristorante tipico marchigiano affacciato su Piazza del Plebiscito.', en:'Typical restaurant from the Marche region overlooking Piazza del Plebiscito.', de:'Typisches Restaurant aus den Marken mit Blick auf die Piazza del Plebiscito.', pl:'Typowa restauracja marchijska z widokiem na Piazza del Plebiscito.', dist:'🚶 200 m – 3 min', mapQuery:'La Moretta Ancona', lat:43.6195442, lng:13.5114100 },
+            { name:'La Degosteria', emoji:'🍝', photo:'degosteria.jpg', hours:'12:30–14:30, 19:30–22:30', closedOn:[1], it:'Ristorante del centro storico alle spalle della Chiesa di Santa Maria della Piazza.', en:'Restaurant in the historic centre, behind the Church of Santa Maria della Piazza.', de:'Restaurant im historischen Zentrum, hinter der Kirche Santa Maria della Piazza.', pl:'Restauracja w historycznym centrum, za Kościołem Santa Maria della Piazza.', dist:'🚶 400 m – 6 min', mapQuery:'La Degosteria Ancona', lat:43.6202772, lng:13.5110345 },
+            { name:'Vino e Cucina Miscia', emoji:'🐟', photo:'rist-miscia.jpg', hours:'12:30–15:00, 19:30–22:30', closedOn:[0,1], it:'Ristorante di pesce nel quartiere Archi.', en:'Fish restaurant in the Archi district.', de:'Fischrestaurant im Archi-Viertel.', pl:'Restauracja rybna w dzielnicy Archi.', dist:'🚗 1 km – 2 min', mapQuery:'Vino e Cucina Miscia Ancona', lat:43.6126474, lng:13.5044134 },
+            { name:'Amélie', emoji:'🦐', photo:'rist-amelie.jpg', hours:'12:00–15:00, 19:30–22:30', closedOn:[1], it:'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en:'Family-run and friendly restaurant. Excellent mixed fried fish.', de:'Familiengeführtes und freundliches Restaurant. Ausgezeichnete gemischte frittierte Fischgerichte.', pl:'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist:'🚗 2 km – 3 min', mapQuery:'Amelie Ancona', lat:43.6022208, lng:13.5060781 },
+            { name:'Giardino', emoji:'🌿', photo:'rist-giardino.jpg', hours:'12:30–14:30, 19:30–22:30', closedOn:[1], it:'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en:'Elegant restaurant along Viale della Vittoria that never disappoints.', de:'Elegantes Restaurant entlang der Viale della Vittoria, das nie enttäuscht.', pl:'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist:'🚶 1350 m – 18 min', mapQuery:'Il Giardino Ancona', lat:43.6158317, lng:13.5257132 },
+            { name:'Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg', hours:'12:00–15:30, 19:30–22:30', closedOn:[], it:'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en:'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', de:'Historisches Fischrestaurant mit Blick auf das Meer der Bucht von Portonovo. An Sommerabenden speist man direkt am Strand.', pl:'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona', lat:43.5641460, lng:13.5910907 }
         ],
         barpub: [
-            { name:'Bar Torino', emoji:'☕', photo:'', it:'Storico bar di Corso Garibaldi famoso per cocktail e aperitivi.', en:'Historic bar on Corso Garibaldi famous for cocktails and aperitifs.', de:'Historische Bar am Corso Garibaldi, berühmt für Cocktails und Aperitifs.', pl:'Historyczny bar przy Corso Garibaldi słynący z koktajli i aperitifów.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
-            { name:'Bar Giuliani', emoji:'☕', photo:'', it:'Bar, tabacchi, gelateria, ristorante, pizzeria. L\'unico bar del centro aperto anche la domenica. Aperto fino a tarda ora.', en:'Bar, tobacconist, ice cream parlour, restaurant, pizzeria. The only bar in the centre open on Sundays too. Open until late.', de:'Bar, Tabakladen, Eisdiele, Restaurant, Pizzeria. Die einzige Bar im Zentrum, die auch sonntags geöffnet ist. Bis spät geöffnet.', pl:'Bar, tytoń, lodziarnia, restauracja, pizzeria. Jedyny bar w centrum otwarty również w niedziele. Czynny do późna.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
-            { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', it:'Ottime lasagne da asporto a due passi da casa.', en:'Excellent takeaway lasagne just a stone\'s throw from home.', de:'Ausgezeichnete Lasagne zum Mitnehmen, nur einen Steinwurf von zu Hause entfernt.', pl:'Doskonałe lasagne na wynos o rzut kamieniem od domu.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
-            { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', it:'Ottima pizzeria a pochi passi da casa. Consigliata la pizza regina 😉', en:'Great pizzeria just a few steps from home. The "pizza regina" is highly recommended 😉', de:'Großartige Pizzeria nur wenige Schritte von zu Hause entfernt. Die "Pizza Regina" wird sehr empfohlen 😉', pl:'Doskonała pizzeria o kilka kroków od domu. Polecana pizza regina 😉', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
-            { name:'La Farina', emoji:'🍕', photo:'', it:'Buona pizzeria al taglio.', en:'Good pizza by the slice.', de:'Gute Pizzeria mit Pizzastücken.', pl:'Dobra pizzeria na kawałki.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
-            { name:'Il Chiosco', emoji:'🍹', photo:'', it:'Bar all\'aperto in piazza Cavour con nuova gestione giovane e pimpante.', en:'Open-air bar in Piazza Cavour with new, young and lively management.', de:'Freiluftbar an der Piazza Cavour mit neuem, jungem und lebhaftem Management.', pl:'Bar na świeżym powietrzu na Piazza Cavour z nowym, młodym i energicznym kierownictwem.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
-            { name:'Donegal Irish Pub', emoji:'🍺', photo:'', it:'Pub irlandese, birre alla spina e musica dal vivo.', en:'Irish pub, draught beer and live music.', de:'Irish Pub, Bier vom Fass und Livemusik.', pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona', lat:43.6163846, lng:13.5156090 }
+            { name:'Bar Torino', emoji:'☕', photo:'', hours:'06:30–21:00', closedOn:[0], it:'Storico bar di Corso Garibaldi famoso per cocktail e aperitivi.', en:'Historic bar on Corso Garibaldi famous for cocktails and aperitifs.', de:'Historische Bar am Corso Garibaldi, berühmt für Cocktails und Aperitifs.', pl:'Historyczny bar przy Corso Garibaldi słynący z koktajli i aperitifów.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
+            { name:'Bar Giuliani', emoji:'☕', photo:'', hours:'06:00–24:00', closedOn:[], it:'Bar, tabacchi, gelateria, ristorante, pizzeria. L\'unico bar del centro aperto anche la domenica. Aperto fino a tarda ora.', en:'Bar, tobacconist, ice cream parlour, restaurant, pizzeria. The only bar in the centre open on Sundays too. Open until late.', de:'Bar, Tabakladen, Eisdiele, Restaurant, Pizzeria. Die einzige Bar im Zentrum, die auch sonntags geöffnet ist. Bis spät geöffnet.', pl:'Bar, tytoń, lodziarnia, restauracja, pizzeria. Jedyny bar w centrum otwarty również w niedziele. Czynny do późna.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
+            { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', hours:'11:30–14:30', closedOn:[0,6], it:'Ottime lasagne da asporto a due passi da casa.', en:'Excellent takeaway lasagne just a stone\'s throw from home.', de:'Ausgezeichnete Lasagne zum Mitnehmen, nur einen Steinwurf von zu Hause entfernt.', pl:'Doskonałe lasagne na wynos o rzut kamieniem od domu.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
+            { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', hours:'12:00–14:30, 19:00–23:00', closedOn:[1], it:'Ottima pizzeria a pochi passi da casa. Consigliata la pizza regina 😉', en:'Great pizzeria just a few steps from home. The "pizza regina" is highly recommended 😉', de:'Großartige Pizzeria nur wenige Schritte von zu Hause entfernt. Die "Pizza Regina" wird sehr empfohlen 😉', pl:'Doskonała pizzeria o kilka kroków od domu. Polecana pizza regina 😉', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
+            { name:'La Farina', emoji:'🍕', photo:'', hours:'08:00–20:00', closedOn:[0], it:'Buona pizzeria al taglio.', en:'Good pizza by the slice.', de:'Gute Pizzeria mit Pizzastücken.', pl:'Dobra pizzeria na kawałki.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
+            { name:'Il Chiosco', emoji:'🍹', photo:'', hours:'08:00–24:00', closedOn:[], it:'Bar all\'aperto in piazza Cavour con nuova gestione giovane e pimpante.', en:'Open-air bar in Piazza Cavour with new, young and lively management.', de:'Freiluftbar an der Piazza Cavour mit neuem, jungem und lebhaftem Management.', pl:'Bar na świeżym powietrzu na Piazza Cavour z nowym, młodym i energicznym kierownictwem.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
+            { name:'Donegal Irish Pub', emoji:'🍺', photo:'', hours:'18:00–02:00', closedOn:[1], it:'Pub irlandese, birre alla spina e musica dal vivo.', en:'Irish pub, draught beer and live music.', de:'Irish Pub, Bier vom Fass und Livemusik.', pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona', lat:43.6163846, lng:13.5156090 }
         ],
         supermarkets: [
-            { name:'Coal – Via Podesti', emoji:'🛒', photo:'', it:'Supermercato ben fornito. Il più vicino a casa.', en:'Well-stocked supermarket. The closest one to home.', de:'Gut sortierter Supermarkt. Der nächste zu Hause.', pl:'Dobrze zaopatrzony supermarket. Najbliższy domu.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
-            { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', it:'Storico mercato coperto aperto solo la mattina con frutta e verdura di produzione locale, banchi di pesce fresco, forno, stoccafisso, macelleria.', en:'Historic covered market open only in the morning with locally produced fruit and vegetables, fresh fish stalls, bakery, stockfish, butcher\'s.', de:'Historischer überdachter Markt, nur morgens geöffnet, mit lokal produziertem Obst und Gemüse, Frischfischständen, Bäckerei, Stockfisch, Metzgerei.', pl:'Historyczny kryty targ otwarty tylko rano z lokalnie produkowanymi owocami i warzywami, straganami ze świeżymi rybami, piekarnią, sztokfiszem, masarnią.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
-            { name:'Coal – Via San Martino', emoji:'🛒', photo:'', it:'Supermercato aperto anche la mattina di domenica e festivi.', en:'Supermarket open also on Sunday mornings and public holidays.', de:'Supermarkt auch sonntagmorgens und an Feiertagen geöffnet.', pl:'Supermarket otwarty również w niedzielne poranki i święta.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
-            { name:'Sì con te', emoji:'🛒', photo:'', it:'Supermercato in via Matteotti.', en:'Supermarket in Via Matteotti.', de:'Supermarkt in der Via Matteotti.', pl:'Supermarket przy Via Matteotti.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
+            { name:'Coal – Via Podesti', emoji:'🛒', photo:'', hours:'08:00–20:00', closedOn:[0], it:'Supermercato ben fornito. Il più vicino a casa.', en:'Well-stocked supermarket. The closest one to home.', de:'Gut sortierter Supermarkt. Der nächste zu Hause.', pl:'Dobrze zaopatrzony supermarket. Najbliższy domu.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
+            { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', hours:'07:00–13:30', closedOn:[0], it:'Storico mercato coperto aperto solo la mattina con frutta e verdura di produzione locale, banchi di pesce fresco, forno, stoccafisso, macelleria.', en:'Historic covered market open only in the morning with locally produced fruit and vegetables, fresh fish stalls, bakery, stockfish, butcher\'s.', de:'Historischer überdachter Markt, nur morgens geöffnet, mit lokal produziertem Obst und Gemüse, Frischfischständen, Bäckerei, Stockfisch, Metzgerei.', pl:'Historyczny kryty targ otwarty tylko rano z lokalnie produkowanymi owocami i warzywami, straganami ze świeżymi rybami, piekarnią, sztokfiszem, masarnią.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
+            { name:'Coal – Via San Martino', emoji:'🛒', photo:'', hours:'08:00–20:00', closedOn:[], it:'Supermercato aperto anche la mattina di domenica e festivi.', en:'Supermarket open also on Sunday mornings and public holidays.', de:'Supermarkt auch sonntagmorgens und an Feiertagen geöffnet.', pl:'Supermarket otwarty również w niedzielne poranki i święta.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
+            { name:'Sì con te', emoji:'🛒', photo:'', hours:'08:00–20:30', closedOn:[0], it:'Supermercato in via Matteotti.', en:'Supermarket in Via Matteotti.', de:'Supermarkt in der Via Matteotti.', pl:'Supermarket przy Via Matteotti.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
         ],
         beaches: [
-            { name:'Spiaggia del Passetto', emoji:'🌊', photo:'passetto.jpg',
-              it:'Scogli e sabbia grossa con grotte scavate nella roccia, ascensore panoramico, raggiungibile a piedi.',
-              en:'Rocks and coarse sand with grottoes carved into the cliff, panoramic lift, reachable on foot.',
-              de:'Felsen und grober Sand mit in den Fels gehauenen Grotten, Panoramaaufzug, zu Fuß erreichbar.',
-              pl:'Skały i gruby piasek z grotami wykutymi w klifie, panoramiczna winda, dostępna pieszo.',
-              dist:'🚶 2150 m – 29 min', mapQuery:'Spiaggia del Passetto Ancona', lat:43.616139, lng:13.533622 },
-            { name:'Palombina', emoji:'🏖️', photo:'',
-              it:'Lunga spiaggia di sabbia finissima, fondali bassi, ideale per famiglie. Raggiungibile con bus A, B e C dalla fermata di piazza Roma, alla destra del portone. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>',
-              en:'Long beach of very fine sand, shallow waters, ideal for families. Reachable by bus A, B and C from Piazza Roma stop, to the right of the entrance. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>',
-              de:'Langer Strand mit feinstem Sand, flaches Wasser, ideal für Familien. Erreichbar mit Bus A, B und C ab Piazza Roma, rechts vom Eingang. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>',
-              pl:'Długa plaża z bardzo drobnym piaskiem, płytka woda, idealna dla rodzin. Dostępna autobusami A, B i C z przystanku piazza Roma, na prawo od bramy. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>',
-              dist:'🚗 4 km – 8 min', mapQuery:'Spiaggia di Palombina Ancona', lat:43.6166715, lng:13.4299650 },
-            { name:'Portonovo – Baia del Conero', emoji:'🏝️', photo:'portonovo.jpg',
-              it:'Baia di ciottoli e acqua cristallina, Torre de Bosis, ristoranti sul mare. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>',
-              en:'Pebble bay with crystal-clear water, Torre de Bosis, seaside restaurants. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>',
-              de:'Kieselbucht mit kristallklarem Wasser, Torre de Bosis, Restaurants am Meer. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>',
-              pl:'Zatoka z otoczaków z krystalicznie czystą wodą, Torre de Bosis, restauracje nad morzem. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>',
-              dist:'🚌 12 km – 25 min', mapQuery:'Baia di Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
-            { name:'Mezzavalle', emoji:'🏝️', photo:'',
-              it:'Spiaggia di sabbia grossa, accesso solo a piedi o via mare, natura incontaminata. Parco del Conero. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>',
-              en:'Coarse sand beach, access only on foot or by sea, unspoiled nature. Conero Park. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>',
-              de:'Grobkörniger Sandstrand, Zugang nur zu Fuß oder vom Meer, unberührte Natur. Conero-Park. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>',
-              pl:'Plaża z grubym piaskiem, dostęp tylko pieszo lub od morza, dziewicza przyroda. Parco del Conero. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>',
-              dist:'🚶 13 km – percorso a piedi', mapQuery:'Spiaggia di Mezzavalle Ancona', lat:43.5671694, lng:13.5723437 },
-            { name:'Due Sorelle', emoji:'⛰️', photo:'',
-              it:'Icona del Conero, due faraglioni gemelli. Raggiungibile solo in barca dal porto di Sirolo. Parco del Conero.',
-              en:'Icon of Conero, twin sea stacks. Reachable only by boat from Sirolo harbour. Conero Park.',
-              de:'Wahrzeichen des Conero, zwei Felsnadeln. Nur mit dem Boot vom Hafen Sirolo aus erreichbar. Conero-Park.',
-              pl:'Ikona Conero, dwie bliźniacze skały. Dostępna tylko łodzią z portu Sirolo. Parco del Conero.',
-              dist:'⛵ Solo via mare', mapQuery:'Due Sorelle Sirolo', lat:43.5460130, lng:13.6271517 }
+            { name:'Spiaggia del Passetto', emoji:'🌊', photo:'passetto.jpg', it:'Scogli e sabbia grossa con grotte scavate nella roccia, ascensore panoramico, raggiungibile a piedi.', en:'Rocks and coarse sand with grottoes carved into the cliff, panoramic lift, reachable on foot.', de:'Felsen und grober Sand mit in den Fels gehauenen Grotten, Panoramaaufzug, zu Fuß erreichbar.', pl:'Skały i gruby piasek z grotami wykutymi w klifie, panoramiczna winda, dostępna pieszo.', dist:'🚶 2150 m – 29 min', mapQuery:'Spiaggia del Passetto Ancona', lat:43.616139, lng:13.533622 },
+            { name:'Palombina', emoji:'🏖️', photo:'', it:'Lunga spiaggia di sabbia finissima, fondali bassi, ideale per famiglie. Raggiungibile con bus A, B e C dalla fermata di piazza Roma, alla destra del portone. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>', en:'Long beach of very fine sand, shallow waters, ideal for families. Reachable by bus A, B and C from Piazza Roma stop, to the right of the entrance. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>', de:'Langer Strand mit feinstem Sand, flaches Wasser, ideal für Familien. Erreichbar mit Bus A, B und C ab Piazza Roma, rechts vom Eingang. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>', pl:'Długa plaża z bardzo drobnym piaskiem, płytka woda, idealna dla rodzin. Dostępna autobusami A, B i C z przystanku piazza Roma, na prawo od bramy. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>', dist:'🚗 4 km – 8 min', mapQuery:'Spiaggia di Palombina Ancona', lat:43.6166715, lng:13.4299650 },
+            { name:'Portonovo – Baia del Conero', emoji:'🏝️', photo:'portonovo.jpg', it:'Baia di ciottoli e acqua cristallina, Torre de Bosis, ristoranti sul mare. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>', en:'Pebble bay with crystal-clear water, Torre de Bosis, seaside restaurants. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>', de:'Kieselbucht mit kristallklarem Wasser, Torre de Bosis, Restaurants am Meer. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>', pl:'Zatoka z otoczaków z krystalicznie czystą wodą, Torre de Bosis, restauracje nad morzem. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>', dist:'🚌 12 km – 25 min', mapQuery:'Baia di Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
+            { name:'Mezzavalle', emoji:'🏝️', photo:'', it:'Spiaggia di sabbia grossa, accesso solo a piedi o via mare, natura incontaminata. Parco del Conero. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>', en:'Coarse sand beach, access only on foot or by sea, unspoiled nature. Conero Park. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>', de:'Grobkörniger Sandstrand, Zugang nur zu Fuß oder vom Meer, unberührte Natur. Conero-Park. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>', pl:'Plaża z grubym piaskiem, dostęp tylko pieszo lub od morza, dziewicza przyroda. Parco del Conero. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>', dist:'🚶 13 km – percorso a piedi', mapQuery:'Spiaggia di Mezzavalle Ancona', lat:43.5671694, lng:13.5723437 },
+            { name:'Due Sorelle', emoji:'⛰️', photo:'', it:'Icona del Conero, due faraglioni gemelli. Raggiungibile solo in barca dal porto di Sirolo. Parco del Conero.', en:'Icon of Conero, twin sea stacks. Reachable only by boat from Sirolo harbour. Conero Park.', de:'Wahrzeichen des Conero, zwei Felsnadeln. Nur mit dem Boot vom Hafen Sirolo aus erreichbar. Conero-Park.', pl:'Ikona Conero, dwie bliźniacze skały. Dostępna tylko łodzią z portu Sirolo. Parco del Conero.', dist:'⛵ Solo via mare', mapQuery:'Due Sorelle Sirolo', lat:43.5460130, lng:13.6271517 }
         ],
         parking: [
             { name:'Parcheggio degli Archi', emoji:'🅿️', photo:'parcheggio-archi.jpg', it:'Consigliato – €6/giorno, oltre 500 posti, custodito.', en:'Recommended – €6/day, over 500 spaces, supervised.', de:'Empfohlen – €6/Tag, über 500 Stellplätze, bewacht.', pl:'Polecany – €6/dzień, ponad 500 miejsc, strzeżony.', dist:'🚗 1 km – 2 min', mapQuery:'Parcheggio degli Archi Ancona', lat:43.6098074, lng:13.5032732 },
@@ -389,319 +400,617 @@
         { id:'contact', icon:'📞', it:'Contatti & Emergenze', en:'Contacts & Emergency', de:'Kontakt & Notfälle', pl:'Kontakt i alarmy' }
     ];
 
-    const sectionHashMap = { 'apartment': 0, 'mustsee': 1, 'around': 2, 'beaches': 3, 'marche': 4, 'restaurants': 5, 'barpub': 6, 'supermarkets': 7, 'parking': 8, 'transport': 9, 'contact': 10 };
+    const sectionHashMap = { 'apartment':0, 'mustsee':1, 'around':2, 'beaches':3, 'marche':4, 'restaurants':5, 'barpub':6, 'supermarkets':7, 'parking':8, 'transport':9, 'contact':10 };
 
-    let currentLang = 'it';
-    let currentSection = -1;
-    let currentPlaceDetail = -1;
-    let currentSectionPlaces = [];
-    let leafletMap = null;
-    let currentSubItinerary = null;
-    const HOST_PHONE = '3356750269';
-    const HOST_EMAIL = 'anconacentro@yahoo.com';
-    const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
-    const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
-    let placeDataMap = {};
-    let _mapRetryCount = 0;
-    const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
-    let gpsWatchId = null;
-    let gpsMarker = null;
-    let gpsCircle = null;
-    let gpsConsentGiven = sessionStorage.getItem('gpsConsent');
-    let gpsBoxCollapsed = false;
-    let deferredPrompt;
+    let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null;
+    let placeDataMap = {}, _mapRetryCount = 0;
+    let gpsWatchId = null, gpsMarker = null, gpsCircle = null, gpsConsentGiven = null, gpsBoxCollapsed = false, deferredPrompt = null;
+    try { gpsConsentGiven = sessionStorage.getItem('gpsConsent'); } catch(e) {}
+    try {
+        const urlLang = new URLSearchParams(window.location.search).get('lang');
+        const stored = localStorage.getItem('guida_lang');
+        const valid = ['it','en','de','pl'];
+        if (urlLang && valid.includes(urlLang)) currentLang = urlLang;
+        else if (stored && valid.includes(stored)) currentLang = stored;
+    } catch(e) {}
 
-    function tr(it, en, de, pl) { if (currentLang === 'en') return en || it; if (currentLang === 'de') return de || en || it; if (currentLang === 'pl') return pl || en || it; return it; }
-    function setLang(lang) { currentLang = lang; document.documentElement.lang = lang; document.querySelectorAll('.lang-btn').forEach(btn => { const isActive = btn.id === `btn-${lang}`; btn.classList.toggle('active', isActive); btn.setAttribute('aria-checked', isActive ? 'true' : 'false'); }); if (leafletMap) { leafletMap.remove(); leafletMap = null; } renderAll(); }
+    function tr(it, en, de, pl) {
+        const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
+        return val || '';
+    }
+    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
     function getMapLink(query, noSuffix) { const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
     function getImgSearchUrl(p) { const q = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q); }
-    function photoFallback(wrapId) { const el = document.getElementById(wrapId); if (!el) return; const p = placeDataMap[wrapId]; if (p) el.innerHTML = `<a href="${getImgSearchUrl(p)}" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di ${p.name} su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">${tr('Clicca per vedere le foto', 'Click to see photos', 'Klicken, um Fotos zu sehen', 'Kliknij, aby zobaczyć zdjęcia')}</span></a>`; }
-    function calcDistance(lat1, lon1, lat2, lon2) { const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180; const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); }
 
-    function openSubItinerary(subId) { currentSubItinerary = subId; currentPlaceDetail = -1; placeDataMap = {}; if (leafletMap) { leafletMap.remove(); leafletMap = null; } renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function closeSubItinerary() { currentSubItinerary = null; currentPlaceDetail = -1; placeDataMap = {}; if (leafletMap) { leafletMap.remove(); leafletMap = null; } renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function getHoursBadge(p) {
+        if (!p.hours) return '';
+        const now = new Date();
+        const day = now.getDay();
+        const dayNames = { it:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'], en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], de:['So','Mo','Di','Mi','Do','Fr','Sa'], pl:['Nd','Pn','Wt','Śr','Cz','Pt','Sb'] };
+        const closedOn = p.closedOn || [];
+        if (closedOn.includes(day)) {
+            const closedLabel = tr('Chiuso oggi','Closed today','Heute geschlossen','Dziś zamknięte');
+            return '<div><span class="hours-badge holiday">🔴 '+closedLabel+'</span><div class="hours-text">🕐 '+p.hours+'</div></div>';
+        }
+        const hm = now.getHours()*60+now.getMinutes();
+        const slots = p.hours.split(',').map(s=>s.trim());
+        let isOpen = false;
+        for (const slot of slots) {
+            const parts = slot.split('–').map(t=>{ const [h,m]=t.trim().split(':'); return parseInt(h)*60+(parseInt(m)||0); });
+            if (parts.length===2 && hm>=parts[0] && hm<=parts[1]) { isOpen=true; break; }
+        }
+        const badge = isOpen
+            ? '<span class="hours-badge open">🟢 '+tr('Aperto ora','Open now','Jetzt geöffnet','Teraz otwarte')+'</span>'
+            : '<span class="hours-badge closed">🔴 '+tr('Chiuso ora','Closed now','Jetzt geschlossen','Teraz zamknięte')+'</span>';
+        let closedDaysStr = '';
+        if (closedOn.length) {
+            const dn = dayNames[currentLang] || dayNames.it;
+            closedDaysStr = ' · '+tr('Chiuso il','Closed on','Geschlossen am','Zamknięte:')+' '+closedOn.map(d=>dn[d]).join(', ');
+        }
+        return '<div>'+badge+'<div class="hours-text">🕐 '+p.hours+closedDaysStr+'</div></div>';
+    }
+
+    function getCountdownHtml() {
+        try {
+            const co = new URLSearchParams(window.location.search).get('checkout');
+            if (!co) return '';
+            const target = new Date(co+'T11:00:00');
+            const now = new Date();
+            const diff = target - now;
+            if (diff <= 0 || diff > 7*24*3600*1000) return '';
+            const h = Math.floor(diff/3600000);
+            const m = Math.floor((diff%3600000)/60000);
+            const label = tr('Check-out tra','Check-out in','Check-out in','Wymeldowanie za');
+            const timeStr = h > 0 ? h+'h '+m+'m' : m+' min';
+            return '<div class="checkout-countdown"><div class="countdown-icon">🧳</div><div class="countdown-text"><div>'+label+'</div><div class="countdown-value">'+timeStr+'</div><div style="font-size:.62rem;margin-top:2px;opacity:.7">'+tr('entro le 11:00','by 11:00','bis 11:00 Uhr','do 11:00')+'</div></div></div>';
+        } catch(e) { return ''; }
+    }
+
+    function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
+    function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
+
+    function openSubItinerary(subId) { currentSubItinerary=subId; currentPlaceDetail=-1; placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+    function closeSubItinerary() { currentSubItinerary=null; currentPlaceDetail=-1; placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
 
     function goTo(i) {
-        const noGpsSections = ['apartment', 'contact', 'transport'];
-        const targetId = i >= 0 && sections[i] ? sections[i].id : null;
-        if ((i === -1 || (targetId && noGpsSections.includes(targetId))) && gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
-        if (gpsMarker && leafletMap) leafletMap.removeLayer(gpsMarker);
-        if (gpsCircle && leafletMap) leafletMap.removeLayer(gpsCircle);
-        gpsMarker = null; gpsCircle = null;
-        if (currentSection >= 0 && sections[currentSection] && sections[currentSection].id === 'apartment' && targetId !== 'apartment') { window._activeReachTab = 'auto'; }
-        currentSection = i; currentPlaceDetail = -1; currentSubItinerary = null; placeDataMap = {};
-        if (leafletMap) { leafletMap.remove(); leafletMap = null; }
-        renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        const targetId = i>=0 && sections[i] ? sections[i].id : null;
+        if((i===-1||(targetId&&NO_GPS_SECTIONS.includes(targetId)))&&gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;}
+        if(gpsMarker&&leafletMap)leafletMap.removeLayer(gpsMarker);
+        if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle);
+        gpsMarker=null;gpsCircle=null;
+        distSortActive=false;
+        currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={};
+        if(leafletMap){leafletMap.remove();leafletMap=null;}
+        try{const hash=i>=0&&sections[i]?'#'+sections[i].id:'';history.replaceState(null,'',hash||window.location.pathname);}catch(e){}
+        renderAll();window.scrollTo({top:0,behavior:'smooth'});
     }
 
     function selectPlaceDetail(i) {
-        const items = currentSubItinerary ? (appData.subItineraries[currentSubItinerary] || []) : currentSectionPlaces;
-        const p = items[i];
-        if (p && p.isSubItinerary && p.subId) { openSubItinerary(p.subId); return; }
-        currentPlaceDetail = i;
-        if (leafletMap) { leafletMap.remove(); leafletMap = null; }
-        renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        const items=currentSubItinerary?(appData.subItineraries[currentSubItinerary]||[]):currentSectionPlaces;
+        const p=items[i];
+        if(p&&p.isSubItinerary&&p.subId){openSubItinerary(p.subId);return;}
+        currentPlaceDetail=i;
+        if(leafletMap){leafletMap.remove();leafletMap=null;}
+        renderAll();window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function backToMap() { currentPlaceDetail = -1; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    function panToHome() { if (leafletMap) leafletMap.setView([HOME_COORDS.lat, HOME_COORDS.lng], 15); }
+    function backToMap(){currentPlaceDetail=-1;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
+    function panToHome(){if(leafletMap)leafletMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],15);}
 
-    function getDisplayNumber(p, index) {
-        if (currentSubItinerary) return String.fromCharCode(65 + index);
-        if (typeof p.order === 'string' && p.order.indexOf('bis') > -1) return p.order.replace('-bis', 'b');
-        if (typeof p.order === 'number') return p.order;
-        return index + 1;
+    function getDisplayNumber(p,index){
+        if(currentSubItinerary)return String.fromCharCode(65+index);
+        if(typeof p.order==='string'&&p.order.indexOf('bis')>-1)return p.order.replace('-bis','b');
+        if(typeof p.order==='number')return p.order;
+        return index+1;
     }
 
-    function getTotalDisplay(items, total) {
-        if (!total || !items || !items.length) return 0;
-        if (currentSubItinerary) return String.fromCharCode(64 + total);
-        const last = items[total - 1];
-        if (last && typeof last.order === 'string' && last.order.indexOf('bis') > -1) return last.order.replace('-bis', 'b');
-        if (last && typeof last.order === 'number') return last.order;
+    function getTotalDisplay(items,total){
+        if(!total||!items||!items.length)return 0;
+        if(currentSubItinerary)return String.fromCharCode(64+total);
+        const last=items[total-1];
+        if(last&&typeof last.order==='string'&&last.order.indexOf('bis')>-1)return last.order.replace('-bis','b');
+        if(last&&typeof last.order==='number')return last.order;
         return total;
     }
 
-    function sortMustSee(a, b) { function toNum(val) { if (typeof val === 'string' && val.indexOf('bis') > -1) return parseFloat(val.split('-')[0]) + 0.5; return Number(val); } return toNum(a.order) - toNum(b.order); }
+    function sortMustSee(a,b){function toNum(val){if(typeof val==='string'&&val.indexOf('bis')>-1)return parseFloat(val.split('-')[0])+.5;return Number(val);}return toNum(a.order)-toNum(b.order);}
 
-    function updateGpsUI() {
-        const container = document.querySelector('.gps-container'); const box = document.querySelector('.gps-box'); const overlay = document.querySelector('.gps-icon-overlay');
-        if (!container || !box || !overlay) return;
-        if (currentPlaceDetail >= 0 || gpsBoxCollapsed) box.classList.add('collapsed'); else box.classList.remove('collapsed');
-        if (gpsWatchId !== null) overlay.classList.add('active'); else overlay.classList.remove('active');
-        const textEl = box.querySelector('.gps-text'); const btnsEl = box.querySelector('.gps-buttons');
-        if (textEl) {
-            if (gpsWatchId !== null) textEl.innerHTML = `<strong>${tr('GPS attivo', 'GPS active', 'GPS aktiv', 'GPS aktywny')}</strong> – ${tr('La tua posizione viene aggiornata in tempo reale.', 'Your position is updating in real time.', 'Ihre Position wird in Echtzeit aktualisiert.', 'Twoja pozycja jest aktualizowana w czasie rzeczywistym.')}`;
-            else if (gpsConsentGiven === null) textEl.innerHTML = tr('🧭 <strong>Navigazione in tempo reale</strong><br>Attiva la geolocalizzazione per vedere la tua posizione sulla mappa e seguire l\'itinerario passo dopo passo.', '🧭 <strong>Real-time navigation</strong><br>Enable geolocation to see your position on the map and follow the route step by step.', '🧭 <strong>Echtzeit-Navigation</strong><br>Aktivieren Sie die Standortermittlung, um Ihre Position auf der Karte zu sehen und der Route Schritt für Schritt zu folgen.', '🧭 <strong>Nawigacja w czasie rzeczywistym</strong><br>Włącz geolokalizację, aby zobaczyć swoją pozycję na mapie i podążać trasą krok po kroku.');
-            else textEl.innerHTML = tr('GPS non attivo. Clicca su "Riattiva" per attivarlo.', 'GPS not active. Click "Reactivate" to enable it.', 'GPS nicht aktiv. Klicken Sie auf "Reaktivieren", um ihn zu aktivieren.', 'GPS nieaktywny. Kliknij "Ponownie włącz", aby go włączyć.');
-        }
-        if (btnsEl) {
-            if (gpsWatchId !== null) { btnsEl.innerHTML = `<button class="btn-gps-toggle active" id="btn-gps-stop">⏹ ${tr('Spegni GPS', 'Stop GPS', 'GPS ausschalten', 'Wyłącz GPS')}</button>`; document.getElementById('btn-gps-stop')?.addEventListener('click', function(e) { e.stopPropagation(); toggleGpsTracking(); }); }
-            else if (gpsConsentGiven === null) { btnsEl.innerHTML = `<button class="btn-gps-accept" id="btn-gps-accept">✅ ${tr('Accetta', 'Accept', 'Akzeptieren', 'Akceptuj')}</button><button class="btn-gps-deny" id="btn-gps-deny">❌ ${tr('Nega', 'Deny', 'Ablehnen', 'Odrzuć')}</button>`; document.getElementById('btn-gps-accept')?.addEventListener('click', function(e) { e.stopPropagation(); gpsConsentGiven = 'true'; sessionStorage.setItem('gpsConsent', 'true'); toggleGpsTracking(); }); document.getElementById('btn-gps-deny')?.addEventListener('click', function(e) { e.stopPropagation(); gpsConsentGiven = 'false'; sessionStorage.setItem('gpsConsent', 'false'); gpsBoxCollapsed = true; updateGpsUI(); }); }
-            else { btnsEl.innerHTML = `<button class="btn-gps-accept" id="btn-gps-accept">✅ ${tr('Riattiva GPS', 'Reactivate GPS', 'GPS reaktivieren', 'Ponownie włącz GPS')}</button>`; document.getElementById('btn-gps-accept')?.addEventListener('click', function(e) { e.stopPropagation(); toggleGpsTracking(); }); }
-        }
-    }
-
-    function toggleGpsBox() { gpsBoxCollapsed = !gpsBoxCollapsed; updateGpsUI(); }
-
-    function toggleGpsTracking() {
-        if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; if (gpsMarker && leafletMap) { leafletMap.removeLayer(gpsMarker); gpsMarker = null; } if (gpsCircle && leafletMap) { leafletMap.removeLayer(gpsCircle); gpsCircle = null; } updateGpsUI(); return; }
-        if (!navigator.geolocation) { const textEl = document.querySelector('.gps-box .gps-text'); const btnsEl = document.querySelector('.gps-box .gps-buttons'); if (textEl) textEl.innerHTML = `<strong>⚠️ ${tr('GPS non supportato', 'GPS not supported', 'GPS nicht unterstützt', 'GPS nieobsługiwany')}</strong><br>${tr('Il tuo dispositivo non supporta la geolocalizzazione.', 'Your device does not support geolocation.', 'Ihr Gerät unterstützt keine Geolokalisierung.', 'Twoje urządzenie nie obsługuje geolokalizacji.')}`; if (btnsEl) btnsEl.innerHTML = ''; return; }
-        gpsWatchId = navigator.geolocation.watchPosition((position) => { const lat = position.coords.latitude; const lng = position.coords.longitude; const accuracy = position.coords.accuracy; if (!leafletMap) return; if (gpsMarker) gpsMarker.setLatLng([lat, lng]); else { const gpsIcon = L.divIcon({ html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>', className: '', iconSize: [20, 20], iconAnchor: [10, 10] }); gpsMarker = L.marker([lat, lng], { icon: gpsIcon, zIndexOffset: 2000 }).addTo(leafletMap); } if (gpsCircle) { gpsCircle.setLatLng([lat, lng]); gpsCircle.setRadius(accuracy); } else gpsCircle = L.circle([lat, lng], { radius: accuracy, color: '#007aff', fillColor: '#007aff', fillOpacity: 0.15, weight: 1 }).addTo(leafletMap); updateGpsUI(); }, (error) => { if (error.code === error.PERMISSION_DENIED) { const textEl = document.querySelector('.gps-box .gps-text'); const btnsEl = document.querySelector('.gps-box .gps-buttons'); if (textEl) textEl.innerHTML = `<strong>🔒 ${tr('Accesso GPS negato', 'GPS access denied', 'GPS-Zugriff verweigert', 'Odmowa dostępu GPS')}</strong><br>${tr('Abilita i permessi di localizzazione nelle impostazioni del browser.', 'Enable location permissions in your browser settings.', 'Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.', 'Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.')}`; if (btnsEl) btnsEl.innerHTML = ''; if (gpsWatchId !== null) toggleGpsTracking(); } }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 2000 }); updateGpsUI();
-    }
-
-    function renderAll() {
-        document.getElementById('header-sub').textContent = tr(headerSubTr.it, headerSubTr.en, headerSubTr.de, headerSubTr.pl);
-        document.documentElement.lang = currentLang;
-        const hero = document.getElementById('hero'); const nav = document.getElementById('nav'); const cont = document.getElementById('content');
-        if (currentSection === -1 && leafletMap) { if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; if (gpsMarker) leafletMap.removeLayer(gpsMarker); if (gpsCircle) leafletMap.removeLayer(gpsCircle); gpsMarker = null; gpsCircle = null; } leafletMap.remove(); leafletMap = null; }
-        hero.classList.toggle('section-mode', currentSection !== -1);
-        if (currentSection === -1) { nav.style.display = 'none'; renderHome(); return; }
-        nav.style.display = 'flex';
-        nav.innerHTML = sections.map((s, i) => `<button class="nav-pill${i === currentSection ? ' active' : ''}" data-index="${i}" role="tab" aria-selected="${i === currentSection ? 'true' : 'false'}">${s.icon} ${tr(s.it, s.en, s.de, s.pl)}</button>`).join('');
-        nav.querySelectorAll('.nav-pill').forEach(btn => btn.addEventListener('click', function() { goTo(parseInt(this.dataset.index)); }));
-        const s = sections[currentSection]; const body = renderSection(s.id);
-        cont.innerHTML = `<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">${s.icon}</div><div><div class="section-title">${tr(s.it, s.en, s.de, s.pl)}</div></div></div></div><div class="cards">${body}<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div></section>`;
-        document.getElementById('home-btn')?.addEventListener('click', function() { goTo(-1); });
-        document.getElementById('sub-back-btn')?.addEventListener('click', closeSubItinerary);
-        attachDetailListeners(); attachPlaceSectionListeners(); attachReachListeners();
-        const noGpsSections = ['apartment', 'contact', 'transport'];
-        if (currentPlaceDetail < 0 && !noGpsSections.includes(s.id)) {
-            const cardsEl = cont.querySelector('.cards'); const gpsContainer = document.createElement('div'); gpsContainer.className = 'gps-container';
-            gpsContainer.innerHTML = `<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>`;
-            if (cardsEl) cardsEl.insertBefore(gpsContainer, cardsEl.firstChild);
-            document.getElementById('gps-overlay-icon')?.addEventListener('click', toggleGpsBox);
-            updateGpsUI(); setTimeout(initSectionMap, 0);
-        }
-    }
-
-    function renderHome() {
-        const cont = document.getElementById('content');
-        const hostImgSrc = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg';
-        const socialHtml = `<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="${appData.social.instagram}" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="${appData.social.facebook}" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener" class="social-link" aria-label="Meteo Ancona">🌤️ Meteo</a></div><div class="home-social-text">${tr('Informazioni e aggiornamenti costanti sui profili social', 'Constant information and updates on social profiles', 'Ständige Informationen und Updates auf den Social-Media-Profilen', 'Stałe informacje i aktualizacje na profilach społecznościowych')}</div></div></div>`;
-        const tiles = sections.map((s, i) => `<button class="nav-tile" data-index="${i}" aria-label="${tr(s.it, s.en, s.de, s.pl)}"><div class="nav-tile-icon" aria-hidden="true">${s.icon}</div><div class="nav-tile-label">${tr(s.it, s.en, s.de, s.pl)}</div></button>`).join('');
-        const installBtnHtml = `<button id="install-btn" class="install-btn" style="display: none;">📲 ${tr('Aggiungi alla schermata Home', 'Add to Home Screen', 'Zum Startbildschirm hinzufügen', 'Dodaj do ekranu głównego')}</button>`;
-        const html = `<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="${hostImgSrc}" alt="Foto dell'host" class="host-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="host-photo-placeholder" style="display:none;">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">${tr('Benvenuti!', 'Welcome!', 'Willkommen!', 'Witamy!')}</div><div class="home-welcome-sub">${tr('Siamo felici di ospitarvi', 'We are happy to host you', 'Wir freuen uns, Sie zu beherbergen', 'Cieszymy się, że możemy Was gościć')}</div></div></div>${installBtnHtml}${socialHtml}<div class="nav-grid">${tiles}</div></section>`;
-        cont.innerHTML = html;
-        document.querySelectorAll('.nav-tile').forEach(btn => btn.addEventListener('click', function() { goTo(parseInt(this.dataset.index)); }));
-        const installBtn = document.getElementById('install-btn');
-        if (installBtn) { installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; console.log(`Installazione: ${outcome}`); deferredPrompt = null; installBtn.style.display = 'none'; } }); if (deferredPrompt) installBtn.style.display = 'inline-flex'; else if (window.matchMedia('(display-mode: standalone)').matches) installBtn.style.display = 'none'; }
-    }
-
-    function renderSection(id) {
-        if (id === 'contact') return renderContact();
-        if (id === 'transport') return renderTransport();
-        if (id === 'apartment') return renderApartment();
-        const map = { mustsee: () => { if (currentSubItinerary) return appData.subItineraries[currentSubItinerary] || []; return appData.mustsee.slice().sort(sortMustSee); }, restaurants: () => appData.restaurants, barpub: () => appData.barpub, supermarkets: () => appData.supermarkets, beaches: () => appData.beaches, parking: () => appData.parking, around: () => appData.around, marche: () => appData.marche };
-        if (map[id]) return renderPlaceSection(map[id](), id);
-        return '';
-    }
-
-    function starBtnHtml() {
-        if (currentSectionPlaces && currentSectionPlaces.length > 0) { let minDist = Infinity; for (let i = 0; i < currentSectionPlaces.length; i++) { const p = currentSectionPlaces[i]; if (p._dist !== undefined && p._dist < minDist) minDist = p._dist; } if (minDist > 30) return ''; }
-        return `<button class="star-list-btn" id="star-home-btn" aria-label="Centra la mappa su Ancona Centro">★ Ancona Centro</button>`;
-    }
-
-    function renderPlaceSection(items, sectionId) {
-        currentSectionPlaces = items;
-        for (let i = 0; i < items.length; i++) { const p = items[i]; if (p.lat && p.lng) p._dist = calcDistance(HOME_COORDS.lat, HOME_COORDS.lng, p.lat, p.lng); else p._dist = Infinity; }
-        const parkingInfoBox = (sectionId === 'parking') ? `<div class="card" style="margin-top: 8px;"><div class="card-header"><span class="card-header-icon">🅿️</span><span class="card-title">Strisce blu (zona centro)</span></div><div class="card-body">Parcheggio a pagamento su strada, posto difficile.</div></div>` : '';
-        if (currentSubItinerary) {
-            let parent = null; for (let k = 0; k < appData.mustsee.length; k++) { if (appData.mustsee[k].subId === currentSubItinerary) { parent = appData.mustsee[k]; break; } }
-            const descHtml = parent ? `<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">${parent.emoji}</div><div><div class="place-name">${parent.name}</div><div class="place-desc" style="margin-top:5px;">${tr(parent.it, parent.en, parent.de, parent.pl)}</div></div></div></div>` : '';
-            if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, true) + parkingInfoBox;
-            const subBtns = items.map((p, i) => { const dn = getDisplayNumber(p, i); const sel = (i === currentPlaceDetail) ? ' selected' : ''; return `<button class="place-btn-mini${sel}" data-index="${i}" aria-label="${p.name}">${dn}. ${p.name}</button>`; }).join('');
-            return `<button class="back-btn" id="sub-back-btn">← ${tr('Torna al tour principale', 'Back to main tour', 'Zurück zur Haupttour', 'Powrót do głównej trasy')}</button>${descHtml}<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${subBtns}</div></div>${parkingInfoBox}`;
-        }
-        if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, false) + parkingInfoBox;
-        const btns = items.map((p, i) => { const dn = getDisplayNumber(p, i); const sel = (i === currentPlaceDetail) ? ' selected' : ''; const subBadge = p.isSubItinerary ? ' 🔀' : ''; const subHint = p.isSubItinerary ? ` – ${tr('mini-percorso', 'mini-tour', 'Mini-Tour', 'mini-trasa')}` : ''; return `<button class="place-btn-mini${sel}" data-index="${i}" aria-label="${p.name}${subHint}">${dn}. ${p.name}${subBadge}</button>`; }).join('');
-        return `<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${btns}</div></div>${parkingInfoBox}`;
-    }
-
-    function attachPlaceSectionListeners() { document.querySelectorAll('.place-btn-mini').forEach(btn => btn.addEventListener('click', function() { selectPlaceDetail(parseInt(this.dataset.index)); })); document.getElementById('star-home-btn')?.addEventListener('click', panToHome); }
-
-    function renderAnyPlaceDetail(p, index, total, isSubMode) {
-        const wrapId = 'photowrap_' + index; placeDataMap[wrapId] = p; const desc = tr(p.it, p.en, p.de, p.pl);
-        let photoHtml;
-        if (p.photo) { const src = PHOTO_BASE + p.photo; photoHtml = `<div class="detail-photo-wrap" id="${wrapId}"><div class="detail-photo-placeholder" id="ph_${index}" aria-hidden="true">${p.emoji}</div><img class="detail-photo" src="${src}" alt="Foto di ${p.name}" loading="lazy" onload="this.classList.add('loaded');document.getElementById('ph_${index}')?.classList.add('hidden');" onerror="photoFallback('${wrapId}')"></div>`; }
-        else photoHtml = `<div class="detail-photo-wrap"><a href="${getImgSearchUrl(p)}" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di ${p.name} su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">${tr('Clicca per vedere le foto', 'Click to see photos', 'Klicken, um Fotos zu sehen', 'Kliknij, aby zobaczyć zdjęcia')}</span></a></div>`;
-        let btns = `<a href="${getMapLink(p.mapQuery || p.name, !!p.mapQuery)}" target="_blank" rel="noopener" class="map-button" aria-label="Apri mappa per ${p.name}">🗺️ ${tr('Apri mappa', 'Open map', 'Karte öffnen', 'Otwórz mapę')}</a>`;
-        if (!isSubMode && p.extraMap) { const extraHref = p.extraMap.url || getMapLink(p.extraMap.query, true); btns += ` <a href="${extraHref}" target="_blank" rel="noopener" class="map-button" aria-label="${p.extraMap.label}">${p.extraMap.label}</a>`; }
-        const displayNum = getDisplayNumber(p, index); const totalDisplay = getTotalDisplay(currentSectionPlaces, total);
-        const backLabel = tr('Tutti i luoghi', 'All places', 'Alle Orte', 'Wszystkie miejsca');
-        const prev = index > 0 ? `<button class="nav-detail-btn" data-prev="${index - 1}" aria-label="Luogo precedente">◀ ${tr('Prec.', 'Prev', 'Vor.', 'Poprz.')}</button>` : '<span></span>';
-        const next = index < total - 1 ? `<button class="nav-detail-btn" data-next="${index + 1}" aria-label="Luogo successivo">${tr('Succ.', 'Next', 'Näch.', 'Nast.')} ▶</button>` : '<span></span>';
-        return `<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← ${backLabel}</button><div class="place-card">${photoHtml}<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">${p.emoji}</div><div><div class="place-name">${p.name}</div><div class="place-dist">${p.dist}</div><div class="place-desc" style="margin-top:5px;">${desc}</div></div></div><div class="place-actions">${btns}</div></div><div class="detail-nav">${prev}<span class="detail-counter">${displayNum} / ${totalDisplay}</span>${next}</div>`;
-    }
-
-    function attachDetailListeners() { document.getElementById('detail-back-btn')?.addEventListener('click', backToMap); document.querySelectorAll('.nav-detail-btn[data-prev]').forEach(btn => btn.addEventListener('click', function() { selectPlaceDetail(parseInt(this.dataset.prev)); })); document.querySelectorAll('.nav-detail-btn[data-next]').forEach(btn => btn.addEventListener('click', function() { selectPlaceDetail(parseInt(this.dataset.next)); })); }
-
-    function attachReachListeners() {
-        document.querySelectorAll('.reach-sub-btn').forEach(btn => {
-            btn.addEventListener('click', function() { window._toggleReach(this.dataset.reach); });
+    window._reachTexts={};
+    window._activeReachTab='auto';
+    window._toggleReach=function(type){
+        window._activeReachTab=type;
+        const contentEl=document.getElementById('reach-content');
+        if(contentEl)contentEl.innerHTML=window._reachTexts[type]||'';
+        document.querySelectorAll('.reach-sub-btn').forEach(b=>{
+            const isActive=b.dataset.reach===type;
+            b.classList.toggle('active',isActive);
         });
-        if (window._toggleReach) window._toggleReach(window._activeReachTab || 'auto');
+    };
+
+    function updateGpsUI(){
+        const container=document.querySelector('.gps-container'),box=document.querySelector('.gps-box'),overlay=document.querySelector('.gps-icon-overlay');
+        if(!container||!box||!overlay)return;
+        if(currentPlaceDetail>=0||gpsBoxCollapsed)box.classList.add('collapsed');else box.classList.remove('collapsed');
+        if(gpsWatchId!==null)overlay.classList.add('active');else overlay.classList.remove('active');
+        const textEl=box.querySelector('.gps-text'),btnsEl=box.querySelector('.gps-buttons');
+        if(textEl){
+            if(gpsWatchId!==null)textEl.innerHTML='<strong>'+tr('GPS attivo','GPS active','GPS aktiv','GPS aktywny')+'</strong> – '+tr('La tua posizione viene aggiornata in tempo reale.','Your position is updating in real time.','Ihre Position wird in Echtzeit aktualisiert.','Twoja pozycja jest aktualizowana w czasie rzeczywistym.');
+            else if(gpsConsentGiven===null)textEl.innerHTML=tr('🧭 <strong>Navigazione in tempo reale</strong><br>Attiva la geolocalizzazione per vedere la tua posizione sulla mappa e seguire l\'itinerario passo dopo passo.','🧭 <strong>Real-time navigation</strong><br>Enable geolocation to see your position on the map and follow the route step by step.','🧭 <strong>Echtzeit-Navigation</strong><br>Aktivieren Sie die Standortermittlung, um Ihre Position auf der Karte zu sehen und der Route Schritt für Schritt zu folgen.','🧭 <strong>Nawigacja w czasie rzeczywistym</strong><br>Włącz geolokalizację, aby zobaczyć swoją pozycję na mapie i podążać trasą krok po kroku.');
+            else textEl.innerHTML=tr('GPS non attivo. Clicca su "Riattiva" per attivarlo.','GPS not active. Click "Reactivate" to enable it.','GPS nicht aktiv. Klicken Sie auf "Reaktivieren", um ihn zu aktivieren.','GPS nieaktywny. Kliknij "Ponownie włącz", aby go włączyć.');
+        }
+        if(btnsEl){
+            btnsEl.innerHTML='';
+            if(gpsWatchId!==null){
+                const stopBtn=document.createElement('button');stopBtn.className='btn-gps-toggle active';stopBtn.id='btn-gps-stop';stopBtn.textContent='⏹ '+tr('Spegni GPS','Stop GPS','GPS ausschalten','Wyłącz GPS');stopBtn.addEventListener('click',function(e){e.stopPropagation();toggleGpsTracking();});btnsEl.appendChild(stopBtn);
+            }else if(gpsConsentGiven===null){
+                const acceptBtn=document.createElement('button');acceptBtn.className='btn-gps-accept';acceptBtn.id='btn-gps-accept';acceptBtn.textContent='✅ '+tr('Accetta','Accept','Akzeptieren','Akceptuj');acceptBtn.addEventListener('click',function(e){e.stopPropagation();gpsConsentGiven='true';try{sessionStorage.setItem('gpsConsent','true');}catch(ex){}toggleGpsTracking();});btnsEl.appendChild(acceptBtn);
+                const denyBtn=document.createElement('button');denyBtn.className='btn-gps-deny';denyBtn.id='btn-gps-deny';denyBtn.textContent='❌ '+tr('Nega','Deny','Ablehnen','Odrzuć');denyBtn.addEventListener('click',function(e){e.stopPropagation();gpsConsentGiven='false';try{sessionStorage.setItem('gpsConsent','false');}catch(ex){}gpsBoxCollapsed=true;updateGpsUI();});btnsEl.appendChild(denyBtn);
+            }else{
+                const reactivateBtn=document.createElement('button');reactivateBtn.className='btn-gps-accept';reactivateBtn.id='btn-gps-accept';reactivateBtn.textContent='✅ '+tr('Riattiva GPS','Reactivate GPS','GPS reaktivieren','Ponownie włącz GPS');reactivateBtn.addEventListener('click',function(e){e.stopPropagation();toggleGpsTracking();});btnsEl.appendChild(reactivateBtn);
+            }
+        }
     }
 
-    function renderTransport() {
-        const td = appData.transport;
-        const items = [
-            { icon: '🚌', label: tr('Bus', 'Bus', 'Bus', 'Autobus'), text: tr(td.bus.it, td.bus.en, td.bus.de, td.bus.pl) },
-            { icon: '🚂', label: tr('Treno', 'Train', 'Zug', 'Pociąg'), text: tr(td.train.it, td.train.en, td.train.de, td.train.pl) },
-            { icon: '🚕', label: tr('Taxi', 'Taxi', 'Taxi', 'Taxi'), text: tr(td.taxi.it, td.taxi.en, td.taxi.de, td.taxi.pl) },
-            { icon: '⛴️', label: tr('Traghetti', 'Ferries', 'Fähren', 'Promy'), text: tr(td.ferry.it, td.ferry.en, td.ferry.de, td.ferry.pl) },
-            { icon: '✈️', label: tr('Aeroporto', 'Airport', 'Flughafen', 'Lotnisko'), text: tr(td.airport.it, td.airport.en, td.airport.de, td.airport.pl) }
-        ];
-        let cardsHtml = items.map(item => `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">${item.icon}</span><span class="card-title">${item.label}</span></div><div class="card-body"><p>${item.text}</p></div></div>`).join('');
-        cardsHtml += `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">${tr('Portale turistico ufficiale', 'Official tourism portal', 'Offizielles Tourismusportal', 'Oficjalny portal turystyczny')}</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" rel="noopener" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px;" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>`;
-        return cardsHtml;
+    function toggleGpsBox(){gpsBoxCollapsed=!gpsBoxCollapsed;updateGpsUI();}
+
+    function toggleGpsTracking(){
+        if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;if(gpsMarker&&leafletMap){leafletMap.removeLayer(gpsMarker);gpsMarker=null;}if(gpsCircle&&leafletMap){leafletMap.removeLayer(gpsCircle);gpsCircle=null;}updateGpsUI();return;}
+        if(!navigator.geolocation){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>⚠️ '+tr('GPS non supportato','GPS not supported','GPS nicht unterstützt','GPS nieobsługiwany')+'</strong><br>'+tr('Il tuo dispositivo non supporta la geolocalizzazione.','Your device does not support geolocation.','Ihr Gerät unterstützt keine Geolokalisierung.','Twoje urządzenie nie obsługuje geolokalizacji.');if(btnsEl)btnsEl.innerHTML='';return;}
+        gpsWatchId=navigator.geolocation.watchPosition((position)=>{const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},(error)=>{if(error.code===error.PERMISSION_DENIED){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>🔒 '+tr('Accesso GPS negato','GPS access denied','GPS-Zugriff verweigert','Odmowa dostępu GPS')+'</strong><br>'+tr('Abilita i permessi di localizzazione nelle impostazioni del browser.','Enable location permissions in your browser settings.','Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.','Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.');if(btnsEl)btnsEl.innerHTML='';if(gpsWatchId!==null)toggleGpsTracking();}},{enableHighAccuracy:true,timeout:10000,maximumAge:2000});updateGpsUI();
     }
 
-    function renderApartment() {
-        const a = appData.apartment;
-        const reachData = {
-            title: tr('📍 Come raggiungerci', '📍 How to reach us', '📍 Anreise', '📍 Jak do nas dotrzeć'),
-            autoLabel: tr('🚗 In auto', '🚗 By car', '🚗 Mit dem Auto', '🚗 Samochodem'),
-            trenoLabel: tr('🚆 In treno', '🚆 By train', '🚆 Mit dem Zug', '🚆 Pociągiem'),
-            aereoLabel: tr('✈️ In aereo', '✈️ By air', '✈️ Mit dem Flugzeug', '✈️ Samolotem'),
-            autoBody: tr(
-                `L'alloggio è nella piazza centrale di Ancona, in zona pedonale. Se si intende girare in centro non si ha bisogno dell'auto. È possibile parcheggiare su strada nei dintorni sulle strisce blu (a pagamento dalle 8 alle 20 a 1,20€/h dei giorni feriali) ma è difficile trovare posto. Ci sono diversi parcheggi coperti, io consiglio di lasciare l'auto nel più economico <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parcheggio multipiano degli archi</a>, ad 1,5 km di distanza, con l'alloggio facilmente raggiungibile a piedi con una passeggiata tutta pianeggiante.<br><br>Se preferisci l'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l'ascensore fino al quarto piano.`,
-                `The accommodation is located in the main square of Ancona, in a pedestrian area. If you plan to explore the centre, you won't need a car. Street parking is available nearby in the blue bays (€1.20/h on weekdays, 8am‑8pm) but it's difficult to find a space. There are several covered car parks; I recommend the cheaper <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">multi‑storey car park "degli Archi"</a>, 1.5 km away, from where the accommodation can be easily reached on foot with an entirely flat walk.<br><br>If you prefer the bus, take line 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.`,
-                `Die Unterkunft befindet sich am zentralen Platz von Ancona, in einer Fußgängerzone. Wenn Sie das Zentrum besichtigen möchten, brauchen Sie kein Auto. Auf den umliegenden Straßen können Sie auf den blauen Parkbuchten parken (werktags 8–20 Uhr, 1,20 €/Std.), aber es ist schwer, einen Platz zu finden. Es gibt mehrere Parkhäuser; ich empfehle das günstigere <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">Parkhaus „degli Archi"</a> in 1,5 km Entfernung, von wo aus die Unterkunft bequem zu Fuß auf einem völlig flachen Weg erreichbar ist.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 befindet sich links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.`,
-                `Obiekt znajduje się na głównym placu Ankony, w strefie pieszej. Jeśli zamierzasz poruszać się po centrum, nie potrzebujesz samochodu. Można parkować na okolicznych ulicach na niebieskich pasach (w dni powszednie w godz. 8‑20, 1,20 €/godz.), ale trudno znaleźć miejsce. Jest kilka parkingów zadaszonych; polecam zostawić samochód na tańszym <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">wielopoziomowym parkingu „degli Archi"</a>, oddalonym o 1,5 km, skąd można łatwo dojść pieszo całkowicie płaską trasą.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.`
-            ),
-            trenoBody: tr(
-                `Dalla stazione prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l'ascensore fino al quarto piano.`,
-                `From the station, take bus 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.`,
-                `Vom Bahnhof nehmen Sie den Bus 1/4 Richtung Zentrum und steigen am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 ist links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.`,
-                `Ze stacji wsiądź w autobus 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.`
-            ),
-            aereoBody: tr(
-                `Dall'aeroporto si può prendere un taxi, scelta più comoda ma molto più costosa, prendere il bus raffaello, comodo ma presente solo per alcuni voli, oppure il treno che è la soluzione che consiglio per raggiungere la stazione di Ancona e poi proseguire con l'itinerario indicato per chi arriva in treno. Ne passano di frequente e la stazione è proprio di fronte al terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Orari in tempo reale su Trenitalia</a>`,
-                `From the airport you can take a taxi (most convenient but far more expensive), the Raffaello bus (convenient but only available for certain flights), or the train – the option I recommend to reach Ancona station, then follow the directions for those arriving by train. Trains run frequently, and the station is right opposite the terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Real‑time timetables on Trenitalia</a>`,
-                `Vom Flughafen aus können Sie ein Taxi nehmen (am bequemsten, aber deutlich teurer), den Raffaello‑Bus (praktisch, aber nur für bestimmte Flüge) oder den Zug – die von mir empfohlene Lösung, um den Bahnhof von Ancona zu erreichen, und dann der Beschreibung für Zugreisende folgen. Züge verkehren regelmäßig, und der Bahnhof befindet sich direkt gegenüber dem Terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Echtzeit‑Fahrpläne auf Trenitalia</a>`,
-                `Z lotniska można wziąć taksówkę (najwygodniejsza, ale znacznie droższa opcja), autobus Raffaello (wygodny, ale dostępny tylko dla niektórych lotów) lub pociąg – rozwiązanie, które polecam, aby dotrzeć na stację Ancona, a następnie postępować według wskazówek dla przyjeżdżających pociągiem. Pociągi kursują często, a stacja znajduje się dokładnie naprzeciwko terminalu.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Rozkłady jazdy na żywo w Trenitalia</a>`
-            )
-        };
-        window._reachTexts = { auto: reachData.autoBody, treno: reachData.trenoBody, aereo: reachData.aereoBody };
-        window._activeReachTab = window._activeReachTab || 'auto';
-        window._toggleReach = function(type) {
-            window._activeReachTab = type;
-            const contentEl = document.getElementById('reach-content');
-            if (contentEl) contentEl.innerHTML = window._reachTexts[type];
-            document.querySelectorAll('.reach-sub-btn').forEach(b => {
-                const isActive = b.dataset.reach === type;
-                b.style.background = isActive ? 'var(--navy)' : 'var(--bg)';
-                b.style.color = isActive ? 'var(--white)' : 'var(--text)';
-                b.style.fontWeight = isActive ? '600' : '500';
+    // === FULLSCREEN MAP FUNCTIONS ===
+    function openFullscreenMap() {
+        console.log('[Fullscreen] Apertura...');
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (!overlay) {
+            console.error('[Fullscreen] Overlay non trovato!');
+            return;
+        }
+        
+        fsIsHome = (currentSection === -1);
+        fsSubItineraryId = currentSubItinerary || null;
+        
+        if (fsIsHome) {
+            fsStoredPlaces = [];
+            console.log('[Fullscreen] Modalità Home');
+        } else {
+            const places = currentSectionPlaces || [];
+            fsStoredPlaces = places
+                .filter(p => p && p.lat && p.lng)
+                .map(p => {
+                    const copy = { ...p };
+                    copy._originalIndex = places.indexOf(p);
+                    return copy;
+                });
+            console.log('[Fullscreen] Luoghi salvati:', fsStoredPlaces.length);
+        }
+        
+        const titleEl = document.getElementById('map-fs-title');
+        if (titleEl) {
+            if (fsIsHome) {
+                titleEl.textContent = '🗺️ Ancona Centro';
+            } else if (fsSubItineraryId) {
+                const parent = appData.mustsee.find(m => m.subId === fsSubItineraryId);
+                titleEl.textContent = '🗺️ ' + (parent ? parent.name : 'Percorso');
+            } else if (currentSection >= 0 && sections[currentSection]) {
+                const s = sections[currentSection];
+                titleEl.textContent = '🗺️ ' + tr(s.it, s.en, s.de, s.pl);
+            } else {
+                titleEl.textContent = '🗺️ Mappa';
+            }
+        }
+        
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        requestAnimationFrame(() => {
+            initFullscreenMap();
+        });
+    }
+
+    function closeFullscreenMap() {
+        console.log('[Fullscreen] Chiusura...');
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (!overlay) return;
+        
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        if (fullscreenMapInstance) {
+            if (fullscreenMapInstance._resizeHandler) {
+                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
+            }
+            fullscreenMapInstance.remove();
+            fullscreenMapInstance = null;
+            console.log('[Fullscreen] Mappa distrutta');
+        }
+        fsStoredPlaces = [];
+        fsIsHome = false;
+        fsSubItineraryId = null;
+    }
+
+    function initFullscreenMap() {
+        console.log('[Fullscreen] Inizializzazione mappa...');
+        const el = document.getElementById('fullscreenMap');
+        if (!el) {
+            console.error('[Fullscreen] Elemento #fullscreenMap non trovato!');
+            return;
+        }
+        
+        if (typeof L === 'undefined') {
+            console.log('[Fullscreen] Leaflet non caricato, riprovo...');
+            setTimeout(initFullscreenMap, 300);
+            return;
+        }
+        
+        if (fullscreenMapInstance) {
+            if (fullscreenMapInstance._resizeHandler) {
+                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
+            }
+            fullscreenMapInstance.remove();
+            fullscreenMapInstance = null;
+        }
+        
+        fullscreenMapInstance = L.map('fullscreenMap', {
+            zoomControl: true,
+            attributionControl: true
+        });
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(fullscreenMapInstance);
+        
+        const bounds = [];
+        const places = fsStoredPlaces || [];
+        const isSub = !!fsSubItineraryId;
+        
+        console.log('[Fullscreen] Aggiungo', places.length, 'luoghi');
+        
+        places.forEach((p, idx) => {
+            if (!p.lat || !p.lng) {
+                console.warn('[Fullscreen] Luogo senza coordinate:', p.name);
+                return;
+            }
+            
+            let displayNum;
+            if (isSub) {
+                displayNum = String.fromCharCode(65 + idx);
+            } else if (typeof p.order === 'number') {
+                displayNum = p.order;
+            } else if (typeof p.order === 'string' && p.order.indexOf('bis') > -1) {
+                displayNum = p.order.replace('-bis', 'b');
+            } else {
+                displayNum = idx + 1;
+            }
+            
+            let markerClass = 'map-marker-num';
+            if (isSub && (fsSubItineraryId === 'cardeto' || fsSubItineraryId === 'cittadella')) {
+                markerClass += ' ' + fsSubItineraryId;
+            }
+            if (p.isSubItinerary) markerClass += ' has-sub';
+            
+            const icon = L.divIcon({
+                html: '<div class="' + markerClass + '" aria-label="' + p.name + '" role="img">' + displayNum + '</div>',
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
+                popupAnchor: [0, -14]
             });
+            
+            const m = L.marker([p.lat, p.lng], { icon: icon }).addTo(fullscreenMapInstance);
+            m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + p.name + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
+            
+            m.on('click', function() {
+                console.log('[Fullscreen] Click su marker:', p.name);
+                const originalIndex = p._originalIndex !== undefined ? p._originalIndex : idx;
+                closeFullscreenMap();
+                if (originalIndex >= 0 && typeof selectPlaceDetail === 'function') {
+                    setTimeout(() => {
+                        selectPlaceDetail(originalIndex);
+                    }, 400);
+                }
+            });
+            bounds.push([p.lat, p.lng]);
+        });
+        
+        const starIcon = L.divIcon({
+            html: '<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',
+            className: '',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -16]
+        });
+        L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { 
+            icon: starIcon, 
+            zIndexOffset: 1000 
+        }).addTo(fullscreenMapInstance)
+        .bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
+        bounds.push([HOME_COORDS.lat, HOME_COORDS.lng]);
+        
+        if (bounds.length > 1) {
+            fullscreenMapInstance.fitBounds(bounds, { padding: [30, 30] });
+        } else {
+            fullscreenMapInstance.setView([HOME_COORDS.lat, HOME_COORDS.lng], 15);
+        }
+        
+        try {
+            if (gpsWatchId !== null && gpsMarker && typeof gpsMarker.getLatLng === 'function') {
+                const gpsLatLng = gpsMarker.getLatLng();
+                if (gpsLatLng && gpsLatLng.lat && gpsLatLng.lng) {
+                    console.log('[Fullscreen] Aggiungo GPS:', gpsLatLng.lat, gpsLatLng.lng);
+                    const gpsIcon = L.divIcon({
+                        html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',
+                        className: '',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+                    L.marker([gpsLatLng.lat, gpsLatLng.lng], { 
+                        icon: gpsIcon, 
+                        zIndexOffset: 2000 
+                    }).addTo(fullscreenMapInstance);
+                }
+            }
+        } catch(e) {
+            console.warn('[Fullscreen] Errore GPS:', e.message);
+        }
+        
+        setTimeout(() => {
+            if (fullscreenMapInstance) {
+                fullscreenMapInstance.invalidateSize();
+                console.log('[Fullscreen] Mappa resized');
+            }
+        }, 500);
+        
+        const resizeHandler = function() {
+            if (fullscreenMapInstance) {
+                fullscreenMapInstance.invalidateSize();
+            }
         };
-        const reachCardHtml = `<div class="card" style="border-left: 3px solid var(--gold); margin-bottom: 12px;"><div class="card-header"><span class="card-header-icon">📍</span><span class="card-title">${reachData.title}</span></div><div class="card-body"><div style="display: flex; gap: 6px; margin-bottom: 14px;"><button class="reach-sub-btn" data-reach="auto" style="flex: 1; border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; transition: all 0.2s; outline: none;">${reachData.autoLabel}</button><button class="reach-sub-btn" data-reach="treno" style="flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; font-weight: 500; transition: all 0.2s; outline: none;">${reachData.trenoLabel}</button><button class="reach-sub-btn" data-reach="aereo" style="flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; font-weight: 500; transition: all 0.2s; outline: none;">${reachData.aereoLabel}</button></div><div id="reach-content" style="font-size: 0.82rem; line-height: 1.6; color: var(--text);">${window._reachTexts[window._activeReachTab]}</div></div></div>`;
-        const cards = [
-            { icon: '📶', title: tr('Wi‑Fi', 'Wi‑Fi', 'WLAN', 'Wi‑Fi'), body: tr(a.wifi.it, a.wifi.en, a.wifi.de, a.wifi.pl) },
-            { icon: '🚪', title: tr('Citofono', 'Intercom', 'Gegensprechanlage', 'Domofon'), body: tr(a.access.it, a.access.en, a.access.de, a.access.pl) },
-            { icon: '🔑', title: tr('Chiavi', 'Keys', 'Schlüssel', 'Klucze'), body: tr(a.keys.it, a.keys.en, a.keys.de, a.keys.pl) },
-            { icon: '🏨', title: tr('Check‑in flessibile', 'Flexible check‑in', 'Flexibler Check‑in', 'Elastyczne zameldowanie'), body: tr(a.checkin.it, a.checkin.en, a.checkin.de, a.checkin.pl) },
-            { icon: '🧳', title: tr('Check‑out flessibile', 'Flexible check‑out', 'Flexibler Check‑out', 'Elastyczne wymeldowanie'), body: tr(a.checkout.it, a.checkout.en, a.checkout.de, a.checkout.pl) },
-            { icon: '♻️', title: tr('Raccolta differenziata', 'Recycling', 'Mülltrennung', 'Segregacja'), body: tr(a.recycling.it, a.recycling.en, a.recycling.de, a.recycling.pl) }
-        ];
-        let html = reachCardHtml;
-        for (let i = 0; i < cards.length; i++) html += `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">${cards[i].icon}</span><span class="card-title">${cards[i].title}</span></div><div class="card-body">${cards[i].body}</div></div>`;
-        const rulesTitle = tr('📋 Regole della casa', '📋 House rules', '📋 Hausregeln', '📋 Zasady domu');
-        let rulesHtml = `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span><span class="card-title">${rulesTitle}</span></div><div class="card-body">`;
-        for (let i = 0; i < appData.rules.length; i++) { const r = appData.rules[i]; rulesHtml += `<div class="rule-row"><span class="rule-icon" aria-hidden="true">${r.icon}</span><span class="rule-text">${tr(r.it, r.en, r.de, r.pl)}</span></div>`; }
-        rulesHtml += `</div></div>`; html += rulesHtml;
+        window.addEventListener('resize', resizeHandler);
+        fullscreenMapInstance._resizeHandler = resizeHandler;
+    }
+
+    function initFullscreenListeners() {
+        if (fsListenersInitialized) return;
+        fsListenersInitialized = true;
+        
+        const closeBtn = document.getElementById('map-fs-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeFullscreenMap);
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('map-fullscreen-overlay');
+                if (overlay && overlay.classList.contains('active')) {
+                    closeFullscreenMap();
+                }
+            }
+        });
+        
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) closeFullscreenMap();
+            });
+        }
+        
+        console.log('[Fullscreen] Listener inizializzati');
+    }
+
+    function renderAll(){
+        document.getElementById('header-sub').textContent=tr(headerSubTr.it,headerSubTr.en,headerSubTr.de,headerSubTr.pl);
+        document.documentElement.lang=currentLang;
+        const hero=document.getElementById('hero'),nav=document.getElementById('nav'),cont=document.getElementById('content');
+        if(currentSection===-1&&leafletMap){if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;if(gpsMarker)leafletMap.removeLayer(gpsMarker);if(gpsCircle)leafletMap.removeLayer(gpsCircle);gpsMarker=null;gpsCircle=null;}leafletMap.remove();leafletMap=null;}
+        hero.classList.toggle('section-mode',currentSection!==-1);
+        if(currentSection===-1){nav.style.display='none';renderHome();return;}
+        nav.style.display='flex';
+        nav.innerHTML=sections.map((s,i)=>'<button class="nav-pill'+(i===currentSection?' active':'')+'" data-index="'+i+'" role="tab" aria-selected="'+(i===currentSection?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>').join('');
+        nav.querySelectorAll('.nav-pill').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
+        const s=sections[currentSection],body=renderSection(s.id);
+        cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div></section>';
+        document.getElementById('home-btn')?.addEventListener('click',function(){goTo(-1);});
+        document.getElementById('sub-back-btn')?.addEventListener('click',closeSubItinerary);
+        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();
+        if(currentPlaceDetail<0&&!NO_GPS_SECTIONS.includes(s.id)){
+            const cardsEl=cont.querySelector('.cards'),gpsContainer=document.createElement('div');gpsContainer.className='gps-container';
+            gpsContainer.innerHTML='<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>';
+            if(cardsEl)cardsEl.insertBefore(gpsContainer,cardsEl.firstChild);
+            document.getElementById('gps-overlay-icon')?.addEventListener('click',toggleGpsBox);
+            updateGpsUI();requestAnimationFrame(initSectionMap);
+        }
+    }
+
+    function renderHome(){
+        const cont=document.getElementById('content'),hostImgSrc='https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg';
+        const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener" class="social-link" aria-label="Meteo Ancona">🌤️ Meteo</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
+        const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
+        const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
+        const countdownHtml=getCountdownHtml();
+        const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
+        cont.innerHTML=html;
+        document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
+        const installBtn=document.getElementById('install-btn');
+        if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
+        setTimeout(()=>{
+            const mapEl=document.getElementById('home-static-map');
+            if(!mapEl||typeof L==='undefined')return;
+            if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;}
+            homeStaticMap=L.map('home-static-map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(homeStaticMap);
+            homeStaticMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],16);
+            
+            // Aggiungi evento click per fullscreen
+            if (homeStaticMap) {
+                homeStaticMap.on('click', function() {
+                    console.log('[Home] Click sulla mappa');
+                    openFullscreenMap();
+                });
+                mapEl.style.cursor = 'pointer';
+            }
+            
+            const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14]});
+            L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon}).addTo(homeStaticMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem">📍 Piazza Roma 3</span>').openPopup();
+        },0);
+    }
+
+    function renderSection(id){
+        if(id==='contact')return renderContact();
+        if(id==='transport')return renderTransport();
+        if(id==='apartment')return renderApartment();
+        const map={mustsee:()=>{if(currentSubItinerary)return appData.subItineraries[currentSubItinerary]||[];return appData.mustsee.slice().sort(sortMustSee);},restaurants:()=>appData.restaurants,barpub:()=>appData.barpub,supermarkets:()=>appData.supermarkets,beaches:()=>appData.beaches,parking:()=>appData.parking,around:()=>appData.around,marche:()=>appData.marche};
+        if(map[id])return renderPlaceSection(map[id](),id);
+        console.warn('Sezione non trovata:',id);return'';
+    }
+
+    function starBtnHtml(){
+        if(currentSectionPlaces&&currentSectionPlaces.length>0){let minDist=Infinity;for(let i=0;i<currentSectionPlaces.length;i++){const p=currentSectionPlaces[i];if(p._dist!==undefined&&p._dist<minDist)minDist=p._dist;}if(minDist>30)return'';}
+        return '<button class="star-list-btn" id="star-home-btn" aria-label="Centra la mappa su Ancona Centro">★ Ancona Centro</button>';
+    }
+
+    function renderPlaceSection(items,sectionId){
+        currentSectionPlaces=items;
+        for(let i=0;i<items.length;i++){const p=items[i];p._dist=(p.lat&&p.lng)?calcDistance(HOME_COORDS.lat,HOME_COORDS.lng,p.lat,p.lng):Infinity;}
+        const parkingInfoBox=(sectionId==='parking')?'<div class="card" style="margin-top:8px"><div class="card-header"><span class="card-header-icon">🅿️</span><span class="card-title">'+tr('Strisce blu (zona centro)','Blue bays (city centre)','Blaue Parkbuchten (Zentrum)','Niebieskie pasy (centrum)')+'</span></div><div class="card-body">'+tr('Parcheggio a pagamento su strada, posto difficile.','Paid street parking, difficult to find a spot.','Gebührenpflichtige Straßenparkplätze, schwer zu finden.','Płatny parking uliczny, trudno znaleźć miejsce.')+'</div></div>':'';
+        if(currentSubItinerary){
+            let parent=null;for(let k=0;k<appData.mustsee.length;k++){if(appData.mustsee[k].subId===currentSubItinerary){parent=appData.mustsee[k];break;}}
+            const descHtml=parent?'<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+parent.emoji+'</div><div><div class="place-name">'+parent.name+'</div><div class="place-desc" style="margin-top:5px">'+tr(parent.it,parent.en,parent.de,parent.pl)+'</div></div></div></div>':'';
+            if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,true)+parkingInfoBox;
+            const subBtns=items.map((p,i)=>{const dn=getDisplayNumber(p,i),sel=(i===currentPlaceDetail)?' selected':'';return'<button class="place-btn-mini'+sel+'" data-index="'+i+'" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';}).join('');
+            return'<button class="back-btn" id="sub-back-btn">← '+tr('Torna al tour principale','Back to main tour','Zurück zur Haupttour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+subBtns+'</div></div>'+parkingInfoBox;
+        }
+        if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,false)+parkingInfoBox;
+        const sortedItems = distSortActive ? items.slice().sort((a,b)=>(a._dist||Infinity)-(b._dist||Infinity)) : items;
+        const distSortLabel = distSortActive ? '📍 '+tr('Ordine distanza','By distance','Nach Entfernung','Wg odległości') : '📍 '+tr('Ordina per distanza','Sort by distance','Nach Entfernung sortieren','Sortuj wg odl.');
+        const distSortBtn = '<button class="dist-sort-btn'+(distSortActive?' active':'')+'" id="dist-sort-btn">'+distSortLabel+'</button>';
+        const btns=sortedItems.map((p,i)=>{const origIdx=items.indexOf(p),dn=getDisplayNumber(p,origIdx),sel=(origIdx===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+origIdx+'" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';}).join('');
+        return'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+distSortBtn+btns+'</div></div>'+parkingInfoBox;
+    }
+
+    function attachPlaceSectionListeners(){
+        document.querySelectorAll('.place-btn-mini').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.index));}));
+        document.getElementById('star-home-btn')?.addEventListener('click',panToHome);
+        document.getElementById('dist-sort-btn')?.addEventListener('click',function(){distSortActive=!distSortActive;renderAll();});
+    }
+
+    function renderAnyPlaceDetail(p,index,total,isSubMode){
+        const wrapId='photowrap_'+index;placeDataMap[wrapId]=p;const desc=tr(p.it,p.en,p.de,p.pl);
+        const hoursBadge=getHoursBadge(p);
+        let photoHtml;
+        if(p.photo){const src=PHOTO_BASE+p.photo;photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" loading="lazy" id="img_'+index+'"></div>';}
+        else photoHtml='<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
+        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
+        if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
+        const displayNum=getDisplayNumber(p,index),totalDisplay=getTotalDisplay(currentSectionPlaces,total);
+        const backLabel=tr('Tutti i luoghi','All places','Alle Orte','Wszystkie miejsca');
+        const prev=index>0?'<button class="nav-detail-btn" data-prev="'+(index-1)+'" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Vor.','Poprz.')+'</button>':'<span></span>';
+        const next=index<total-1?'<button class="nav-detail-btn" data-next="'+(index+1)+'" aria-label="Luogo successivo">'+tr('Succ.','Next','Näch.','Nast.')+' ▶</button>':'<span></span>';
+        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:5px">'+desc+'</div></div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
+        setTimeout(()=>{const img=document.getElementById('img_'+index),placeholder=document.getElementById('ph_'+index);if(img){img.addEventListener('load',function(){this.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');});img.addEventListener('error',function(){photoFallback(wrapId);});if(img.complete){img.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');}}},0);
         return html;
     }
 
-    function renderContact() {
-        const fp = HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-        return `<div class="contact-card"><div class="contact-label">📞 ${tr('Host disponibile su WhatsApp', 'Host available on WhatsApp', 'Gastgeber auf WhatsApp erreichbar', 'Gospodarz dostępny na WhatsAppie')}</div><div class="contact-number">${fp}</div><div class="contact-btns"><a href="https://wa.me/39${HOST_PHONE}" target="_blank" rel="noopener" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39${HOST_PHONE}" class="btn-call" aria-label="Chiama il numero di telefono">📞 ${tr('Chiama', 'Call', 'Anrufen', 'Zadzwoń')}</a></div><div class="contact-email">✉️ <a href="mailto:${HOST_EMAIL}">${HOST_EMAIL}</a></div><div style="margin-top:14px;display:flex;justify-content:center;gap:20px;"><a href="${appData.social.instagram}" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="${appData.social.facebook}" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div>
-        <div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">${tr('Numeri di emergenza', 'Emergency numbers', 'Notrufnummern', 'Numery alarmowe')}</span></div>
-        <div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">${tr('Emergenza generale', 'General emergency', 'Allgemeiner Notruf', 'Ogólne zagrożenie')}</span></div>
-        <div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">${tr('Polizia', 'Police', 'Polizei', 'Policja')}</span></div>
-        <div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">${tr('Emergenza sanitaria', 'Medical emergency', 'Medizinischer Notfall', 'Nagły wypadek medyczny')}</span></div>
-        <div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">${tr('Ospedale Riuniti – Pronto Soccorso', 'Ospedale Riuniti – A&E', 'Ospedale Riuniti – Notaufnahme', 'Szpital Riuniti – Izba przyjęć')}</span></div>
-        <div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div>
-        <div class="card" style="margin-top:10px;"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">${tr('Link utili', 'Useful links', 'Nützliche Links', 'Przydatne linky')}</span></div><div class="card-body" style="padding:0;">
-        <div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">${tr('Proprio davanti al portone', 'Right in front of the entrance', 'Direkt vor dem Eingang', 'Tuż przed wejściem')}</div></div><a href="${getMapLink('Edicola Piazza Roma Ancona', true)}" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Edicola">🗺️ ${tr('Mappa', 'Map', 'Karte', 'Mapa')}</a></div>
-        <div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">${tr('Portale turistico ufficiale di Ancona', 'Official Ancona tourism portal', 'Offizielles Tourismusportal von Ancona', 'Oficjalny portal turystyczny Ankony')}</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener" class="link-action" aria-label="Apri portale turistico">↗</a></div>
-        <div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="${getMapLink('Lavanderia self service Via Matteotti 137 Ancona', true)}" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Lavanderia">🗺️ ${tr('Mappa', 'Map', 'Karte', 'Mapa')}</a></div>
-        </div></div>`;
-    }
+    function attachDetailListeners(){document.getElementById('detail-back-btn')?.addEventListener('click',backToMap);document.querySelectorAll('.nav-detail-btn[data-prev]').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.prev));}));document.querySelectorAll('.nav-detail-btn[data-next]').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.next));}));}
 
-    function initSectionMap() {
-        if (typeof L === 'undefined') { if (_mapRetryCount < 30) { _mapRetryCount++; setTimeout(initSectionMap, 300); } return; }
-        _mapRetryCount = 0; const el = document.getElementById('sectionMap'); if (!el || !currentSectionPlaces.length) return;
-        if (leafletMap) { leafletMap.remove(); leafletMap = null; }
-        const valid = currentSectionPlaces.filter(p => p.lat && p.lng); if (!valid.length) return;
-        leafletMap = L.map('sectionMap', { zoomControl: true, attributionControl: false });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
-        L.control.attribution({ prefix: '© <a href="https://openstreetmap.org">OSM</a>' }).addTo(leafletMap);
-        const bounds = [];
-        valid.forEach((p, idx) => {
-            const displayNum = getDisplayNumber(p, idx); let markerClass = 'map-marker-num';
-            if (currentSubItinerary === 'cardeto' || currentSubItinerary === 'cittadella') markerClass += ' ' + currentSubItinerary;
-            if (p.isSubItinerary) markerClass += ' has-sub';
-            const icon = L.divIcon({ html: `<div class="${markerClass}" aria-label="${p.name}" role="img">${displayNum}</div>`, className: '', iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -14] });
-            const m = L.marker([p.lat, p.lng], { icon: icon }).addTo(leafletMap);
-            m.bindPopup(`<b style="font-size:.78rem;">${p.emoji} ${p.name}</b><br><span style="font-size:.68rem;color:#888;">${p.dist}</span>`);
-            m.on('click', () => selectPlaceDetail(idx)); bounds.push([p.lat, p.lng]);
+    function attachReachListeners(){
+        document.querySelectorAll('.reach-sub-btn').forEach(btn=>{
+            btn.addEventListener('click',function(){window._toggleReach(this.dataset.reach);});
         });
-        if (bounds.length) leafletMap.fitBounds(bounds, { padding: [22, 22] });
-        const starIcon = L.divIcon({ html: '<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>', className: '', iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -16] });
-        L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { icon: starIcon, zIndexOffset: 1000 }).addTo(leafletMap).bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
+        if(window._toggleReach)window._toggleReach(window._activeReachTab||'auto');
     }
 
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {}); });
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const installBtn = document.getElementById('install-btn'); if (installBtn) installBtn.style.display = 'inline-flex'; });
-    window.addEventListener('appinstalled', () => { deferredPrompt = null; const installBtn = document.getElementById('install-btn'); if (installBtn) installBtn.style.display = 'none'; });
-    if (window.matchMedia('(display-mode: standalone)').matches) { const installBtn = document.getElementById('install-btn'); if (installBtn) installBtn.style.display = 'none'; }
-    window.addEventListener('load', () => { const hash = window.location.hash.replace('#', ''); if (hash && sectionHashMap[hash] !== undefined) goTo(sectionHashMap[hash]); });
+    function renderTransport(){
+        const td=appData.transport;
+        const items=[{icon:'🚌',label:tr('Bus','Bus','Bus','Autobus'),text:tr(td.bus.it,td.bus.en,td.bus.de,td.bus.pl)},{icon:'🚂',label:tr('Treno','Train','Zug','Pociąg'),text:tr(td.train.it,td.train.en,td.train.de,td.train.pl)},{icon:'🚕',label:tr('Taxi','Taxi','Taxi','Taxi'),text:tr(td.taxi.it,td.taxi.en,td.taxi.de,td.taxi.pl)},{icon:'⛴️',label:tr('Traghetti','Ferries','Fähren','Promy'),text:tr(td.ferry.it,td.ferry.en,td.ferry.de,td.ferry.pl)},{icon:'✈️',label:tr('Aeroporto','Airport','Flughafen','Lotnisko'),text:tr(td.airport.it,td.airport.en,td.airport.de,td.airport.pl)}];
+        let cardsHtml=items.map(item=>'<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+item.icon+'</span><span class="card-title">'+item.label+'</span></div><div class="card-body"><p>'+item.text+'</p></div></div>').join('');
+        cardsHtml+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+tr('Portale turistico ufficiale','Official tourism portal','Offizielles Tourismusportal','Oficjalny portal turystyczny')+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" rel="noopener" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
+        return cardsHtml;
+    }
+
+    function renderApartment(){
+        const a=appData.apartment;
+        const reachData={title:tr('📍 Come raggiungerci','📍 How to reach us','📍 Anreise','📍 Jak do nas dotrzeć'),autoLabel:tr('🚗 In auto','🚗 By car','🚗 Mit dem Auto','🚗 Samochodem'),trenoLabel:tr('🚆 In treno','🚆 By train','🚆 Mit dem Zug','🚆 Pociągiem'),aereoLabel:tr('✈️ In aereo','✈️ By air','✈️ Mit dem Flugzeug','✈️ Samolotem'),autoBody:tr('L\'alloggio è nella piazza centrale di Ancona, in zona pedonale. Se si intende girare in centro non si ha bisogno dell\'auto. È possibile parcheggiare su strada nei dintorni sulle strisce blu (a pagamento dalle 8 alle 20 a 1,20€/h dei giorni feriali) ma è difficile trovare posto. Ci sono diversi parcheggi coperti, io consiglio di lasciare l\'auto nel più economico <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parcheggio multipiano degli archi</a>, ad 1,5 km di distanza, con l\'alloggio facilmente raggiungibile a piedi con una passeggiata tutta pianeggiante.<br><br>Se preferisci l\'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','The accommodation is located in the main square of Ancona, in a pedestrian area. If you plan to explore the centre, you won\'t need a car. Street parking is available nearby in the blue bays (€1.20/h on weekdays, 8am‑8pm) but it\'s difficult to find a space. There are several covered car parks; I recommend the cheaper <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">multi‑storey car park "degli Archi"</a>, 1.5 km away, from where the accommodation can be easily reached on foot with an entirely flat walk.<br><br>If you prefer the bus, take line 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Die Unterkunft befindet sich am zentralen Platz von Ancona, in einer Fußgängerzone. Wenn Sie das Zentrum besichtigen möchten, brauchen Sie kein Auto. Auf den umliegenden Straßen können Sie auf den blauen Parkbuchten parken (werktags 8–20 Uhr, 1,20 €/Std.), aber es ist schwer, einen Platz zu finden. Es gibt mehrere Parkhäuser; ich empfehle das günstigere <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">Parkhaus „degli Archi"</a> in 1,5 km Entfernung, von wo aus die Unterkunft bequem zu Fuß auf einem völlig flachen Weg erreichbar ist.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 befindet sich links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Obiekt znajduje się na głównym placu Ankony, w strefie pieszej. Jeśli zamierzasz poruszać się po centrum, nie potrzebujesz samochodu. Można parkować na okolicznych ulicach na niebieskich pasach (w dni powszednie w godz. 8‑20, 1,20 €/godz.), ale trudno znaleźć miejsce. Jest kilka parkingów zadaszonych; polecam zostawić samochód na tańszym <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">wielopoziomowym parkingu „degli Archi"</a>, oddalonym o 1,5 km, skąd można łatwo dojść pieszo całkowicie płaską trasą.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),trenoBody:tr('Dalla stazione prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','From the station, take bus 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Vom Bahnhof nehmen Sie den Bus 1/4 Richtung Zentrum und steigen am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 ist links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Ze stacji wsiądź w autobus 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),aereoBody:tr('Dall\'aeroporto si può prendere un taxi, scelta più comoda ma molto più costosa, prendere il bus raffaello, comodo ma presente solo per alcuni voli, oppure il treno che è la soluzione che consiglio per raggiungere la stazione di Ancona e poi proseguire con l\'itinerario indicato per chi arriva in treno. Ne passano di frequente e la stazione è proprio di fronte al terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Orari in tempo reale su Trenitalia</a>','From the airport you can take a taxi (most convenient but far more expensive), the Raffaello bus (convenient but only available for certain flights), or the train – the option I recommend to reach Ancona station, then follow the directions for those arriving by train. Trains run frequently, and the station is right opposite the terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Real‑time timetables on Trenitalia</a>','Vom Flughafen aus können Sie ein Taxi nehmen (am bequemsten, aber deutlich teurer), den Raffaello‑Bus (praktisch, aber nur für bestimmte Flüge) oder den Zug – die von mir empfohlene Lösung, um den Bahnhof von Ancona zu erreichen, und dann der Beschreibung für Zugreisende folgen. Züge verkehren regelmäßig, und der Bahnhof befindet sich direkt gegenüber dem Terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Echtzeit‑Fahrpläne auf Trenitalia</a>','Z lotniska można wziąć taksówkę (najwygodniejsza, ale znacznie droższa opcja), autobus Raffaello (wygodny, ale dostępny tylko dla niektórych lotów) lub pociąg – rozwiązanie, które polecam, aby dotrzeć na stację Ancona, a następnie postępować według wskazówek dla przyjeżdżających pociągiem. Pociągi kursują często, a stacja znajduje się dokładnie naprzeciwko terminalu.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Rozkłady jazdy na żywo w Trenitalia</a>')};
+        window._reachTexts={auto:reachData.autoBody,treno:reachData.trenoBody,aereo:reachData.aereoBody};
+        const reachCardHtml='<div class="card" style="border-left:3px solid var(--gold);margin-bottom:12px"><div class="card-header"><span class="card-header-icon">📍</span><span class="card-title">'+reachData.title+'</span></div><div class="card-body"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="reach-sub-btn" data-reach="auto" style="flex:1">'+reachData.autoLabel+'</button><button class="reach-sub-btn" data-reach="treno" style="flex:1">'+reachData.trenoLabel+'</button><button class="reach-sub-btn" data-reach="aereo" style="flex:1">'+reachData.aereoLabel+'</button></div><div id="reach-content" class="reach-content">'+reachData.autoBody+'</div></div></div>';
+        const cards=[{icon:'📶',title:tr('Wi‑Fi','Wi‑Fi','WLAN','Wi‑Fi'),body:tr(a.wifi.it,a.wifi.en,a.wifi.de,a.wifi.pl)},{icon:'🚪',title:tr('Citofono','Intercom','Gegensprechanlage','Domofon'),body:tr(a.access.it,a.access.en,a.access.de,a.access.pl)},{icon:'🔑',title:tr('Chiavi','Keys','Schlüssel','Klucze'),body:tr(a.keys.it,a.keys.en,a.keys.de,a.keys.pl)},{icon:'🏨',title:tr('Check‑in flessibile','Flexible check‑in','Flexibler Check‑in','Elastyczne zameldowanie'),body:tr(a.checkin.it,a.checkin.en,a.checkin.de,a.checkin.pl)},{icon:'🧳',title:tr('Check‑out flessibile','Flexible check‑out','Flexibler Check‑out','Elastyczne wymeldowanie'),body:tr(a.checkout.it,a.checkout.en,a.checkout.de,a.checkout.pl)},{icon:'♻️',title:tr('Raccolta differenziata','Recycling','Mülltrennung','Segregacja'),body:tr(a.recycling.it,a.recycling.en,a.recycling.de,a.recycling.pl)}];
+        let html=reachCardHtml;
+        for(let i=0;i<cards.length;i++)html+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+cards[i].icon+'</span><span class="card-title">'+cards[i].title+'</span></div><div class="card-body">'+cards[i].body+'</div></div>';
+        const rulesTitle=tr('📋 Regole della casa','📋 House rules','📋 Hausregeln','📋 Zasady domu');
+        let rulesHtml='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span><span class="card-title">'+rulesTitle+'</span></div><div class="card-body">';
+        for(let i=0;i<appData.rules.length;i++){const r=appData.rules[i];rulesHtml+='<div class="rule-row"><span class="rule-icon" aria-hidden="true">'+r.icon+'</span><span class="rule-text">'+tr(r.it,r.en,r.de,r.pl)+'</span></div>';}
+        rulesHtml+='</div></div>';html+=rulesHtml;
+        return html;
+    }
+
+    function renderContact(){
+        const fp=HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
+        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;justify-content:center;gap:20px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linky')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona',true)+'" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener" class="link-action" aria-label="Apri portale turistico">↗</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="'+getMapLink('Lavanderia self service Via Matteotti 137 Ancona',true)+'" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Lavanderia">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div></div></div>';
+    }
+
+    function initSectionMap(){
+        if(typeof L==='undefined'){if(_mapRetryCount<30){_mapRetryCount++;setTimeout(initSectionMap,300);}return;}
+        _mapRetryCount=0;const el=document.getElementById('sectionMap');if(!el||!currentSectionPlaces.length)return;
+        if(leafletMap){leafletMap.remove();leafletMap=null;}
+        const valid=currentSectionPlaces.filter(p=>p.lat&&p.lng);if(!valid.length)return;
+        leafletMap=L.map('sectionMap',{zoomControl:true,attributionControl:true});
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(leafletMap);
+        const bounds=[];
+        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
+            m.on('click',function(){
+                // Evidenzia il marker selezionato
+                document.querySelectorAll('.map-marker-num').forEach(el=>el.classList.remove('selected'));
+                this.getElement().querySelector('.map-marker-num')?.classList.add('selected');
+                selectPlaceDetail(idx);
+            });
+            bounds.push([p.lat,p.lng]);
+        });
+        if(bounds.length)leafletMap.fitBounds(bounds,{padding:[22,22]});
+        
+        // Aggiungi evento click per fullscreen
+        if (leafletMap) {
+            leafletMap.on('click', function() {
+                console.log('[Sezione] Click sulla mappa');
+                openFullscreenMap();
+            });
+            el.style.cursor = 'pointer';
+        }
+        
+        const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]});
+        L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
+    }
+
+    if('serviceWorker' in navigator)window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
+            reg.addEventListener('updatefound',()=>{
+                const newWorker=reg.installing;
+                if(!newWorker)return;
+                newWorker.addEventListener('statechange',()=>{
+                    if(newWorker.state==='activated'&&navigator.serviceWorker.controller){
+                        window.location.reload();
+                    }
+                });
+            });
+        }).catch(()=>{});
+        let refreshing=false;
+        navigator.serviceWorker.addEventListener('controllerchange',()=>{
+            if(!refreshing){refreshing=true;window.location.reload();}
+        });
+    });
+    window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='inline-flex';});
+    window.addEventListener('appinstalled',()=>{deferredPrompt=null;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';});
+    if(window.matchMedia('(display-mode:standalone)').matches){const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';}
+    window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
+    window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
+    
+    // Inizializza fullscreen listeners
+    initFullscreenListeners();
     renderAll();
-    setTimeout(updateGpsUI, 300);
+    setTimeout(updateGpsUI,300);
     </script>
 </body>
 </html>
