@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.0 | 23/06/26 13:35 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 24/06/26 16:40 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.0</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.1</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.0">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.1">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -195,9 +195,11 @@
         .phrase-row:last-child{border-bottom:none}
         .phrase-it{font-size:.8rem;font-weight:600;color:var(--navy);flex:1}
         .phrase-tr{font-size:.75rem;color:var(--muted);flex:1;font-style:italic}
-        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s;position:relative}
         .home-map-wrap:hover{transform:scale(1.01)}
         .home-map-wrap:active{transform:scale(.98)}
+        .home-map-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,31,51,.35);pointer-events:none;z-index:10}
+        .home-map-overlay-text{color:var(--white);font-size:.75rem;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,.5);display:flex;align-items:center;gap:6px}
         .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:12px}
         .countdown-icon{font-size:1.4rem}
         .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
@@ -212,6 +214,10 @@
         .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
         .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
         .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
+        
+        /* Offline banner */
+        .offline-banner{background:linear-gradient(135deg,var(--navy-2),var(--navy-3));border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid rgba(200,164,90,.25);color:var(--white);font-size:.75rem;display:flex;align-items:center;gap:10px}
+        .offline-banner-icon{font-size:1.2rem}
     </style>
 </head>
 <body>
@@ -229,7 +235,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.0 · <span id="release-time">23/06/26 13:35</span></div>
+                <div class="version-info">V4.2.1 · <span id="release-time">24/06/26 16:40</span></div>
             </div>
         </div>
     </header>
@@ -251,7 +257,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.0 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.1 · All rights reserved</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -271,6 +277,7 @@
     let fsIsHome = false;
     let fsSubItineraryId = null;
     let fsListenersInitialized = false;
+    let isFullscreenOpening = false;
 
     const appData = {
         apartment: {
@@ -303,7 +310,7 @@
             { order:10, name:'Cattedrale di San Ciriaco', emoji:'⛪', photo:'duomo-san-ciriaco.jpg', it:'La Cattedrale di San Ciriaco, che rappresenta l\'emblema di Ancona, sorge sull\'antico tempio dedicato a Venere Euplea, protettrice della navigazione, di cui restano parte delle fondamenta. Su di esso, nel VI secolo d.C., venne costruita la basilica paleocristiana dedicata a San Lorenzo, che divenne Cattedrale nel 1000 quando vi furono traslati i corpi di San Ciriaco e San Marcellino. Spettacolare panorama sulla città. A sinistra della facciata c\'è il Museo Diocesano. Scendendo invece sulla destra si arriva ai resti dell\'Anfiteatro romano.', en:'The Cathedral of San Ciriaco, the emblem of Ancona, stands on the ancient temple dedicated to Venus Euplea, protector of navigation, of which part of the foundations remain. On it, in the 6th century AD, the early Christian basilica dedicated to San Lorenzo was built, which became the Cathedral in the year 1000 when the bodies of Saint Cyriacus and Saint Marcellinus were transferred there. Spectacular view over the city. To the left of the façade is the Diocesan Museum. Descending to the right, instead, you reach the remains of the Roman Amphitheatre.', de:'Die Kathedrale San Ciriaco, das Wahrzeichen Anconas, steht auf dem antiken Tempel der Venus Euplea, der Beschützerin der Schifffahrt, von dem Teile der Fundamente erhalten sind. Darauf wurde im 6. Jahrhundert n. Chr. die frühchristliche Basilika San Lorenzo erbaut, die im Jahr 1000 zur Kathedrale wurde, als die Gebeine der Heiligen Cyriacus und Marcellinus dorthin überführt wurden. Spektakulärer Blick über die Stadt. Links von der Fassade befindet sich das Diözesanmuseum. Rechts hinunter gelangt man zu den Überresten des römischen Amphitheaters.', pl:'Katedra San Ciriaco, która jest symbolem Ankony, wznosi się na starożytnej świątyni poświęconej Wenus Euplea, opiekunce żeglugi, z której zachowała się część fundamentów. Na niej, w VI wieku n.e., zbudowano wczesnochrześcijańską bazylikę pod wezwaniem San Lorenzo, która stała się katedrą w roku 1000, kiedy przeniesiono tam ciała świętego Cyriaka i świętego Marcellina. Spektakularny widok na miasto. Na lewo od fasady znajduje się Muzeum Diecezjalne. Schodząc natomiast w prawo, docieramy do pozostałości rzymskiego Amfiteatru.', dist:'🚶 1000 m – 13 min', mapQuery:'Cattedrale di San Ciriaco Ancona', lat:43.6251216, lng:13.510037 },
             { order:11, name:'Anfiteatro Romano', emoji:'🏟️', photo:'anfiteatro-romano.jpg', it:'Anfiteatro realizzato in età augustea (I sec. a.C.) che poteva accogliere fino a 10.000 spettatori. Dopo l\'abbandono in età antica (IV sec. d.C.) venne utilizzato come cava di materiali e, a partire dal XIII secolo, come base per nuove costruzioni che ne hanno nascosto la struttura. Fu riportato alla luce solo a partire dagli anni 70. Tornando in discesa verso piazza del Senato si possono ammirare degli splendidi mosaici. Scendendo per via Pizzecolli si torna in piazza Stracca dove, di fronte alla facciata del Palazzo degli Anziani si erge la maestosa chiesa del Gesù progettata dal Vanvitelli.', en:'Amphitheatre built in the Augustan age (1st century BC) that could hold up to 10,000 spectators. After its abandonment in ancient times (4th century AD), it was used as a quarry for building materials and, from the 13th century, as a foundation for new constructions that concealed its structure. It was brought back to light only from the 1970s onwards. Heading back down towards Piazza del Senato you can admire some splendid mosaics. Descending Via Pizzecolli you return to Piazza Stracca where, opposite the façade of Palazzo degli Anziani, stands the majestic Chiesa del Gesù designed by Vanvitelli.', de:'Amphitheater aus der augusteischen Zeit (1. Jh. v. Chr.), das bis zu 10.000 Zuschauer fasste. Nach seiner Aufgabe in der Antike (4. Jh. n. Chr.) diente es als Steinbruch und ab dem 13. Jahrhundert als Fundament für neue Gebäude, die seine Struktur verbargen. Erst ab den 1970er Jahren wieder ans Licht gebracht. Zurück hinunter zum Piazza del Senato bewundern Sie prächtige Mosaike. Über die Via Pizzecolli gelangen Sie zurück zur Piazza Stracca, wo gegenüber der Fassade des Palazzo degli Anziani die majestätische Chiesa del Gesù nach einem Entwurf von Vanvitelli steht.', pl:'Amfiteatr zbudowany w epoce augustiańskiej (I w. p.n.e.), który mógł pomieścić do 10 000 widzów. Po opuszczeniu w starożytności (IV w. n.e.) był wykorzystywany jako kamieniołom, a od XIII wieku jako podstawa dla nowych budowli, które ukryły jego strukturę. Został ponownie odsłonięty dopiero od lat 70. XX wieku. Schodząc z powrotem w kierunku Piazza del Senato, można podziwiać wspaniałe mozaiki. Idąc w dół Via Pizzecolli, wracamy na Piazza Stracca, gdzie naprzeciwko fasady Palazzo degli Anziani wznosi się majestatyczny kościół del Gesù zaprojektowany przez Vanvitellego.', dist:'🚶 900 m – 12 min', mapQuery:'Anfiteatro Romano Ancona', lat:43.6247408, lng:13.5117513 },
             { order:12, name:'Chiesa del Gesù', emoji:'⛪', photo:'chiesa-gesu.jpg', it:'Monumento commissionato dal conte Nappi nel 1605. Nel 1733 i Gesuiti affidarono a Luigi Vanvitelli il progetto dell\'ampliamento della chiesa realizzato con la facciata concava che richiama la forma del porto. Continuando a scendere per via Pizzecolli, una delle più antiche vie della città, si raggiunge piazza San Francesco, ove si erge l\'omonima chiesa.', en:'Monument commissioned by Count Nappi in 1605. In 1733 the Jesuits entrusted Luigi Vanvitelli with the project for the enlargement of the church, carried out with a concave façade that echoes the shape of the harbour. Continuing down Via Pizzecolli, one of the oldest streets in the city, you reach Piazza San Francesco, where the church of the same name stands.', de:'Monument, das 1605 von Graf Nappi in Auftrag gegeben wurde. 1733 beauftragten die Jesuiten Luigi Vanvitelli mit dem Erweiterungsprojekt der Kirche, das mit einer konkaven Fassade ausgeführt wurde, die die Form des Hafens widerspiegelt. Weiter die Via Pizzecolli hinunter, eine der ältesten Straßen der Stadt, erreichen Sie die Piazza San Francesco, wo die gleichnamige Kirche steht.', pl:'Monument zamówiony przez hrabiego Nappi w 1605 roku. W 1733 roku Jezuici powierzyli Luigiemu Vanvitellemu projekt rozbudowy kościoła, zrealizowany z wklęsłą fasadą nawiązującą do kształtu portu. Kontynuując w dół Via Pizzecolli, jedną z najstarszych ulic miasta, docieramy do Piazza San Francesco, gdzie wznosi się kościół o tej samej nazwie.', dist:'🚶 600 m – 8 min', mapQuery:'Chiesa del Gesù Ancona', lat:43.6226099, lng:13.5111676 },
-            { order:13, name:'San Francesco alle Scale', emoji:'⛪', photo:'san-francesco-scale.jpg', it:'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico. Facciata con magnifico portale gotico-veneziano a forma di tabernacolo, realizzato in pietra di Brioni da Giorgio da Sebenico, alla metà del Quattrocento (1455). All\'interno opere notevoli, dal Lotto a Tibaldi. Scendendo per via Pizzecolli si arriva alla Pinacoteca civica.', en:'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect. Façade with a magnificent Venetian-Gothic tabernacle-shaped portal, made of Brioni stone by Giorgio da Sebenico in the mid-15th century (1455). Inside, notable works from Lotto to Tibaldi. Descending Via Pizzecolli you reach the Civic Art Gallery (Pinacoteca civica).', de:'Von der Spitze einer Treppe überblickt die Kirche San Francesco delle Scale die Piazza San Francesco mit bemerkenswerter szenischer Wirkung. Fassade mit einem prächtigen venezianisch-gotischen Portal in Form eines Tabernakels, gefertigt aus Brioni-Stein von Giorgio da Sebenico Mitte des 15. Jahrhunderts (1455). Im Inneren bedeutende Werke von Lotto bis Tibaldi. Über die Via Pizzecolli gelangt man zur Städtischen Pinakothek (Pinacoteca civica).', pl:'Ze szczytu schodów kościół San Francesco delle Scale góruje nad Piazza San Francesco, tworząc niezwykły efekt scenograficzny. Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego. Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).', dist:'🚶 450 m – 6 min', mapQuery:'Chiesa di San Francesco alle Scale Ancona', lat:43.6214786, lng:13.5118841 },
+            { order:13, name:'San Francesco alle Scale', emoji:'⛪', photo:'san-francesco-scale.jpg', it:'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico. Facciata con magnifico portale gotico-veneziano a forma di tabernacolo, realizzato in pietra di Brioni da Giorgio da Sebenico, alla metà del Quattrocento (1455). All\'interno opere notevoli, dal Lotto a Tibaldi. Scendendo per via Pizzecolli si arriva alla Pinacoteca civica.', en:'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect. Façade with a magnificent Venetian-Gothic tabernacle-shaped portal, made of Brioni stone by Giorgio da Sebenico in the mid-15th century (1455). Inside, notable works from Lotto to Tibaldi. Descending Via Pizzecolli you reach the Civic Art Gallery (Pinacoteca civica).', de:'Von der Spitze einer Treppe überblickt die Kirche San Francesco delle Scale die Piazza San Francesco mit bemerkenswerter szenischer Wirkung. Fassade mit einem prächtigen venezianisch-gotischen Portal in Form eines Tabernakels, gefertigt aus Brioni-Stein von Giorgio da Sebenico Mitte des 15. Jahrhunderts (1455). Im Inneren bedeutende Werke von Lotto bis Tibaldi. Über die Via Pizzecolli gelangt man zur Städtischen Pinakothek (Pinakoteca civica).', pl:'Ze szczytu schodów kościół San Francesco delle Scale góruje nad Piazza San Francesco, tworząc niezwykły efekt scenograficzny. Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego. Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).', dist:'🚶 450 m – 6 min', mapQuery:'Chiesa di San Francesco alle Scale Ancona', lat:43.6214786, lng:13.5118841 },
             { order:14, name:'Pinacoteca Civica F. Podesti', emoji:'🖼️', photo:'', it:'Pinacoteca civica con opere di importanti autori tra cui Tiziano, Lotto, Crivelli, Guercino. Continuando si passa per il cinquecentesco Arco del Rastrello e si arriva in Piazza del Plebiscito.', en:'Civic art gallery with works by important artists including Titian, Lotto, Crivelli, Guercino. Continuing, you pass through the 16th-century Arco del Rastrello and reach Piazza del Plebiscito.', de:'Städtische Gemäldegalerie mit Werken bedeutender Künstler wie Tizian, Lotto, Crivelli, Guercino. Weiter geht es durch den Arco del Rastrello aus dem 16. Jahrhundert zur Piazza del Plebiscito.', pl:'Miejska pinakoteka z dziełami ważnych artystów, m.in. Tycjana, Lotta, Crivellego, Guercina. Idąc dalej, przechodzimy przez XVI-wieczny Arco del Rastrello i docieramy na Piazza del Plebiscito.', dist:'🚶 300 m – 4 min', mapQuery:'Pinacoteca Civica Podesti Ancona', lat:43.6208333, lng:13.5122222 },
             { order:15, name:'Piazza del Plebiscito', emoji:'⛲', photo:'piazza-plebiscito.jpg', it:'Nata come Piazza Nuova, le sue dimensioni la fecero subito ribattezzare Piazza Grande sino al 1860, anno in cui prende il nome dell\'attuale Piazza del Plebiscito, notoriamente chiamata Piazza del Papa per la presenza della statua di Papa Clemente XII. Su di essa si affacciano il Palazzo del Governo, sede della Prefettura, la chiesa di San Domenico e importanti palazzi storici. Oggi resta il centro nevralgico della parte antica della città e importante luogo di vita notturna e sociale di Ancona. Passando per la caratteristica via degli Orefici si torna in Corso Mazzini ed alla Fontana delle 13 Cannelle.', en:'Originally called Piazza Nuova, its size soon earned it the name Piazza Grande until 1860, when it took its current name Piazza del Plebiscito, popularly known as Piazza del Papa due to the statue of Pope Clement XII. It is overlooked by the Palazzo del Governo, seat of the Prefecture, the church of San Domenico and important historic buildings. Today it remains the nerve centre of the old part of the city and an important venue for Ancona\'s nightlife and social life. Passing through the characteristic Via degli Orefici you return to Corso Mazzini and the Fontana delle 13 Cannelle.', de:'Ursprünglich Piazza Nuova genannt, bekam sie aufgrund ihrer Größe schnell den Namen Piazza Grande, bis sie 1860 ihren heutigen Namen Piazza del Plebiscito erhielt, allgemein bekannt als Piazza del Papa wegen der Statue von Papst Clemens XII. Auf den Platz blicken der Palazzo del Governo, Sitz der Präfektur, die Kirche San Domenico und bedeutende historische Paläste. Heute ist er das pulsierende Zentrum der Altstadt und ein wichtiger Ort des Nacht- und Soziallebens von Ancona. Durch die charakteristische Via degli Orefici kehrt man zum Corso Mazzini und zur Fontana delle 13 Cannelle zurück.', pl:'Pierwotnie nazwany Piazza Nuova, jego rozmiary szybko sprawiły, że przemianowano go na Piazza Grande aż do 1860 roku, kiedy to otrzymał obecną nazwę Piazza del Plebiscito, powszechnie zwanego Piazza del Papa ze względu na posąg papieża Klemensa XII. Znajduje się przy nim Palazzo del Governo, siedziba Prefektury, kościół San Domenico oraz ważne historyczne pałace. Dziś pozostaje nerwowym centrum starej części miasta i ważnym miejscem życia nocnego i towarzyskiego Ankony. Przechodząc przez charakterystyczną Via degli Orefici, wracamy na Corso Mazzini i do Fontanny 13 Cannelle.', dist:'🚶 200 m – 3 min', mapQuery:'Piazza del Plebiscito Ancona', lat:43.6195337, lng:13.511651 },
             { order:16, name:'Parco del Cardeto', emoji:'🌳', photo:'', isSubItinerary:true, subId:'cardeto', it:'Il Parco del Cardeto è il più vasto parco urbano di Ancona, aperto nel 2005. A picco sul mare, immerso nella natura, occupa le sommità di Monte Cappuccini e Monte Cardeto e si estende in un\'area di circa 35 ettari, tutti a ridosso del centro. Comprende luoghi di valore storico, un ambiente naturale di notevole interesse e numerosi punti panoramici sulla costa alta e sulla città. Fino agli anni 70 l\'area era adibita ad uso militare.', en:'The Parco del Cardeto is Ancona\'s largest urban park, opened in 2005. Perched on the cliffs overlooking the sea and surrounded by nature, it occupies the summits of Monte Cappuccini and Monte Cardeto and covers an area of about 35 hectares, all close to the city centre. It includes sites of historical value, a natural environment of great interest, and numerous panoramic points over the high coast and the city. Until the 1970s, the area was used for military purposes.', de:'Der Parco del Cardeto ist der größte Stadtpark Anconas, eröffnet 2005. Auf den Klippen über dem Meer gelegen und von Natur umgeben, nimmt er die Gipfel des Monte Cappuccini und Monte Cardeto ein und erstreckt sich über etwa 35 Hektar, alles in unmittelbarer Nähe zum Zentrum. Er umfasst Orte von historischem Wert, eine natürliche Umgebung von großem Interesse und zahlreiche Panoramablicke auf die Steilküste und die Stadt. Bis in die 1970er Jahre wurde das Gebiet militärisch genutzt.', pl:'Parco del Cardeto to największy park miejski w Ankonie, otwarty w 2005 roku. Położony na klifach z widokiem na morze, otoczony przyrodą, zajmuje szczyty Monte Cappuccini i Monte Cardeto i rozciąga się na powierzchni około 35 hektarów, tuż przy centrum miasta. Obejmuje miejsca o wartości historycznej, środowisko naturalne o dużym znaczeniu i liczne punkty widokowe na wysokie wybrzeże i miasto. Do lat 70. XX wieku teren ten był wykorzystywany do celów wojskowych.', dist:'🌳 Parco cittadino', mapQuery:'Parco del Cardeto Ancona', lat:43.6222659, lng:13.5207122 },
@@ -355,9 +362,9 @@
         ],
         beaches: [
             { name:'Spiaggia del Passetto', emoji:'🌊', photo:'passetto.jpg', it:'Scogli e sabbia grossa con grotte scavate nella roccia, ascensore panoramico, raggiungibile a piedi.', en:'Rocks and coarse sand with grottoes carved into the cliff, panoramic lift, reachable on foot.', de:'Felsen und grober Sand mit in den Fels gehauenen Grotten, Panoramaaufzug, zu Fuß erreichbar.', pl:'Skały i gruby piasek z grotami wykutymi w klifie, panoramiczna winda, dostępna pieszo.', dist:'🚶 2150 m – 29 min', mapQuery:'Spiaggia del Passetto Ancona', lat:43.616139, lng:13.533622 },
-            { name:'Palombina', emoji:'🏖️', photo:'', it:'Lunga spiaggia di sabbia finissima, fondali bassi, ideale per famiglie. Raggiungibile con bus A, B e C dalla fermata di piazza Roma, alla destra del portone. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>', en:'Long beach of very fine sand, shallow waters, ideal for families. Reachable by bus A, B and C from Piazza Roma stop, to the right of the entrance. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>', de:'Langer Strand mit feinstem Sand, flaches Wasser, ideal für Familien. Erreichbar mit Bus A, B und C ab Piazza Roma, rechts vom Eingang. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>', pl:'Długa plaża z bardzo drobnym piaskiem, płytka woda, idealna dla rodzin. Dostępna autobusami A, B i C z przystanku piazza Roma, na prawo od bramy. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>', dist:'🚗 4 km – 8 min', mapQuery:'Spiaggia di Palombina Ancona', lat:43.6166715, lng:13.4299650 },
-            { name:'Portonovo – Baia del Conero', emoji:'🏝️', photo:'portonovo.jpg', it:'Baia di ciottoli e acqua cristallina, Torre de Bosis, ristoranti sul mare. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>', en:'Pebble bay with crystal-clear water, Torre de Bosis, seaside restaurants. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>', de:'Kieselbucht mit kristallklarem Wasser, Torre de Bosis, Restaurants am Meer. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>', pl:'Zatoka z otoczaków z krystalicznie czystą wodą, Torre de Bosis, restauracje nad morzem. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>', dist:'🚌 12 km – 25 min', mapQuery:'Baia di Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
-            { name:'Mezzavalle', emoji:'🏝️', photo:'', it:'Spiaggia di sabbia grossa, accesso solo a piedi o via mare, natura incontaminata. Parco del Conero. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Orari Conerobus ↗</a>', en:'Coarse sand beach, access only on foot or by sea, unspoiled nature. Conero Park. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus timetables ↗</a>', de:'Grobkörniger Sandstrand, Zugang nur zu Fuß oder vom Meer, unberührte Natur. Conero-Park. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Conerobus Fahrpläne ↗</a>', pl:'Plaża z grubym piaskiem, dostęp tylko pieszo lub od morza, dziewicza przyroda. Parco del Conero. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener">Rozkład Conerobus ↗</a>', dist:'🚶 13 km – percorso a piedi', mapQuery:'Spiaggia di Mezzavalle Ancona', lat:43.5671694, lng:13.5723437 },
+            { name:'Palombina', emoji:'🏖️', photo:'', it:'Lunga spiaggia di sabbia finissima, fondali bassi, ideale per famiglie. Raggiungibile con bus A, B e C dalla fermata di piazza Roma, alla destra del portone. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Orari Conerobus ↗</a>', en:'Long beach of very fine sand, shallow waters, ideal for families. Reachable by bus A, B and C from Piazza Roma stop, to the right of the entrance. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Conerobus timetables ↗</a>', de:'Langer Strand mit feinstem Sand, flaches Wasser, ideal für Familien. Erreichbar mit Bus A, B und C ab Piazza Roma, rechts vom Eingang. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Conerobus Fahrpläne ↗</a>', pl:'Długa plaża z bardzo drobnym piaskiem, płytka woda, idealna dla rodzin. Dostępna autobusami A, B i C z przystanku piazza Roma, na prawo od bramy. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Rozkład Conerobus ↗</a>', dist:'🚗 4 km – 8 min', mapQuery:'Spiaggia di Palombina Ancona', lat:43.6166715, lng:13.4299650 },
+            { name:'Portonovo – Baia del Conero', emoji:'🏝️', photo:'portonovo.jpg', it:'Baia di ciottoli e acqua cristallina, Torre de Bosis, ristoranti sul mare. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Orari Conerobus ↗</a>', en:'Pebble bay with crystal-clear water, Torre de Bosis, seaside restaurants. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Conerobus timetables ↗</a>', de:'Kieselbucht mit kristallklarem Wasser, Torre de Bosis, Restaurants am Meer. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Conerobus Fahrpläne ↗</a>', pl:'Zatoka z otoczaków z krystalicznie czystą wodą, Torre de Bosis, restauracje nad morzem. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Rozkład Conerobus ↗</a>', dist:'🚌 12 km – 25 min', mapQuery:'Baia di Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
+            { name:'Mezzavalle', emoji:'🏝️', photo:'', it:'Spiaggia di sabbia grossa, accesso solo a piedi o via mare, natura incontaminata. Parco del Conero. Raggiungibile con bus 94 da piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Orari Conerobus ↗</a>', en:'Coarse sand beach, access only on foot or by sea, unspoiled nature. Conero Park. Reachable by bus 94 from Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Conerobus timetables ↗</a>', de:'Grobkörniger Sandstrand, Zugang nur zu Fuß oder vom Meer, unberührte Natur. Conero-Park. Erreichbar mit Bus 94 ab Piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Conerobus Fahrpläne ↗</a>', pl:'Plaża z grubym piaskiem, dostęp tylko pieszo lub od morza, dziewicza przyroda. Parco del Conero. Dostępna autobusem 94 z piazza Cavour. <a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer">Rozkład Conerobus ↗</a>', dist:'🚶 13 km – percorso a piedi', mapQuery:'Spiaggia di Mezzavalle Ancona', lat:43.5671694, lng:13.5723437 },
             { name:'Due Sorelle', emoji:'⛰️', photo:'', it:'Icona del Conero, due faraglioni gemelli. Raggiungibile solo in barca dal porto di Sirolo. Parco del Conero.', en:'Icon of Conero, twin sea stacks. Reachable only by boat from Sirolo harbour. Conero Park.', de:'Wahrzeichen des Conero, zwei Felsnadeln. Nur mit dem Boot vom Hafen Sirolo aus erreichbar. Conero-Park.', pl:'Ikona Conero, dwie bliźniacze skały. Dostępna tylko łodzią z portu Sirolo. Parco del Conero.', dist:'⛵ Solo via mare', mapQuery:'Due Sorelle Sirolo', lat:43.5460130, lng:13.6271517 }
         ],
         parking: [
@@ -378,10 +385,10 @@
             { name:'Ascoli Piceno', emoji:'⛲', photo:'ascoli.jpg', it:'Città del travertino che conserva un centro storico intatto con la stupenda Piazza del Popolo, una delle più belle d\'Italia. Imperdibili le olive all\'ascolana.', en:'City of travertine, preserving an intact historic centre with the stunning Piazza del Popolo, one of the most beautiful squares in Italy. Not to be missed: the olive all\'ascolana.', de:'Stadt aus Travertin, mit einem unversehrten historischen Zentrum und der herrlichen Piazza del Popolo, einem der schönsten Plätze Italiens. Unbedingt probieren: die Olive all\'ascolana.', pl:'Miasto trawertynu, zachowujące nienaruszone historyczne centrum ze wspaniałym Piazza del Popolo, jednym z najpiękniejszych placów we Włoszech. Nie można przegapić: oliwki po ascolańsku.', dist:'🚗 90 km – 1h', mapQuery:'Ascoli Piceno AP', lat:42.8534, lng:13.5741 }
         ],
         transport: {
-            bus: { it:'Per la stazione bus 1/4 a pochi metri da casa. Per Portonovo bus 94 da piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'For bus 1/4 stop, just a few metres from home. For Portonovo, bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', de:'Zur Bushaltestelle 1/4 nur wenige Meter vom Haus entfernt. Nach Portonovo Bus 94 ab Piazza Cavour. Fahrkarte €1,30 (70 Min.).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus Fahrpläne →</a>', pl:'Przystanek autobusów 1/4 kilka metrów od domu. Do Portonovo autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
-            train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara e per/da l\'aeroporto.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara and to/from the airport.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', de:'Hauptbahnhof: 1 km – 15 Min. zu Fuß. Züge nach Rom, Bologna, Pescara und zum/vom Flughafen.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia Fahrpläne →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary oraz do/z lotniska.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
+            bus: { it:'Per la stazione bus 1/4 a pochi metri da casa. Per Portonovo bus 94 da piazza Cavour. Biglietto €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🗓️ Orari Conerobus →</a>', en:'For bus 1/4 stop, just a few metres from home. For Portonovo, bus 94 from Piazza Cavour. Ticket €1.30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus timetables →</a>', de:'Zur Bushaltestelle 1/4 nur wenige Meter vom Haus entfernt. Nach Portonovo Bus 94 ab Piazza Cavour. Fahrkarte €1,30 (70 Min.).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🗓️ Conerobus Fahrpläne →</a>', pl:'Przystanek autobusów 1/4 kilka metrów od domu. Do Portonovo autobus 94 z Piazza Cavour. Bilet €1,30 (70 min).<br><a href="https://www.conerobus.it/orari/" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🗓️ Rozkład Conerobus →</a>' },
+            train: { it:'Stazione Centrale: 1 km – 15 min a piedi. Treni per Roma, Bologna, Pescara e per/da l\'aeroporto.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🚆 Orari Trenitalia →</a>', en:'Central Station: 1 km – 15 min walk. Trains to Rome, Bologna, Pescara and to/from the airport.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia timetables →</a>', de:'Hauptbahnhof: 1 km – 15 Min. zu Fuß. Züge nach Rom, Bologna, Pescara und zum/vom Flughafen.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🚆 Trenitalia Fahrpläne →</a>', pl:'Stacja Centralna: 1 km – 15 min pieszo. Pociągi do Rzymu, Bolonii, Pescary oraz do/z lotniska.<br><a href="https://www.trenitalia.com" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">🚆 Rozkład Trenitalia →</a>' },
             taxi: { it:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', en:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', de:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)', pl:'Radiotaxi Ancona: <a href="tel:+3907143321" style="color:var(--navy-3);font-weight:600;">+39 071 43321</a> (24h)' },
-            ferry: { it:'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en:'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', de:'Fährhafen: 2 km – 10 Min. mit dem Taxi. Fähren nach Kroatien, Griechenland, Albanien.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl:'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" rel="noopener" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
+            ferry: { it:'Porto Traghetti: 2 km – 10 min in taxi. Traghetti per Croazia, Grecia, Albania.<br><a href="https://www.directferries.it" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', en:'Ferry Port: 2 km – 10 min by taxi. Ferries to Croatia, Greece, Albania.<br><a href="https://www.directferries.it" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', de:'Fährhafen: 2 km – 10 Min. mit dem Taxi. Fähren nach Kroatien, Griechenland, Albanien.<br><a href="https://www.directferries.it" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>', pl:'Port promowy: 2 km – 10 min taksówką. Promy do Chorwacji, Grecji, Albanii.<br><a href="https://www.directferries.it" target="_blank" rel="noopener noreferrer" style="color:var(--navy-3);font-weight:600;">⛴️ DirectFerries →</a>' },
             airport: { it:'Aeroporto Falconara "Raffaello Sanzio": 15 km – 30 min in auto, bus o treno.', en:'Falconara Airport "Raffaello Sanzio": 15 km – 30 min by car, bus or train.', de:'Flughafen Falconara "Raffaello Sanzio": 15 km – 30 Min. mit Auto, Bus oder Zug.', pl:'Lotnisko Falconara "Raffaello Sanzio": 15 km – 30 min samochodem, autobusem lub pociągiem.' }
         }
     };
@@ -421,42 +428,31 @@
     function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
-    function getMapLink(query, noSuffix) { const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
+    function getMapLink(query, noSuffix) { 
+        if (!query) return '#'; 
+        const q = noSuffix ? query : query + ', Ancona Italia'; 
+        return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); 
+    }
     function getImgSearchUrl(p) { const q = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q); }
 
     function getHoursBadge(p) {
         if (!p.hours) return '';
-        const now = new Date();
-        const day = now.getDay();
+        // V4.2.1: rimosso badge colorato in tempo reale, mostra solo orari
+        let closedDaysStr = '';
         const dayNames = { it:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'], en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], de:['So','Mo','Di','Mi','Do','Fr','Sa'], pl:['Nd','Pn','Wt','Śr','Cz','Pt','Sb'] };
         const closedOn = p.closedOn || [];
-        if (closedOn.includes(day)) {
-            const closedLabel = tr('Chiuso oggi','Closed today','Heute geschlossen','Dziś zamknięte');
-            return '<div><span class="hours-badge holiday">🔴 '+closedLabel+'</span><div class="hours-text">🕐 '+p.hours+'</div></div>';
-        }
-        const hm = now.getHours()*60+now.getMinutes();
-        const slots = p.hours.split(',').map(s=>s.trim());
-        let isOpen = false;
-        for (const slot of slots) {
-            const parts = slot.split('–').map(t=>{ const [h,m]=t.trim().split(':'); return parseInt(h)*60+(parseInt(m)||0); });
-            if (parts.length===2 && hm>=parts[0] && hm<=parts[1]) { isOpen=true; break; }
-        }
-        const badge = isOpen
-            ? '<span class="hours-badge open">🟢 '+tr('Aperto ora','Open now','Jetzt geöffnet','Teraz otwarte')+'</span>'
-            : '<span class="hours-badge closed">🔴 '+tr('Chiuso ora','Closed now','Jetzt geschlossen','Teraz zamknięte')+'</span>';
-        let closedDaysStr = '';
         if (closedOn.length) {
             const dn = dayNames[currentLang] || dayNames.it;
-            closedDaysStr = ' · '+tr('Chiuso il','Closed on','Geschlossen am','Zamknięte:')+' '+closedOn.map(d=>dn[d]).join(', ');
+            closedDaysStr = ' · ' + tr('Chiuso il','Closed on','Geschlossen am','Zamknięte:') + ' ' + closedOn.map(d=>dn[d]).join(', ');
         }
-        return '<div>'+badge+'<div class="hours-text">🕐 '+p.hours+closedDaysStr+'</div></div>';
+        return '<div class="hours-text">🕐 ' + p.hours + closedDaysStr + '</div>';
     }
 
     function getCountdownHtml() {
         try {
             const co = new URLSearchParams(window.location.search).get('checkout');
-            if (!co) return '';
-            const target = new Date(co+'T11:00:00');
+            if (!co || !/^\d{4}-\d{2}-\d{2}$/.test(co)) return '';
+            const target = new Date(co + 'T11:00:00+02:00'); // V4.2.1: timezone CEST
             const now = new Date();
             const diff = target - now;
             if (diff <= 0 || diff > 7*24*3600*1000) return '';
@@ -468,7 +464,7 @@
         } catch(e) { return ''; }
     }
 
-    function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
+    function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
     function openSubItinerary(subId) { currentSubItinerary=subId; currentPlaceDetail=-1; placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -558,15 +554,17 @@
     function toggleGpsTracking(){
         if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;if(gpsMarker&&leafletMap){leafletMap.removeLayer(gpsMarker);gpsMarker=null;}if(gpsCircle&&leafletMap){leafletMap.removeLayer(gpsCircle);gpsCircle=null;}updateGpsUI();return;}
         if(!navigator.geolocation){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>⚠️ '+tr('GPS non supportato','GPS not supported','GPS nicht unterstützt','GPS nieobsługiwany')+'</strong><br>'+tr('Il tuo dispositivo non supporta la geolocalizzazione.','Your device does not support geolocation.','Ihr Gerät unterstützt keine Geolokalisierung.','Twoje urządzenie nie obsługuje geolokalizacji.');if(btnsEl)btnsEl.innerHTML='';return;}
-        gpsWatchId=navigator.geolocation.watchPosition((position)=>{const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},(error)=>{if(error.code===error.PERMISSION_DENIED){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>🔒 '+tr('Accesso GPS negato','GPS access denied','GPS-Zugriff verweigert','Odmowa dostępu GPS')+'</strong><br>'+tr('Abilita i permessi di localizzazione nelle impostazioni del browser.','Enable location permissions in your browser settings.','Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.','Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.');if(btnsEl)btnsEl.innerHTML='';if(gpsWatchId!==null)toggleGpsTracking();}},{enableHighAccuracy:true,timeout:10000,maximumAge:2000});updateGpsUI();
+        gpsWatchId=navigator.geolocation.watchPosition((position)=>{const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},(error)=>{const GPS_ERRORS={1:{it:'Permesso negato',en:'Permission denied',de:'Zugriff verweigert',pl:'Odmowa dostępu'},2:{it:'Posizione non disponibile',en:'Position unavailable',de:'Position nicht verfügbar',pl:'Pozycja niedostępna'},3:{it:'Timeout',en:'Timeout',de:'Zeitüberschreitung',pl:'Przekroczono czas'}};const err=GPS_ERRORS[error.code]||{it:'Errore sconosciuto',en:'Unknown error',de:'Unbekannter Fehler',pl:'Nieznany błąd'};const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>🔒 '+tr(err.it,err.en,err.de,err.pl)+'</strong><br>'+tr('Abilita i permessi di localizzazione nelle impostazioni del browser.','Enable location permissions in your browser settings.','Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.','Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.');if(btnsEl)btnsEl.innerHTML='';if(gpsWatchId!==null)toggleGpsTracking();}},{enableHighAccuracy:true,timeout:10000,maximumAge:2000});updateGpsUI();
     }
 
     // === FULLSCREEN MAP FUNCTIONS ===
     function openFullscreenMap() {
-        console.log('[Fullscreen] Apertura...');
+        if (isFullscreenOpening) return;
+        isFullscreenOpening = true;
+        
         const overlay = document.getElementById('map-fullscreen-overlay');
         if (!overlay) {
-            console.error('[Fullscreen] Overlay non trovato!');
+            isFullscreenOpening = false;
             return;
         }
         
@@ -575,17 +573,15 @@
         
         if (fsIsHome) {
             fsStoredPlaces = [];
-            console.log('[Fullscreen] Modalità Home');
         } else {
             const places = currentSectionPlaces || [];
             fsStoredPlaces = places
-                .filter(p => p && p.lat && p.lng)
-                .map(p => {
+                .filter(p => p && p.lat !== undefined && p.lng !== undefined && p.lat !== null && p.lng !== null)
+                .map((p, idx) => {
                     const copy = { ...p };
                     copy._originalIndex = places.indexOf(p);
                     return copy;
                 });
-            console.log('[Fullscreen] Luoghi salvati:', fsStoredPlaces.length);
         }
         
         const titleEl = document.getElementById('map-fs-title');
@@ -608,51 +604,47 @@
         
         requestAnimationFrame(() => {
             initFullscreenMap();
+            isFullscreenOpening = false;
         });
     }
 
     function closeFullscreenMap() {
-        console.log('[Fullscreen] Chiusura...');
         const overlay = document.getElementById('map-fullscreen-overlay');
         if (!overlay) return;
         
         overlay.classList.remove('active');
         document.body.style.overflow = '';
         
-        if (fullscreenMapInstance) {
-            if (fullscreenMapInstance._resizeHandler) {
-                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
-            }
-            fullscreenMapInstance.remove();
-            fullscreenMapInstance = null;
-            console.log('[Fullscreen] Mappa distrutta');
-        }
+        destroyFullscreenMap();
         fsStoredPlaces = [];
         fsIsHome = false;
         fsSubItineraryId = null;
     }
 
+    function destroyFullscreenMap() {
+        if (!fullscreenMapInstance) return;
+        if (fullscreenMapInstance._resizeHandler) {
+            window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
+        }
+        fullscreenMapInstance.remove();
+        fullscreenMapInstance = null;
+    }
+
     function initFullscreenMap() {
-        console.log('[Fullscreen] Inizializzazione mappa...');
-        const el = document.getElementById('fullscreenMap');
-        if (!el) {
-            console.error('[Fullscreen] Elemento #fullscreenMap non trovato!');
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (!overlay || !overlay.classList.contains('active')) {
             return;
         }
         
+        const el = document.getElementById('fullscreenMap');
+        if (!el) return;
+        
         if (typeof L === 'undefined') {
-            console.log('[Fullscreen] Leaflet non caricato, riprovo...');
             setTimeout(initFullscreenMap, 300);
             return;
         }
         
-        if (fullscreenMapInstance) {
-            if (fullscreenMapInstance._resizeHandler) {
-                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
-            }
-            fullscreenMapInstance.remove();
-            fullscreenMapInstance = null;
-        }
+        destroyFullscreenMap();
         
         fullscreenMapInstance = L.map('fullscreenMap', {
             zoomControl: true,
@@ -667,13 +659,8 @@
         const places = fsStoredPlaces || [];
         const isSub = !!fsSubItineraryId;
         
-        console.log('[Fullscreen] Aggiungo', places.length, 'luoghi');
-        
         places.forEach((p, idx) => {
-            if (!p.lat || !p.lng) {
-                console.warn('[Fullscreen] Luogo senza coordinate:', p.name);
-                return;
-            }
+            if (p.lat === undefined || p.lat === null || p.lng === undefined || p.lng === null) return;
             
             let displayNum;
             if (isSub) {
@@ -704,7 +691,6 @@
             m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + p.name + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
             
             m.on('click', function() {
-                console.log('[Fullscreen] Click su marker:', p.name);
                 const originalIndex = p._originalIndex !== undefined ? p._originalIndex : idx;
                 closeFullscreenMap();
                 if (originalIndex >= 0 && typeof selectPlaceDetail === 'function') {
@@ -739,8 +725,7 @@
         try {
             if (gpsWatchId !== null && gpsMarker && typeof gpsMarker.getLatLng === 'function') {
                 const gpsLatLng = gpsMarker.getLatLng();
-                if (gpsLatLng && gpsLatLng.lat && gpsLatLng.lng) {
-                    console.log('[Fullscreen] Aggiungo GPS:', gpsLatLng.lat, gpsLatLng.lng);
+                if (gpsLatLng && gpsLatLng.lat !== undefined && gpsLatLng.lng !== undefined && gpsLatLng.lat !== null && gpsLatLng.lng !== null) {
                     const gpsIcon = L.divIcon({
                         html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',
                         className: '',
@@ -760,17 +745,24 @@
         setTimeout(() => {
             if (fullscreenMapInstance) {
                 fullscreenMapInstance.invalidateSize();
-                console.log('[Fullscreen] Mappa resized');
             }
         }, 500);
         
-        const resizeHandler = function() {
+        const resizeHandler = debounce(function() {
             if (fullscreenMapInstance) {
                 fullscreenMapInstance.invalidateSize();
             }
-        };
+        }, 150);
         window.addEventListener('resize', resizeHandler);
         fullscreenMapInstance._resizeHandler = resizeHandler;
+    }
+
+    function debounce(fn, ms) {
+        let t;
+        return function() {
+            clearTimeout(t);
+            t = setTimeout(fn, ms);
+        };
     }
 
     function initFullscreenListeners() {
@@ -797,8 +789,6 @@
                 if (e.target === this) closeFullscreenMap();
             });
         }
-        
-        console.log('[Fullscreen] Listener inizializzati');
     }
 
     function renderAll(){
@@ -827,12 +817,13 @@
 
     function renderHome(){
         const cont=document.getElementById('content'),hostImgSrc='https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg';
-        const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener" class="social-link" aria-label="Meteo Ancona">🌤️ Meteo</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
+        const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Meteo Ancona">🌤️ Meteo</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
         const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const countdownHtml=getCountdownHtml();
-        const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
+        const offlineBannerHtml = '<div class="offline-banner"><div class="offline-banner-icon">📴</div><div>'+tr('Apri questa pagina con il Wi-Fi per usarla anche offline.','Open this page with Wi-Fi to use it offline too.','Öffnen Sie diese Seite mit WLAN, um sie auch offline nutzen zu können.','Otwórz tę stronę z Wi-Fi, aby korzystać z niej również offline.')+'</div></div>';
+        const staticMapHtml='<div class="home-map-wrap" id="home-static-map"><div class="home-map-overlay"><div class="home-map-overlay-text">🔍 '+tr('Tocca per ingrandire','Tap to enlarge','Zum Vergrößern tippen','Dotknij, aby powiększyć')+'</div></div></div>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+offlineBannerHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
         cont.innerHTML=html;
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
@@ -845,10 +836,8 @@
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(homeStaticMap);
             homeStaticMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],16);
             
-            // Aggiungi evento click per fullscreen
             if (homeStaticMap) {
                 homeStaticMap.on('click', function() {
-                    console.log('[Home] Click sulla mappa');
                     openFullscreenMap();
                 });
                 mapEl.style.cursor = 'pointer';
@@ -875,7 +864,7 @@
 
     function renderPlaceSection(items,sectionId){
         currentSectionPlaces=items;
-        for(let i=0;i<items.length;i++){const p=items[i];p._dist=(p.lat&&p.lng)?calcDistance(HOME_COORDS.lat,HOME_COORDS.lng,p.lat,p.lng):Infinity;}
+        for(let i=0;i<items.length;i++){const p=items[i];p._dist=(p.lat!==undefined&&p.lat!==null&&p.lng!==undefined&&p.lng!==null)?calcDistance(HOME_COORDS.lat,HOME_COORDS.lng,p.lat,p.lng):Infinity;}
         const parkingInfoBox=(sectionId==='parking')?'<div class="card" style="margin-top:8px"><div class="card-header"><span class="card-header-icon">🅿️</span><span class="card-title">'+tr('Strisce blu (zona centro)','Blue bays (city centre)','Blaue Parkbuchten (Zentrum)','Niebieskie pasy (centrum)')+'</span></div><div class="card-body">'+tr('Parcheggio a pagamento su strada, posto difficile.','Paid street parking, difficult to find a spot.','Gebührenpflichtige Straßenparkplätze, schwer zu finden.','Płatny parking uliczny, trudno znaleźć miejsce.')+'</div></div>':'';
         if(currentSubItinerary){
             let parent=null;for(let k=0;k<appData.mustsee.length;k++){if(appData.mustsee[k].subId===currentSubItinerary){parent=appData.mustsee[k];break;}}
@@ -903,9 +892,9 @@
         const hoursBadge=getHoursBadge(p);
         let photoHtml;
         if(p.photo){const src=PHOTO_BASE+p.photo;photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" loading="lazy" id="img_'+index+'"></div>';}
-        else photoHtml='<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
-        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
-        if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
+        else photoHtml='<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
+        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
+        if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
         const displayNum=getDisplayNumber(p,index),totalDisplay=getTotalDisplay(currentSectionPlaces,total);
         const backLabel=tr('Tutti i luoghi','All places','Alle Orte','Wszystkie miejsca');
         const prev=index>0?'<button class="nav-detail-btn" data-prev="'+(index-1)+'" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Vor.','Poprz.')+'</button>':'<span></span>';
@@ -928,13 +917,13 @@
         const td=appData.transport;
         const items=[{icon:'🚌',label:tr('Bus','Bus','Bus','Autobus'),text:tr(td.bus.it,td.bus.en,td.bus.de,td.bus.pl)},{icon:'🚂',label:tr('Treno','Train','Zug','Pociąg'),text:tr(td.train.it,td.train.en,td.train.de,td.train.pl)},{icon:'🚕',label:tr('Taxi','Taxi','Taxi','Taxi'),text:tr(td.taxi.it,td.taxi.en,td.taxi.de,td.taxi.pl)},{icon:'⛴️',label:tr('Traghetti','Ferries','Fähren','Promy'),text:tr(td.ferry.it,td.ferry.en,td.ferry.de,td.ferry.pl)},{icon:'✈️',label:tr('Aeroporto','Airport','Flughafen','Lotnisko'),text:tr(td.airport.it,td.airport.en,td.airport.de,td.airport.pl)}];
         let cardsHtml=items.map(item=>'<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+item.icon+'</span><span class="card-title">'+item.label+'</span></div><div class="card-body"><p>'+item.text+'</p></div></div>').join('');
-        cardsHtml+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+tr('Portale turistico ufficiale','Official tourism portal','Offizielles Tourismusportal','Oficjalny portal turystyczny')+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" rel="noopener" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
+        cardsHtml+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🌐</span><span class="card-title">'+tr('Portale turistico ufficiale','Official tourism portal','Offizielles Tourismusportal','Oficjalny portal turystyczny')+'</span></div><div class="card-body"><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:var(--navy);color:white;padding:8px 16px;border-radius:20px;font-size:.8rem;font-weight:500;margin-top:4px" aria-label="Apri portale turistico">anconatourism.it ↗</a></div></div>';
         return cardsHtml;
     }
 
     function renderApartment(){
         const a=appData.apartment;
-        const reachData={title:tr('📍 Come raggiungerci','📍 How to reach us','📍 Anreise','📍 Jak do nas dotrzeć'),autoLabel:tr('🚗 In auto','🚗 By car','🚗 Mit dem Auto','🚗 Samochodem'),trenoLabel:tr('🚆 In treno','🚆 By train','🚆 Mit dem Zug','🚆 Pociągiem'),aereoLabel:tr('✈️ In aereo','✈️ By air','✈️ Mit dem Flugzeug','✈️ Samolotem'),autoBody:tr('L\'alloggio è nella piazza centrale di Ancona, in zona pedonale. Se si intende girare in centro non si ha bisogno dell\'auto. È possibile parcheggiare su strada nei dintorni sulle strisce blu (a pagamento dalle 8 alle 20 a 1,20€/h dei giorni feriali) ma è difficile trovare posto. Ci sono diversi parcheggi coperti, io consiglio di lasciare l\'auto nel più economico <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parcheggio multipiano degli archi</a>, ad 1,5 km di distanza, con l\'alloggio facilmente raggiungibile a piedi con una passeggiata tutta pianeggiante.<br><br>Se preferisci l\'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','The accommodation is located in the main square of Ancona, in a pedestrian area. If you plan to explore the centre, you won\'t need a car. Street parking is available nearby in the blue bays (€1.20/h on weekdays, 8am‑8pm) but it\'s difficult to find a space. There are several covered car parks; I recommend the cheaper <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">multi‑storey car park "degli Archi"</a>, 1.5 km away, from where the accommodation can be easily reached on foot with an entirely flat walk.<br><br>If you prefer the bus, take line 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Die Unterkunft befindet sich am zentralen Platz von Ancona, in einer Fußgängerzone. Wenn Sie das Zentrum besichtigen möchten, brauchen Sie kein Auto. Auf den umliegenden Straßen können Sie auf den blauen Parkbuchten parken (werktags 8–20 Uhr, 1,20 €/Std.), aber es ist schwer, einen Platz zu finden. Es gibt mehrere Parkhäuser; ich empfehle das günstigere <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">Parkhaus „degli Archi"</a> in 1,5 km Entfernung, von wo aus die Unterkunft bequem zu Fuß auf einem völlig flachen Weg erreichbar ist.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 befindet sich links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Obiekt znajduje się na głównym placu Ankony, w strefie pieszej. Jeśli zamierzasz poruszać się po centrum, nie potrzebujesz samochodu. Można parkować na okolicznych ulicach na niebieskich pasach (w dni powszednie w godz. 8‑20, 1,20 €/godz.), ale trudno znaleźć miejsce. Jest kilka parkingów zadaszonych; polecam zostawić samochód na tańszym <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">wielopoziomowym parkingu „degli Archi"</a>, oddalonym o 1,5 km, skąd można łatwo dojść pieszo całkowicie płaską trasą.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),trenoBody:tr('Dalla stazione prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','From the station, take bus 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Vom Bahnhof nehmen Sie den Bus 1/4 Richtung Zentrum und steigen am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 ist links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Ze stacji wsiądź w autobus 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),aereoBody:tr('Dall\'aeroporto si può prendere un taxi, scelta più comoda ma molto più costosa, prendere il bus raffaello, comodo ma presente solo per alcuni voli, oppure il treno che è la soluzione che consiglio per raggiungere la stazione di Ancona e poi proseguire con l\'itinerario indicato per chi arriva in treno. Ne passano di frequente e la stazione è proprio di fronte al terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Orari in tempo reale su Trenitalia</a>','From the airport you can take a taxi (most convenient but far more expensive), the Raffaello bus (convenient but only available for certain flights), or the train – the option I recommend to reach Ancona station, then follow the directions for those arriving by train. Trains run frequently, and the station is right opposite the terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Real‑time timetables on Trenitalia</a>','Vom Flughafen aus können Sie ein Taxi nehmen (am bequemsten, aber deutlich teurer), den Raffaello‑Bus (praktisch, aber nur für bestimmte Flüge) oder den Zug – die von mir empfohlene Lösung, um den Bahnhof von Ancona zu erreichen, und dann der Beschreibung für Zugreisende folgen. Züge verkehren regelmäßig, und der Bahnhof befindet sich direkt gegenüber dem Terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Echtzeit‑Fahrpläne auf Trenitalia</a>','Z lotniska można wziąć taksówkę (najwygodniejsza, ale znacznie droższa opcja), autobus Raffaello (wygodny, ale dostępny tylko dla niektórych lotów) lub pociąg – rozwiązanie, które polecam, aby dotrzeć na stację Ancona, a następnie postępować według wskazówek dla przyjeżdżających pociągiem. Pociągi kursują często, a stacja znajduje się dokładnie naprzeciwko terminalu.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Rozkłady jazdy na żywo w Trenitalia</a>')};
+        const reachData={title:tr('📍 Come raggiungerci','📍 How to reach us','📍 Anreise','📍 Jak do nas dotrzeć'),autoLabel:tr('🚗 In auto','🚗 By car','🚗 Mit dem Auto','🚗 Samochodem'),trenoLabel:tr('🚆 In treno','🚆 By train','🚆 Mit dem Zug','🚆 Pociągiem'),aereoLabel:tr('✈️ In aereo','✈️ By air','✈️ Mit dem Flugzeug','✈️ Samolotem'),autoBody:tr('L\'alloggio è nella piazza centrale di Ancona, in zona pedonale. Se si intende girare in centro non si ha bisogno dell\'auto. È possibile parcheggiare su strada nei dintorni sulle strisce blu (a pagamento dalle 8 alle 20 a 1,20€/h dei giorni feriali) ma è difficile trovare posto. Ci sono diversi parcheggi coperti, io consiglio di lasciare l\'auto nel più economico <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener noreferrer">parcheggio multipiano degli archi</a>, ad 1,5 km di distanza, con l\'alloggio facilmente raggiungibile a piedi con una passeggiata tutta pianeggiante.<br><br>Se preferisci l\'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','The accommodation is located in the main square of Ancona, in a pedestrian area. If you plan to explore the centre, you won\'t need a car. Street parking is available nearby in the blue bays (€1.20/h on weekdays, 8am‑8pm) but it\'s difficult to find a space. There are several covered car parks; I recommend the cheaper <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener noreferrer">multi‑storey car park "degli Archi"</a>, 1.5 km away, from where the accommodation can be easily reached on foot with an entirely flat walk.<br><br>If you prefer the bus, take line 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Die Unterkunft befindet sich am zentralen Platz von Ancona, in einer Fußgängerzone. Wenn Sie das Zentrum besichtigen möchten, brauchen Sie kein Auto. Auf den umliegenden Straßen können Sie auf den blauen Parkbuchten parken (werktags 8–20 Uhr, 1,20 €/Std.), aber es ist schwer, einen Platz zu finden. Es gibt mehrere Parkhäuser; ich empfehle das günstigere <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener noreferrer">Parkhaus „degli Archi"</a> in 1,5 km Entfernung, von wo aus die Unterkunft bequem zu Fuß auf einem völlig flachen Weg erreichbar ist.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 befindet sich links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Obiekt znajduje się na głównym placu Ankony, w strefie pieszej. Jeśli zamierzasz poruszać się po centrum, nie potrzebujesz samochodu. Można parkować na okolicznych ulicach na niebieskich pasach (w dni powszednie w godz. 8‑20, 1,20 €/godz.), ale trudno znaleźć miejsce. Jest kilka parkingów zadaszonych; polecam zostawić samochód na tańszym <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener noreferrer">wielopoziomowym parkingu „degli Archi"</a>, oddalonym o 1,5 km, skąd można łatwo dojść pieszo całkowicie płaską trasą.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),trenoBody:tr('Dalla stazione prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','From the station, take bus 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Vom Bahnhof nehmen Sie den Bus 1/4 Richtung Zentrum und steigen am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 ist links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Ze stacji wsiądź w autobus 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),aereoBody:tr('Dall\'aeroporto si può prendere un taxi, scelta più comoda ma molto più costosa, prendere il bus raffaello, comodo ma presente solo per alcuni voli, oppure il treno che è la soluzione che consiglio per raggiungere la stazione di Ancona e poi proseguire con l\'itinerario indicato per chi arriva in treno. Ne passano di frequente e la stazione è proprio di fronte al terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener noreferrer">Orari in tempo reale su Trenitalia</a>','From the airport you can take a taxi (most convenient but far more expensive), the Raffaello bus (convenient but only available for certain flights), or the train – the option I recommend to reach Ancona station, then follow the directions for those arriving by train. Trains run frequently, and the station is right opposite the terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener noreferrer">Real‑time timetables on Trenitalia</a>','Vom Flughafen aus können Sie ein Taxi nehmen (am bequemsten, aber deutlich teurer), den Raffaello‑Bus (praktisch, aber nur für bestimmte Flüge) oder den Zug – die von mir empfohlene Lösung, um den Bahnhof von Ancona zu erreichen, und dann der Beschreibung für Zugreisende folgen. Züge verkehren regelmäßig, und der Bahnhof befindet sich direkt gegenüber dem Terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener noreferrer">Echtzeit‑Fahrpläne auf Trenitalia</a>','Z lotniska można wziąć taksówkę (najwygodniejsza, ale znacznie droższa opcja), autobus Raffaello (wygodny, ale dostępny tylko dla niektórych lotów) lub pociąg – rozwiązanie, które polecam, aby dotrzeć na stację Ancona, a następnie postępować według wskazówek dla przyjeżdżających pociągiem. Pociągi kursują często, a stacja znajduje się dokładnie naprzeciwko terminalu.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener noreferrer">Rozkłady jazdy na żywo w Trenitalia</a>')};
         window._reachTexts={auto:reachData.autoBody,treno:reachData.trenoBody,aereo:reachData.aereoBody};
         const reachCardHtml='<div class="card" style="border-left:3px solid var(--gold);margin-bottom:12px"><div class="card-header"><span class="card-header-icon">📍</span><span class="card-title">'+reachData.title+'</span></div><div class="card-body"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="reach-sub-btn" data-reach="auto" style="flex:1">'+reachData.autoLabel+'</button><button class="reach-sub-btn" data-reach="treno" style="flex:1">'+reachData.trenoLabel+'</button><button class="reach-sub-btn" data-reach="aereo" style="flex:1">'+reachData.aereoLabel+'</button></div><div id="reach-content" class="reach-content">'+reachData.autoBody+'</div></div></div>';
         const cards=[{icon:'📶',title:tr('Wi‑Fi','Wi‑Fi','WLAN','Wi‑Fi'),body:tr(a.wifi.it,a.wifi.en,a.wifi.de,a.wifi.pl)},{icon:'🚪',title:tr('Citofono','Intercom','Gegensprechanlage','Domofon'),body:tr(a.access.it,a.access.en,a.access.de,a.access.pl)},{icon:'🔑',title:tr('Chiavi','Keys','Schlüssel','Klucze'),body:tr(a.keys.it,a.keys.en,a.keys.de,a.keys.pl)},{icon:'🏨',title:tr('Check‑in flessibile','Flexible check‑in','Flexibler Check‑in','Elastyczne zameldowanie'),body:tr(a.checkin.it,a.checkin.en,a.checkin.de,a.checkin.pl)},{icon:'🧳',title:tr('Check‑out flessibile','Flexible check‑out','Flexibler Check‑out','Elastyczne wymeldowanie'),body:tr(a.checkout.it,a.checkout.en,a.checkout.de,a.checkout.pl)},{icon:'♻️',title:tr('Raccolta differenziata','Recycling','Mülltrennung','Segregacja'),body:tr(a.recycling.it,a.recycling.en,a.recycling.de,a.recycling.pl)}];
@@ -949,20 +938,19 @@
 
     function renderContact(){
         const fp=HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
-        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;justify-content:center;gap:20px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linky')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona',true)+'" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener" class="link-action" aria-label="Apri portale turistico">↗</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="'+getMapLink('Lavanderia self service Via Matteotti 137 Ancona',true)+'" target="_blank" rel="noopener" class="link-action" aria-label="Mappa Lavanderia">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div></div></div>';
+        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama il numero di telefono">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;justify-content:center;gap:20px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linky')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Edicola di Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">👕</span><div class="link-info"><div class="link-name">Lavanderia self service</div><div class="link-desc">Via Matteotti 137</div></div><a href="'+getMapLink('Lavanderia self service Via Matteotti 137 Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Lavanderia">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div></div></div>';
     }
 
     function initSectionMap(){
         if(typeof L==='undefined'){if(_mapRetryCount<30){_mapRetryCount++;setTimeout(initSectionMap,300);}return;}
         _mapRetryCount=0;const el=document.getElementById('sectionMap');if(!el||!currentSectionPlaces.length)return;
         if(leafletMap){leafletMap.remove();leafletMap=null;}
-        const valid=currentSectionPlaces.filter(p=>p.lat&&p.lng);if(!valid.length)return;
+        const valid=currentSectionPlaces.filter(p=>p.lat!==undefined&&p.lat!==null&&p.lng!==undefined&&p.lng!==null);if(!valid.length)return;
         leafletMap=L.map('sectionMap',{zoomControl:true,attributionControl:true});
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(leafletMap);
         const bounds=[];
         valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
             m.on('click',function(){
-                // Evidenzia il marker selezionato
                 document.querySelectorAll('.map-marker-num').forEach(el=>el.classList.remove('selected'));
                 this.getElement().querySelector('.map-marker-num')?.classList.add('selected');
                 selectPlaceDetail(idx);
@@ -971,10 +959,8 @@
         });
         if(bounds.length)leafletMap.fitBounds(bounds,{padding:[22,22]});
         
-        // Aggiungi evento click per fullscreen
         if (leafletMap) {
             leafletMap.on('click', function() {
-                console.log('[Sezione] Click sulla mappa');
                 openFullscreenMap();
             });
             el.style.cursor = 'pointer';
@@ -982,6 +968,22 @@
         
         const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]});
         L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
+        
+        // V4.2.1: aggiungi GPS marker se già attivo
+        try {
+            if (gpsWatchId !== null && gpsMarker && typeof gpsMarker.getLatLng === 'function') {
+                const ll = gpsMarker.getLatLng();
+                if (ll && ll.lat !== undefined && ll.lng !== undefined && ll.lat !== null && ll.lng !== null) {
+                    const gpsIcon = L.divIcon({
+                        html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',
+                        className: '',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+                    L.marker([ll.lat, ll.lng], { icon: gpsIcon, zIndexOffset: 2000 }).addTo(leafletMap);
+                }
+            }
+        } catch(e) {}
     }
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
@@ -1007,7 +1009,6 @@
     window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
     window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
     
-    // Inizializza fullscreen listeners
     initFullscreenListeners();
     renderAll();
     setTimeout(updateGpsUI,300);
