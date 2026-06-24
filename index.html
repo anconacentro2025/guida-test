@@ -1,5 +1,10 @@
+Sì, chiarissimo. Due blocchi autonomi, da incollare in sequenza, già completi e funzionanti. Nessuna aggiunta manuale.
+
+Ecco la Parte 1 (HTML + CSS + dati JavaScript fino alla fine di appData).
+
+```html
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 24/06/26 16:40 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 24/06/26 18:00 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -178,10 +183,6 @@
         .reach-sub-btn{flex:1;border:1px solid var(--border);padding:8px 4px;border-radius:8px;font-size:.72rem;font-weight:500;transition:all .2s;outline:none;background:var(--bg);color:var(--text)}
         .reach-sub-btn.active{background:var(--navy);color:var(--white);font-weight:600}
         .reach-content{font-size:.82rem;line-height:1.6;color:var(--text)}
-        .hours-badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:4px}
-        .hours-badge.open{background:#D1FAE5;color:#065F46}
-        .hours-badge.closed{background:#FEE2E2;color:#991B1B}
-        .hours-badge.holiday{background:#FEF3C7;color:#92400E}
         .hours-text{font-size:.68rem;color:var(--muted);margin-top:2px}
         .meteo-widget{background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px}
         .meteo-left{display:flex;align-items:center;gap:10px}
@@ -195,29 +196,25 @@
         .phrase-row:last-child{border-bottom:none}
         .phrase-it{font-size:.8rem;font-weight:600;color:var(--navy);flex:1}
         .phrase-tr{font-size:.75rem;color:var(--muted);flex:1;font-style:italic}
-        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s;position:relative}
+        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
         .home-map-wrap:hover{transform:scale(1.01)}
         .home-map-wrap:active{transform:scale(.98)}
-        .home-map-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,31,51,.35);pointer-events:none;z-index:10}
-        .home-map-overlay-text{color:var(--white);font-size:.75rem;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,.5);display:flex;align-items:center;gap:6px}
         .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:12px}
         .countdown-icon{font-size:1.4rem}
         .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
         .countdown-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:#78350F}
-
-        /* === MAPPA FULL-SCREEN OVERLAY === */
+        .home-map-overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(11,31,51,.55);border-radius:10px;cursor:pointer;flex-direction:column;gap:6px;color:var(--white);font-size:.85rem;font-weight:500;pointer-events:auto}
+        .home-map-overlay .tap-icon{font-size:1.8rem}
+        .home-map-container{position:relative;margin:8px 16px 0}
         .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
         .map-fullscreen-overlay.active{display:flex;opacity:1}
-        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:10}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000}
         .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
-        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s}
+        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;position:relative;z-index:1002;pointer-events:auto}
         .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
         .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
         .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
-        
-        /* Offline banner */
-        .offline-banner{background:linear-gradient(135deg,var(--navy-2),var(--navy-3));border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid rgba(200,164,90,.25);color:var(--white);font-size:.75rem;display:flex;align-items:center;gap:10px}
-        .offline-banner-icon{font-size:1.2rem}
+        :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     </style>
 </head>
 <body>
@@ -235,7 +232,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.1 · <span id="release-time">24/06/26 16:40</span></div>
+                <div class="version-info">V4.2.1 · <span id="release-time">24/06/26 18:00</span></div>
             </div>
         </div>
     </header>
@@ -247,8 +244,6 @@
     <div class="gold-bar" aria-hidden="true"></div>
     <nav class="nav-scroll" id="nav" style="display:none" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
-
-    <!-- FULLSCREEN MAP OVERLAY -->
     <div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
         <div class="map-fs-header">
             <span class="map-fs-title" id="map-fs-title">🗺️ Mappa</span>
@@ -256,28 +251,36 @@
         </div>
         <div id="fullscreenMap"></div>
     </div>
-
     <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.1 · All rights reserved</div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+    // V4.2.1 – Fix completi (24/06/26 18:00)
     const NO_GPS_SECTIONS = ['apartment', 'contact', 'transport'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
-    const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik für Gäste · Piazza Roma 3' };
+    const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
     let distSortActive = false;
     let homeStaticMap = null;
-
-    // === FULLSCREEN MAP VARIABLES ===
     let fullscreenMapInstance = null;
     let fsStoredPlaces = [];
     let fsIsHome = false;
     let fsSubItineraryId = null;
     let fsListenersInitialized = false;
     let isFullscreenOpening = false;
+    let gpsWatchId = null, gpsMarker = null, gpsCircle = null, gpsConsentGiven = null, gpsBoxCollapsed = false, deferredPrompt = null;
+    try { gpsConsentGiven = sessionStorage.getItem('gpsConsent'); } catch(e) {}
+    try {
+        const urlLang = new URLSearchParams(window.location.search).get('lang');
+        const stored = localStorage.getItem('guida_lang');
+        const valid = ['it','en','de','pl'];
+        if (urlLang && valid.includes(urlLang)) currentLang = urlLang;
+        else if (stored && valid.includes(stored)) currentLang = stored;
+    } catch(e) {}
+
+    function debounce(fn, delay) { let timer; return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); }; }
 
     const appData = {
         apartment: {
@@ -290,7 +293,7 @@
             checkout: { it: 'Check‑out flessibile: di norma entro le 11:00. Se avete bisogno di trattenervi, ove non fosse possibile potete sempre lasciare i bagagli nell\'ingresso e tornare a prenderli più tardi. Lasciate le chiavi sull\'attaccapanni all\'ingresso.', en: 'Flexible check‑out: normally by 11:00. If you need to stay longer and it is not possible, you can always leave your luggage in the entrance and pick it up later. Leave the keys on the coat hook at the entrance.', de: 'Flexibler Check‑out: normalerweise bis 11:00 Uhr. Wenn Sie länger bleiben müssen und es nicht möglich ist, können Sie Ihr Gepäck jederzeit im Eingangsbereich abstellen und später abholen. Lassen Sie die Schlüssel am Garderobenhaken im Eingangsbereich.', pl: 'Elastyczne wymeldowanie: zwykle do 11:00. Jeśli potrzebujesz zostać dłużej, a nie jest to możliwe, zawsze możesz zostawić bagaż w wejściu i odebrać go później. Zostaw klucze na wieszaku przy wejściu.' }
         },
         rules: [
-            { icon: '🚭', it: 'Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', de: 'Rauchen in der gesamten Wohnung verboten', pl: 'Zakaz palenia w całym mieszkaniu' },
+            { icon: '🚭', it: ('Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', de: 'Rauchen in der gesamten Wohnung verboten', pl: 'Zakaz palenia w całym mieszkaniu' },
             { icon: '🐾', it: 'Vietati gli animali domestici', en: 'No pets allowed', de: 'Haustiere nicht erlaubt', pl: 'Zakaz wprowadzania zwierząt domowych' },
             { icon: '❄️', it: 'Condizionatore: spegnere quando si esce', en: 'Air conditioning: turn off when leaving', de: 'Klimaanlage: beim Verlassen ausschalten', pl: 'Klimatyzacja: wyłącz przy wyjściu' },
             { icon: '🪟', it: 'Assicurarsi che le persiane siano sempre bloccate, altrimenti in caso di vento può essere pericoloso.', en: 'Make sure the shutters are always secured; otherwise, in case of wind, it can be dangerous.', de: 'Stellen Sie sicher, dass die Fensterläden immer gesichert sind; sonst kann es bei Wind gefährlich werden.', pl: 'Upewnij się, że okiennice są zawsze zablokowane; w przeciwnym razie przy wietrze może to być niebezpieczne.' }
@@ -310,7 +313,7 @@
             { order:10, name:'Cattedrale di San Ciriaco', emoji:'⛪', photo:'duomo-san-ciriaco.jpg', it:'La Cattedrale di San Ciriaco, che rappresenta l\'emblema di Ancona, sorge sull\'antico tempio dedicato a Venere Euplea, protettrice della navigazione, di cui restano parte delle fondamenta. Su di esso, nel VI secolo d.C., venne costruita la basilica paleocristiana dedicata a San Lorenzo, che divenne Cattedrale nel 1000 quando vi furono traslati i corpi di San Ciriaco e San Marcellino. Spettacolare panorama sulla città. A sinistra della facciata c\'è il Museo Diocesano. Scendendo invece sulla destra si arriva ai resti dell\'Anfiteatro romano.', en:'The Cathedral of San Ciriaco, the emblem of Ancona, stands on the ancient temple dedicated to Venus Euplea, protector of navigation, of which part of the foundations remain. On it, in the 6th century AD, the early Christian basilica dedicated to San Lorenzo was built, which became the Cathedral in the year 1000 when the bodies of Saint Cyriacus and Saint Marcellinus were transferred there. Spectacular view over the city. To the left of the façade is the Diocesan Museum. Descending to the right, instead, you reach the remains of the Roman Amphitheatre.', de:'Die Kathedrale San Ciriaco, das Wahrzeichen Anconas, steht auf dem antiken Tempel der Venus Euplea, der Beschützerin der Schifffahrt, von dem Teile der Fundamente erhalten sind. Darauf wurde im 6. Jahrhundert n. Chr. die frühchristliche Basilika San Lorenzo erbaut, die im Jahr 1000 zur Kathedrale wurde, als die Gebeine der Heiligen Cyriacus und Marcellinus dorthin überführt wurden. Spektakulärer Blick über die Stadt. Links von der Fassade befindet sich das Diözesanmuseum. Rechts hinunter gelangt man zu den Überresten des römischen Amphitheaters.', pl:'Katedra San Ciriaco, która jest symbolem Ankony, wznosi się na starożytnej świątyni poświęconej Wenus Euplea, opiekunce żeglugi, z której zachowała się część fundamentów. Na niej, w VI wieku n.e., zbudowano wczesnochrześcijańską bazylikę pod wezwaniem San Lorenzo, która stała się katedrą w roku 1000, kiedy przeniesiono tam ciała świętego Cyriaka i świętego Marcellina. Spektakularny widok na miasto. Na lewo od fasady znajduje się Muzeum Diecezjalne. Schodząc natomiast w prawo, docieramy do pozostałości rzymskiego Amfiteatru.', dist:'🚶 1000 m – 13 min', mapQuery:'Cattedrale di San Ciriaco Ancona', lat:43.6251216, lng:13.510037 },
             { order:11, name:'Anfiteatro Romano', emoji:'🏟️', photo:'anfiteatro-romano.jpg', it:'Anfiteatro realizzato in età augustea (I sec. a.C.) che poteva accogliere fino a 10.000 spettatori. Dopo l\'abbandono in età antica (IV sec. d.C.) venne utilizzato come cava di materiali e, a partire dal XIII secolo, come base per nuove costruzioni che ne hanno nascosto la struttura. Fu riportato alla luce solo a partire dagli anni 70. Tornando in discesa verso piazza del Senato si possono ammirare degli splendidi mosaici. Scendendo per via Pizzecolli si torna in piazza Stracca dove, di fronte alla facciata del Palazzo degli Anziani si erge la maestosa chiesa del Gesù progettata dal Vanvitelli.', en:'Amphitheatre built in the Augustan age (1st century BC) that could hold up to 10,000 spectators. After its abandonment in ancient times (4th century AD), it was used as a quarry for building materials and, from the 13th century, as a foundation for new constructions that concealed its structure. It was brought back to light only from the 1970s onwards. Heading back down towards Piazza del Senato you can admire some splendid mosaics. Descending Via Pizzecolli you return to Piazza Stracca where, opposite the façade of Palazzo degli Anziani, stands the majestic Chiesa del Gesù designed by Vanvitelli.', de:'Amphitheater aus der augusteischen Zeit (1. Jh. v. Chr.), das bis zu 10.000 Zuschauer fasste. Nach seiner Aufgabe in der Antike (4. Jh. n. Chr.) diente es als Steinbruch und ab dem 13. Jahrhundert als Fundament für neue Gebäude, die seine Struktur verbargen. Erst ab den 1970er Jahren wieder ans Licht gebracht. Zurück hinunter zum Piazza del Senato bewundern Sie prächtige Mosaike. Über die Via Pizzecolli gelangen Sie zurück zur Piazza Stracca, wo gegenüber der Fassade des Palazzo degli Anziani die majestätische Chiesa del Gesù nach einem Entwurf von Vanvitelli steht.', pl:'Amfiteatr zbudowany w epoce augustiańskiej (I w. p.n.e.), który mógł pomieścić do 10 000 widzów. Po opuszczeniu w starożytności (IV w. n.e.) był wykorzystywany jako kamieniołom, a od XIII wieku jako podstawa dla nowych budowli, które ukryły jego strukturę. Został ponownie odsłonięty dopiero od lat 70. XX wieku. Schodząc z powrotem w kierunku Piazza del Senato, można podziwiać wspaniałe mozaiki. Idąc w dół Via Pizzecolli, wracamy na Piazza Stracca, gdzie naprzeciwko fasady Palazzo degli Anziani wznosi się majestatyczny kościół del Gesù zaprojektowany przez Vanvitellego.', dist:'🚶 900 m – 12 min', mapQuery:'Anfiteatro Romano Ancona', lat:43.6247408, lng:13.5117513 },
             { order:12, name:'Chiesa del Gesù', emoji:'⛪', photo:'chiesa-gesu.jpg', it:'Monumento commissionato dal conte Nappi nel 1605. Nel 1733 i Gesuiti affidarono a Luigi Vanvitelli il progetto dell\'ampliamento della chiesa realizzato con la facciata concava che richiama la forma del porto. Continuando a scendere per via Pizzecolli, una delle più antiche vie della città, si raggiunge piazza San Francesco, ove si erge l\'omonima chiesa.', en:'Monument commissioned by Count Nappi in 1605. In 1733 the Jesuits entrusted Luigi Vanvitelli with the project for the enlargement of the church, carried out with a concave façade that echoes the shape of the harbour. Continuing down Via Pizzecolli, one of the oldest streets in the city, you reach Piazza San Francesco, where the church of the same name stands.', de:'Monument, das 1605 von Graf Nappi in Auftrag gegeben wurde. 1733 beauftragten die Jesuiten Luigi Vanvitelli mit dem Erweiterungsprojekt der Kirche, das mit einer konkaven Fassade ausgeführt wurde, die die Form des Hafens widerspiegelt. Weiter die Via Pizzecolli hinunter, eine der ältesten Straßen der Stadt, erreichen Sie die Piazza San Francesco, wo die gleichnamige Kirche steht.', pl:'Monument zamówiony przez hrabiego Nappi w 1605 roku. W 1733 roku Jezuici powierzyli Luigiemu Vanvitellemu projekt rozbudowy kościoła, zrealizowany z wklęsłą fasadą nawiązującą do kształtu portu. Kontynuując w dół Via Pizzecolli, jedną z najstarszych ulic miasta, docieramy do Piazza San Francesco, gdzie wznosi się kościół o tej samej nazwie.', dist:'🚶 600 m – 8 min', mapQuery:'Chiesa del Gesù Ancona', lat:43.6226099, lng:13.5111676 },
-            { order:13, name:'San Francesco alle Scale', emoji:'⛪', photo:'san-francesco-scale.jpg', it:'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico. Facciata con magnifico portale gotico-veneziano a forma di tabernacolo, realizzato in pietra di Brioni da Giorgio da Sebenico, alla metà del Quattrocento (1455). All\'interno opere notevoli, dal Lotto a Tibaldi. Scendendo per via Pizzecolli si arriva alla Pinacoteca civica.', en:'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect. Façade with a magnificent Venetian-Gothic tabernacle-shaped portal, made of Brioni stone by Giorgio da Sebenico in the mid-15th century (1455). Inside, notable works from Lotto to Tibaldi. Descending Via Pizzecolli you reach the Civic Art Gallery (Pinacoteca civica).', de:'Von der Spitze einer Treppe überblickt die Kirche San Francesco delle Scale die Piazza San Francesco mit bemerkenswerter szenischer Wirkung. Fassade mit einem prächtigen venezianisch-gotischen Portal in Form eines Tabernakels, gefertigt aus Brioni-Stein von Giorgio da Sebenico Mitte des 15. Jahrhunderts (1455). Im Inneren bedeutende Werke von Lotto bis Tibaldi. Über die Via Pizzecolli gelangt man zur Städtischen Pinakothek (Pinakoteca civica).', pl:'Ze szczytu schodów kościół San Francesco delle Scale góruje nad Piazza San Francesco, tworząc niezwykły efekt scenograficzny. Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego. Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).', dist:'🚶 450 m – 6 min', mapQuery:'Chiesa di San Francesco alle Scale Ancona', lat:43.6214786, lng:13.5118841 },
+            { order:13, name:'San Francesco alle Scale', emoji:'⛪', photo:'san-francesco-scale.jpg', it:'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico. Facciata con magnifico portale gotico-veneziano a forma di tabernacolo, realizzato in pietra di Brioni da Giorgio da Sebenico, alla metà del Quattrocento (1455). All\'interno opere notevoli, dal Lotto a Tibaldi. Scendendo per via Pizzecolli si arriva alla Pinacoteca civica.', en:'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect. Façade with a magnificent Venetian-Gothic tabernacle-shaped portal, made of Brioni stone by Giorgio da Sebenico in the mid-15th century (1455). Inside, notable works from Lotto to Tibaldi. Descending Via Pizzecolli you reach the Civic Art Gallery (Pinacoteca civica).', de:'Von der Spitze einer Treppe überblickt die Kirche San Francesco delle Scale die Piazza San Francesco mit bemerkenswerter szenischer Wirkung. Fassade mit einem prächtigen venezianisch-gotischen Portal in Form eines Tabernakels, gefertigt aus Brioni-Stein von Giorgio da Sebenico Mitte des 15. Jahrhunderts (1455). Im Inneren bedeutende Werke von Lotto bis Tibaldi. Über die Via Pizzecolli gelangt man zur Städtischen Pinakothek (Pinacoteca civica).', pl:'Ze szczytu schodów kościół San Francesco delle Scale góruje nad Piazza San Francesco, tworząc niezwykły efekt scenograficzny. Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego. Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).', dist:'🚶 450 m – 6 min', mapQuery:'Chiesa di San Francesco alle Scale Ancona', lat:43.6214786, lng:13.5118841 },
             { order:14, name:'Pinacoteca Civica F. Podesti', emoji:'🖼️', photo:'', it:'Pinacoteca civica con opere di importanti autori tra cui Tiziano, Lotto, Crivelli, Guercino. Continuando si passa per il cinquecentesco Arco del Rastrello e si arriva in Piazza del Plebiscito.', en:'Civic art gallery with works by important artists including Titian, Lotto, Crivelli, Guercino. Continuing, you pass through the 16th-century Arco del Rastrello and reach Piazza del Plebiscito.', de:'Städtische Gemäldegalerie mit Werken bedeutender Künstler wie Tizian, Lotto, Crivelli, Guercino. Weiter geht es durch den Arco del Rastrello aus dem 16. Jahrhundert zur Piazza del Plebiscito.', pl:'Miejska pinakoteka z dziełami ważnych artystów, m.in. Tycjana, Lotta, Crivellego, Guercina. Idąc dalej, przechodzimy przez XVI-wieczny Arco del Rastrello i docieramy na Piazza del Plebiscito.', dist:'🚶 300 m – 4 min', mapQuery:'Pinacoteca Civica Podesti Ancona', lat:43.6208333, lng:13.5122222 },
             { order:15, name:'Piazza del Plebiscito', emoji:'⛲', photo:'piazza-plebiscito.jpg', it:'Nata come Piazza Nuova, le sue dimensioni la fecero subito ribattezzare Piazza Grande sino al 1860, anno in cui prende il nome dell\'attuale Piazza del Plebiscito, notoriamente chiamata Piazza del Papa per la presenza della statua di Papa Clemente XII. Su di essa si affacciano il Palazzo del Governo, sede della Prefettura, la chiesa di San Domenico e importanti palazzi storici. Oggi resta il centro nevralgico della parte antica della città e importante luogo di vita notturna e sociale di Ancona. Passando per la caratteristica via degli Orefici si torna in Corso Mazzini ed alla Fontana delle 13 Cannelle.', en:'Originally called Piazza Nuova, its size soon earned it the name Piazza Grande until 1860, when it took its current name Piazza del Plebiscito, popularly known as Piazza del Papa due to the statue of Pope Clement XII. It is overlooked by the Palazzo del Governo, seat of the Prefecture, the church of San Domenico and important historic buildings. Today it remains the nerve centre of the old part of the city and an important venue for Ancona\'s nightlife and social life. Passing through the characteristic Via degli Orefici you return to Corso Mazzini and the Fontana delle 13 Cannelle.', de:'Ursprünglich Piazza Nuova genannt, bekam sie aufgrund ihrer Größe schnell den Namen Piazza Grande, bis sie 1860 ihren heutigen Namen Piazza del Plebiscito erhielt, allgemein bekannt als Piazza del Papa wegen der Statue von Papst Clemens XII. Auf den Platz blicken der Palazzo del Governo, Sitz der Präfektur, die Kirche San Domenico und bedeutende historische Paläste. Heute ist er das pulsierende Zentrum der Altstadt und ein wichtiger Ort des Nacht- und Soziallebens von Ancona. Durch die charakteristische Via degli Orefici kehrt man zum Corso Mazzini und zur Fontana delle 13 Cannelle zurück.', pl:'Pierwotnie nazwany Piazza Nuova, jego rozmiary szybko sprawiły, że przemianowano go na Piazza Grande aż do 1860 roku, kiedy to otrzymał obecną nazwę Piazza del Plebiscito, powszechnie zwanego Piazza del Papa ze względu na posąg papieża Klemensa XII. Znajduje się przy nim Palazzo del Governo, siedziba Prefektury, kościół San Domenico oraz ważne historyczne pałace. Dziś pozostaje nerwowym centrum starej części miasta i ważnym miejscem życia nocnego i towarzyskiego Ankony. Przechodząc przez charakterystyczną Via degli Orefici, wracamy na Corso Mazzini i do Fontanny 13 Cannelle.', dist:'🚶 200 m – 3 min', mapQuery:'Piazza del Plebiscito Ancona', lat:43.6195337, lng:13.511651 },
             { order:16, name:'Parco del Cardeto', emoji:'🌳', photo:'', isSubItinerary:true, subId:'cardeto', it:'Il Parco del Cardeto è il più vasto parco urbano di Ancona, aperto nel 2005. A picco sul mare, immerso nella natura, occupa le sommità di Monte Cappuccini e Monte Cardeto e si estende in un\'area di circa 35 ettari, tutti a ridosso del centro. Comprende luoghi di valore storico, un ambiente naturale di notevole interesse e numerosi punti panoramici sulla costa alta e sulla città. Fino agli anni 70 l\'area era adibita ad uso militare.', en:'The Parco del Cardeto is Ancona\'s largest urban park, opened in 2005. Perched on the cliffs overlooking the sea and surrounded by nature, it occupies the summits of Monte Cappuccini and Monte Cardeto and covers an area of about 35 hectares, all close to the city centre. It includes sites of historical value, a natural environment of great interest, and numerous panoramic points over the high coast and the city. Until the 1970s, the area was used for military purposes.', de:'Der Parco del Cardeto ist der größte Stadtpark Anconas, eröffnet 2005. Auf den Klippen über dem Meer gelegen und von Natur umgeben, nimmt er die Gipfel des Monte Cappuccini und Monte Cardeto ein und erstreckt sich über etwa 35 Hektar, alles in unmittelbarer Nähe zum Zentrum. Er umfasst Orte von historischem Wert, eine natürliche Umgebung von großem Interesse und zahlreiche Panoramablicke auf die Steilküste und die Stadt. Bis in die 1970er Jahre wurde das Gebiet militärisch genutzt.', pl:'Parco del Cardeto to największy park miejski w Ankonie, otwarty w 2005 roku. Położony na klifach z widokiem na morze, otoczony przyrodą, zajmuje szczyty Monte Cappuccini i Monte Cardeto i rozciąga się na powierzchni około 35 hektarów, tuż przy centrum miasta. Obejmuje miejsca o wartości historycznej, środowisko naturalne o dużym znaczeniu i liczne punkty widokowe na wysokie wybrzeże i miasto. Do lat 70. XX wieku teren ten był wykorzystywany do celów wojskowych.', dist:'🌳 Parco cittadino', mapQuery:'Parco del Cardeto Ancona', lat:43.6222659, lng:13.5207122 },
@@ -406,124 +409,34 @@
         { id:'transport', icon:'🚌', it:'Trasporti', en:'Transport', de:'Verkehrsmittel', pl:'Transport' },
         { id:'contact', icon:'📞', it:'Contatti & Emergenze', en:'Contacts & Emergency', de:'Kontakt & Notfälle', pl:'Kontakt i alarmy' }
     ];
-
     const sectionHashMap = { 'apartment':0, 'mustsee':1, 'around':2, 'beaches':3, 'marche':4, 'restaurants':5, 'barpub':6, 'supermarkets':7, 'parking':8, 'transport':9, 'contact':10 };
 
     let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null;
     let placeDataMap = {}, _mapRetryCount = 0;
-    let gpsWatchId = null, gpsMarker = null, gpsCircle = null, gpsConsentGiven = null, gpsBoxCollapsed = false, deferredPrompt = null;
-    try { gpsConsentGiven = sessionStorage.getItem('gpsConsent'); } catch(e) {}
-    try {
-        const urlLang = new URLSearchParams(window.location.search).get('lang');
-        const stored = localStorage.getItem('guida_lang');
-        const valid = ['it','en','de','pl'];
-        if (urlLang && valid.includes(urlLang)) currentLang = urlLang;
-        else if (stored && valid.includes(stored)) currentLang = stored;
-    } catch(e) {}
 
-    function tr(it, en, de, pl) {
-        const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
-        return val || '';
-    }
+    function tr(it, en, de, pl) { return (currentLang==='en'?en||it:currentLang==='de'?de||en||it:currentLang==='pl'?pl||en||it:it)||''; }
     function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
-    document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }));
 
-    function getMapLink(query, noSuffix) { 
-        if (!query) return '#'; 
-        const q = noSuffix ? query : query + ', Ancona Italia'; 
-        return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); 
-    }
+    function getMapLink(query, noSuffix) { if (!query || typeof query !== 'string') return '#'; const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
     function getImgSearchUrl(p) { const q = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q); }
-
-    function getHoursBadge(p) {
-        if (!p.hours) return '';
-        // V4.2.1: rimosso badge colorato in tempo reale, mostra solo orari
-        let closedDaysStr = '';
-        const dayNames = { it:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'], en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], de:['So','Mo','Di','Mi','Do','Fr','Sa'], pl:['Nd','Pn','Wt','Śr','Cz','Pt','Sb'] };
-        const closedOn = p.closedOn || [];
-        if (closedOn.length) {
-            const dn = dayNames[currentLang] || dayNames.it;
-            closedDaysStr = ' · ' + tr('Chiuso il','Closed on','Geschlossen am','Zamknięte:') + ' ' + closedOn.map(d=>dn[d]).join(', ');
-        }
-        return '<div class="hours-text">🕐 ' + p.hours + closedDaysStr + '</div>';
-    }
-
-    function getCountdownHtml() {
-        try {
-            const co = new URLSearchParams(window.location.search).get('checkout');
-            if (!co || !/^\d{4}-\d{2}-\d{2}$/.test(co)) return '';
-            const target = new Date(co + 'T11:00:00+02:00'); // V4.2.1: timezone CEST
-            const now = new Date();
-            const diff = target - now;
-            if (diff <= 0 || diff > 7*24*3600*1000) return '';
-            const h = Math.floor(diff/3600000);
-            const m = Math.floor((diff%3600000)/60000);
-            const label = tr('Check-out tra','Check-out in','Check-out in','Wymeldowanie za');
-            const timeStr = h > 0 ? h+'h '+m+'m' : m+' min';
-            return '<div class="checkout-countdown"><div class="countdown-icon">🧳</div><div class="countdown-text"><div>'+label+'</div><div class="countdown-value">'+timeStr+'</div><div style="font-size:.62rem;margin-top:2px;opacity:.7">'+tr('entro le 11:00','by 11:00','bis 11:00 Uhr','do 11:00')+'</div></div></div>';
-        } catch(e) { return ''; }
-    }
-
+    function getHoursBadge(p) { if (!p.hours) return ''; return '<div class="hours-text">🕐 ' + p.hours + '</div>'; }
+    function getCountdownHtml() { try { const co = new URLSearchParams(window.location.search).get('checkout'); if (!co || !/^\d{4}-\d{2}-\d{2}$/.test(co)) return ''; const target = new Date(co + 'T11:00:00+02:00'); if (isNaN(target.getTime())) return ''; const now = new Date(); const diff = target - now; if (diff <= 0 || diff > 7*24*3600*1000) return ''; const h = Math.floor(diff/3600000); const m = Math.floor((diff%3600000)/60000); const label = tr('Check-out tra','Check-out in','Check-out in','Wymeldowanie za'); const timeStr = h > 0 ? h+'h '+m+'m' : m+' min'; return '<div class="checkout-countdown"><div class="countdown-icon">🧳</div><div class="countdown-text"><div>'+label+'</div><div class="countdown-value">'+timeStr+'</div><div style="font-size:.62rem;margin-top:2px;opacity:.7">'+tr('entro le 11:00','by 11:00','bis 11:00 Uhr','do 11:00')+'</div></div></div>'; } catch(e) { return ''; } }
+    function getOfflineBannerHtml() { if (!navigator.onLine) return ''; try { if (sessionStorage.getItem('offlineBannerSeen')) return ''; } catch(e) {} try { sessionStorage.setItem('offlineBannerSeen', '1'); } catch(e) {} return '<div class="home-social" style="background:linear-gradient(135deg, #1E4A70 0%, #0B1F33 100%); border-color: rgba(255,255,255,0.2);"><div style="display:flex; align-items:center; gap:10px;"><span style="font-size:1.5rem;">📡</span><div><div style="font-weight:600; font-size:0.8rem;">'+tr('Apri ora sotto Wi‑Fi','Open now on Wi‑Fi','Jetzt unter WLAN öffnen','Otwórz teraz przez Wi‑Fi')+'</div><div style="font-size:0.68rem; opacity:0.7; margin-top:2px;">'+tr('Poi funzionerà anche offline!','Then it will work offline too!','Dann funktioniert es auch offline!','Potem będzie działać również offline!')+'</div></div></div></div>'; }
+    function getMapOverlayHtml() { try { if (sessionStorage.getItem('mapOverlaySeen')) return ''; } catch(e) {} try { sessionStorage.setItem('mapOverlaySeen', '1'); } catch(e) {} return '<div class="home-map-overlay" id="home-map-overlay"><span class="tap-icon">🔍</span><span>'+tr('Tocca per ingrandire','Tap to enlarge','Zum Vergrößern tippen','Dotknij, aby powiększyć')+'</span></div>'; }
     function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
-
     function openSubItinerary(subId) { currentSubItinerary=subId; currentPlaceDetail=-1; placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
     function closeSubItinerary() { currentSubItinerary=null; currentPlaceDetail=-1; placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
-
-    function goTo(i) {
-        const targetId = i>=0 && sections[i] ? sections[i].id : null;
-        if((i===-1||(targetId&&NO_GPS_SECTIONS.includes(targetId)))&&gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;}
-        if(gpsMarker&&leafletMap)leafletMap.removeLayer(gpsMarker);
-        if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle);
-        gpsMarker=null;gpsCircle=null;
-        distSortActive=false;
-        currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={};
-        if(leafletMap){leafletMap.remove();leafletMap=null;}
-        try{const hash=i>=0&&sections[i]?'#'+sections[i].id:'';history.replaceState(null,'',hash||window.location.pathname);}catch(e){}
-        renderAll();window.scrollTo({top:0,behavior:'smooth'});
-    }
-
-    function selectPlaceDetail(i) {
-        const items=currentSubItinerary?(appData.subItineraries[currentSubItinerary]||[]):currentSectionPlaces;
-        const p=items[i];
-        if(p&&p.isSubItinerary&&p.subId){openSubItinerary(p.subId);return;}
-        currentPlaceDetail=i;
-        if(leafletMap){leafletMap.remove();leafletMap=null;}
-        renderAll();window.scrollTo({top:0,behavior:'smooth'});
-    }
-
+    function goTo(i) { const targetId = i>=0 && sections[i] ? sections[i].id : null; if((i===-1||(targetId&&NO_GPS_SECTIONS.includes(targetId)))&&gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;} if(gpsMarker&&leafletMap)leafletMap.removeLayer(gpsMarker); if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle); gpsMarker=null;gpsCircle=null; distSortActive=false; currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} try{const hash=i>=0&&sections[i]?'#'+sections[i].id:'';history.replaceState(null,'',hash||window.location.pathname);}catch(e){} renderAll();window.scrollTo({top:0,behavior:'smooth'}); }
+    function selectPlaceDetail(i) { const items=currentSubItinerary?(appData.subItineraries[currentSubItinerary]||[]):currentSectionPlaces; const p=items[i]; if(p&&p.isSubItinerary&&p.subId){openSubItinerary(p.subId);return;} currentPlaceDetail=i; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll();window.scrollTo({top:0,behavior:'smooth'}); }
     function backToMap(){currentPlaceDetail=-1;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
     function panToHome(){if(leafletMap)leafletMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],15);}
-
-    function getDisplayNumber(p,index){
-        if(currentSubItinerary)return String.fromCharCode(65+index);
-        if(typeof p.order==='string'&&p.order.indexOf('bis')>-1)return p.order.replace('-bis','b');
-        if(typeof p.order==='number')return p.order;
-        return index+1;
-    }
-
-    function getTotalDisplay(items,total){
-        if(!total||!items||!items.length)return 0;
-        if(currentSubItinerary)return String.fromCharCode(64+total);
-        const last=items[total-1];
-        if(last&&typeof last.order==='string'&&last.order.indexOf('bis')>-1)return last.order.replace('-bis','b');
-        if(last&&typeof last.order==='number')return last.order;
-        return total;
-    }
-
+    function getDisplayNumber(p,index){ if(currentSubItinerary)return String.fromCharCode(65+index); if(typeof p.order==='string'&&p.order.indexOf('bis')>-1)return p.order.replace('-bis','b'); if(typeof p.order==='number')return p.order; return index+1; }
+    function getTotalDisplay(items,total){ if(!total||!items||!items.length)return 0; if(currentSubItinerary)return String.fromCharCode(64+total); const last=items[total-1]; if(last&&typeof last.order==='string'&&last.order.indexOf('bis')>-1)return last.order.replace('-bis','b'); if(last&&typeof last.order==='number')return last.order; return total; }
     function sortMustSee(a,b){function toNum(val){if(typeof val==='string'&&val.indexOf('bis')>-1)return parseFloat(val.split('-')[0])+.5;return Number(val);}return toNum(a.order)-toNum(b.order);}
-
-    window._reachTexts={};
-    window._activeReachTab='auto';
-    window._toggleReach=function(type){
-        window._activeReachTab=type;
-        const contentEl=document.getElementById('reach-content');
-        if(contentEl)contentEl.innerHTML=window._reachTexts[type]||'';
-        document.querySelectorAll('.reach-sub-btn').forEach(b=>{
-            const isActive=b.dataset.reach===type;
-            b.classList.toggle('active',isActive);
-        });
-    };
+    window._reachTexts={}; window._activeReachTab='auto';
+    window._toggleReach=function(type){ window._activeReachTab=type; const contentEl=document.getElementById('reach-content'); if(contentEl)contentEl.innerHTML=window._reachTexts[type]||''; document.querySelectorAll('.reach-sub-btn').forEach(b=>{ const isActive=b.dataset.reach===type; b.classList.toggle('active',isActive); }); };
 
     function updateGpsUI(){
         const container=document.querySelector('.gps-container'),box=document.querySelector('.gps-box'),overlay=document.querySelector('.gps-icon-overlay');
@@ -554,19 +467,45 @@
     function toggleGpsTracking(){
         if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;if(gpsMarker&&leafletMap){leafletMap.removeLayer(gpsMarker);gpsMarker=null;}if(gpsCircle&&leafletMap){leafletMap.removeLayer(gpsCircle);gpsCircle=null;}updateGpsUI();return;}
         if(!navigator.geolocation){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>⚠️ '+tr('GPS non supportato','GPS not supported','GPS nicht unterstützt','GPS nieobsługiwany')+'</strong><br>'+tr('Il tuo dispositivo non supporta la geolocalizzazione.','Your device does not support geolocation.','Ihr Gerät unterstützt keine Geolokalisierung.','Twoje urządzenie nie obsługuje geolokalizacji.');if(btnsEl)btnsEl.innerHTML='';return;}
-        gpsWatchId=navigator.geolocation.watchPosition((position)=>{const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},(error)=>{const GPS_ERRORS={1:{it:'Permesso negato',en:'Permission denied',de:'Zugriff verweigert',pl:'Odmowa dostępu'},2:{it:'Posizione non disponibile',en:'Position unavailable',de:'Position nicht verfügbar',pl:'Pozycja niedostępna'},3:{it:'Timeout',en:'Timeout',de:'Zeitüberschreitung',pl:'Przekroczono czas'}};const err=GPS_ERRORS[error.code]||{it:'Errore sconosciuto',en:'Unknown error',de:'Unbekannter Fehler',pl:'Nieznany błąd'};const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>🔒 '+tr(err.it,err.en,err.de,err.pl)+'</strong><br>'+tr('Abilita i permessi di localizzazione nelle impostazioni del browser.','Enable location permissions in your browser settings.','Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.','Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.');if(btnsEl)btnsEl.innerHTML='';if(gpsWatchId!==null)toggleGpsTracking();}},{enableHighAccuracy:true,timeout:10000,maximumAge:2000});updateGpsUI();
+        gpsWatchId=navigator.geolocation.watchPosition((position)=>{
+            const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;
+            if(!leafletMap)return;
+            if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}
+            if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);
+            updateGpsUI();
+        },(error)=>{
+            const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');
+            let msg='';
+            switch(error.code){
+                case error.PERMISSION_DENIED: msg='<strong>🔒 '+tr('Accesso GPS negato','GPS access denied','GPS-Zugriff verweigert','Odmowa dostępu GPS')+'</strong><br>'+tr('Abilita i permessi di localizzazione nelle impostazioni del browser.','Enable location permissions in your browser settings.','Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.','Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.');break;
+                case error.POSITION_UNAVAILABLE: msg='<strong>📍 '+tr('Segnale GPS non disponibile','GPS signal unavailable','GPS-Signal nicht verfügbar','Sygnał GPS niedostępny')+'</strong><br>'+tr('Spostati all\'aperto o vicino a una finestra.','Move outdoors or near a window.','Gehen Sie ins Freie oder in die Nähe eines Fensters.','Przejdź na zewnątrz lub w pobliże okna.');break;
+                case error.TIMEOUT: msg='<strong>⏳ '+tr('Timeout GPS','GPS timeout','GPS-Timeout','Limit czasu GPS')+'</strong><br>'+tr('Il rilevamento sta impiegando troppo tempo. Riprova.','Detection is taking too long. Try again.','Die Erkennung dauert zu lange. Versuchen Sie es erneut.','Wykrywanie trwa zbyt długo. Spróbuj ponownie.');break;
+                default: msg='<strong>⚠️ '+tr('Errore GPS sconosciuto','Unknown GPS error','Unbekannter GPS-Fehler','Nieznany błąd GPS')+'</strong>';
+            }
+            if(textEl)textEl.innerHTML=msg; if(btnsEl)btnsEl.innerHTML=''; if(gpsWatchId!==null)toggleGpsTracking();
+        },{enableHighAccuracy:true,timeout:10000,maximumAge:2000});
+        updateGpsUI();
+        if(leafletMap && currentSection>=0 && !NO_GPS_SECTIONS.includes(sections[currentSection].id)){
+            if(gpsMarker)gpsMarker.addTo(leafletMap); if(gpsCircle)gpsCircle.addTo(leafletMap);
+        }
     }
 
-    // === FULLSCREEN MAP FUNCTIONS ===
-    function openFullscreenMap() {
-        if (isFullscreenOpening) return;
-        isFullscreenOpening = true;
-        
-        const overlay = document.getElementById('map-fullscreen-overlay');
-        if (!overlay) {
-            isFullscreenOpening = false;
-            return;
+    function destroyFullscreenMap(){
+        if(fullscreenMapInstance){
+            if(fullscreenMapInstance._resizeHandler){
+                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
+                fullscreenMapInstance._resizeHandler = null;
+            }
+            fullscreenMapInstance.remove();
+            fullscreenMapInstance = null;
         }
+    }
+
+    function openFullscreenMap() {
+        if(isFullscreenOpening) return;
+        isFullscreenOpening = true;
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (!overlay) return;
         
         fsIsHome = (currentSection === -1);
         fsSubItineraryId = currentSubItinerary || null;
@@ -576,8 +515,8 @@
         } else {
             const places = currentSectionPlaces || [];
             fsStoredPlaces = places
-                .filter(p => p && p.lat !== undefined && p.lng !== undefined && p.lat !== null && p.lng !== null)
-                .map((p, idx) => {
+                .filter(p => p && p.lat !== undefined && p.lat !== null && p.lng !== undefined && p.lng !== null)
+                .map(p => {
                     const copy = { ...p };
                     copy._originalIndex = places.indexOf(p);
                     return copy;
@@ -609,32 +548,21 @@
     }
 
     function closeFullscreenMap() {
+        isFullscreenOpening = false;
         const overlay = document.getElementById('map-fullscreen-overlay');
         if (!overlay) return;
         
         overlay.classList.remove('active');
         document.body.style.overflow = '';
-        
         destroyFullscreenMap();
         fsStoredPlaces = [];
         fsIsHome = false;
         fsSubItineraryId = null;
     }
 
-    function destroyFullscreenMap() {
-        if (!fullscreenMapInstance) return;
-        if (fullscreenMapInstance._resizeHandler) {
-            window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
-        }
-        fullscreenMapInstance.remove();
-        fullscreenMapInstance = null;
-    }
-
     function initFullscreenMap() {
         const overlay = document.getElementById('map-fullscreen-overlay');
-        if (!overlay || !overlay.classList.contains('active')) {
-            return;
-        }
+        if (!overlay || !overlay.classList.contains('active')) return;
         
         const el = document.getElementById('fullscreenMap');
         if (!el) return;
@@ -725,7 +653,7 @@
         try {
             if (gpsWatchId !== null && gpsMarker && typeof gpsMarker.getLatLng === 'function') {
                 const gpsLatLng = gpsMarker.getLatLng();
-                if (gpsLatLng && gpsLatLng.lat !== undefined && gpsLatLng.lng !== undefined && gpsLatLng.lat !== null && gpsLatLng.lng !== null) {
+                if (gpsLatLng && gpsLatLng.lat && gpsLatLng.lng) {
                     const gpsIcon = L.divIcon({
                         html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',
                         className: '',
@@ -738,9 +666,7 @@
                     }).addTo(fullscreenMapInstance);
                 }
             }
-        } catch(e) {
-            console.warn('[Fullscreen] Errore GPS:', e.message);
-        }
+        } catch(e) {}
         
         setTimeout(() => {
             if (fullscreenMapInstance) {
@@ -752,17 +678,9 @@
             if (fullscreenMapInstance) {
                 fullscreenMapInstance.invalidateSize();
             }
-        }, 150);
+        }, 250);
         window.addEventListener('resize', resizeHandler);
         fullscreenMapInstance._resizeHandler = resizeHandler;
-    }
-
-    function debounce(fn, ms) {
-        let t;
-        return function() {
-            clearTimeout(t);
-            t = setTimeout(fn, ms);
-        };
     }
 
     function initFullscreenListeners() {
@@ -821,13 +739,16 @@
         const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const countdownHtml=getCountdownHtml();
-        const offlineBannerHtml = '<div class="offline-banner"><div class="offline-banner-icon">📴</div><div>'+tr('Apri questa pagina con il Wi-Fi per usarla anche offline.','Open this page with Wi-Fi to use it offline too.','Öffnen Sie diese Seite mit WLAN, um sie auch offline nutzen zu können.','Otwórz tę stronę z Wi-Fi, aby korzystać z niej również offline.')+'</div></div>';
-        const staticMapHtml='<div class="home-map-wrap" id="home-static-map"><div class="home-map-overlay"><div class="home-map-overlay-text">🔍 '+tr('Tocca per ingrandire','Tap to enlarge','Zum Vergrößern tippen','Dotknij, aby powiększyć')+'</div></div></div>';
+        const offlineBannerHtml=getOfflineBannerHtml();
+        const mapOverlayHtml=getMapOverlayHtml();
+        const staticMapHtml='<div class="home-map-container"><div class="home-map-wrap" id="home-static-map"></div>'+mapOverlayHtml+'</div>';
         const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+offlineBannerHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
         cont.innerHTML=html;
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
+        const overlayEl=document.getElementById('home-map-overlay');
+        if(overlayEl){overlayEl.addEventListener('click',function(e){e.stopPropagation();this.style.display='none';openFullscreenMap();});}
         setTimeout(()=>{
             const mapEl=document.getElementById('home-static-map');
             if(!mapEl||typeof L==='undefined')return;
@@ -835,14 +756,7 @@
             homeStaticMap=L.map('home-static-map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(homeStaticMap);
             homeStaticMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],16);
-            
-            if (homeStaticMap) {
-                homeStaticMap.on('click', function() {
-                    openFullscreenMap();
-                });
-                mapEl.style.cursor = 'pointer';
-            }
-            
+            if(homeStaticMap){homeStaticMap.on('click',function(){openFullscreenMap();});mapEl.style.cursor='pointer';}
             const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14]});
             L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon}).addTo(homeStaticMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem">📍 Piazza Roma 3</span>').openPopup();
         },0);
@@ -950,40 +864,13 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(leafletMap);
         const bounds=[];
         valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
-            m.on('click',function(){
-                document.querySelectorAll('.map-marker-num').forEach(el=>el.classList.remove('selected'));
-                this.getElement().querySelector('.map-marker-num')?.classList.add('selected');
-                selectPlaceDetail(idx);
-            });
-            bounds.push([p.lat,p.lng]);
-        });
+        m.on('click',function(){document.querySelectorAll('.map-marker-num').forEach(el=>el.classList.remove('selected'));this.getElement().querySelector('.map-marker-num')?.classList.add('selected');selectPlaceDetail(idx);});
+        bounds.push([p.lat,p.lng]);});
         if(bounds.length)leafletMap.fitBounds(bounds,{padding:[22,22]});
-        
-        if (leafletMap) {
-            leafletMap.on('click', function() {
-                openFullscreenMap();
-            });
-            el.style.cursor = 'pointer';
-        }
-        
+        if(leafletMap){leafletMap.on('click',function(){openFullscreenMap();});el.style.cursor='pointer';}
         const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]});
         L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
-        
-        // V4.2.1: aggiungi GPS marker se già attivo
-        try {
-            if (gpsWatchId !== null && gpsMarker && typeof gpsMarker.getLatLng === 'function') {
-                const ll = gpsMarker.getLatLng();
-                if (ll && ll.lat !== undefined && ll.lng !== undefined && ll.lat !== null && ll.lng !== null) {
-                    const gpsIcon = L.divIcon({
-                        html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',
-                        className: '',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    });
-                    L.marker([ll.lat, ll.lng], { icon: gpsIcon, zIndexOffset: 2000 }).addTo(leafletMap);
-                }
-            }
-        } catch(e) {}
+        if(gpsWatchId!==null&&gpsMarker&&gpsCircle){gpsMarker.addTo(leafletMap);gpsCircle.addTo(leafletMap);}
     }
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
@@ -1012,6 +899,6 @@
     initFullscreenListeners();
     renderAll();
     setTimeout(updateGpsUI,300);
-    </script>
+</script>
 </body>
 </html>
