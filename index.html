@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 24/06/26 21:00 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 25/06/26 09:00 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -206,9 +206,9 @@
         /* === MAPPA FULL-SCREEN OVERLAY === */
         .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
         .map-fullscreen-overlay.active{display:flex;opacity:1}
-        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative;pointer-events:auto;isolation:isolate}
         .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
-        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;z-index:1002;position:relative;-webkit-tap-highlight-color:rgba(200,164,90,.3);touch-action:manipulation}
+        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;z-index:1002;position:relative;pointer-events:auto;-webkit-tap-highlight-color:rgba(200,164,90,.3);touch-action:manipulation;-webkit-appearance:none;appearance:none}
         .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
         .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
         .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
@@ -229,7 +229,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.1 · <span id="release-time">24/06/26 21:00</span></div>
+                <div class="version-info">V4.2.1 · <span id="release-time">25/06/26 09:00</span></div>
             </div>
         </div>
     </header>
@@ -601,7 +601,24 @@
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         isFullscreenOpening = false; // guard rilasciato dopo apertura effettiva
-        
+
+        // Fix iPhone V4.2.1: il bottone close riceve listener ad ogni apertura
+        // (non solo alla prima) perché su iOS il touchend è necessario esplicitamente
+        const closeBtn = document.getElementById('map-fs-close');
+        if (closeBtn) {
+            const _handler = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeBtn.removeEventListener('touchend', _handler);
+                closeBtn.removeEventListener('click', _handler);
+                closeFullscreenMap();
+            };
+            closeBtn.removeEventListener('touchend', _handler);
+            closeBtn.removeEventListener('click', _handler);
+            closeBtn.addEventListener('touchend', _handler, { passive: false });
+            closeBtn.addEventListener('click', _handler);
+        }
+
         requestAnimationFrame(() => {
             initFullscreenMap();
         });
@@ -746,11 +763,8 @@
     function initFullscreenListeners() {
         if (fsListenersInitialized) return;
         fsListenersInitialized = true;
-        
-        const closeBtn = document.getElementById('map-fs-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', closeFullscreenMap);
-        }
+        // Nota: il listener del close button è agganciato in openFullscreenMap
+        // ad ogni apertura con touchend+click espliciti per compatibilità iOS
         
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
