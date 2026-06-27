@@ -1,10 +1,13 @@
-// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.1.2
+// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.2.1
 // FIX CRIT-4: fallback offline restituisce Response valida invece di undefined
 // FIX CRIT-5: cache name allineato alla versione app
 // FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate
 // FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
+// V4.2.1 25/06/26 09:10: postMessage 'SW_UPDATED' quando nuova versione disponibile
+// FIX #8  V4.2.1 27/06/26: delay 1500ms in notifyClientsUpdated per dare tempo ai client di registrare il listener
+// FIX #10 V4.2.1 27/06/26: tile fallback restituisce 404 senza Content-Type invece di body vuoto con image/png
 
-const CACHE_NAME = 'ancona-guida-v4.1.2';
+const CACHE_NAME = 'ancona-guida-v4.2.1-1610';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 
@@ -38,39 +41,42 @@ async function trimTilesCache() {
     }
 }
 
+// FIX #8 V4.2.1 27/06/26: delay 1500ms per dare tempo ai client appena caricati
+// di registrare il listener 'message' prima che il messaggio SW_UPDATED venga inviato.
+// Senza delay il messaggio viene spedito durante activate+claim, troppo presto per
+// le pagine che stanno ancora inizializzando il proprio JS.
+async function notifyClientsUpdated() {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clients) {
+        client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+    }
+}
+
 self.addEventListener('install', (event) => {
-    console.log('🔄 Service Worker: installazione in corso...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('✅ Cache aperta, salvataggio assets...');
                 return cache.addAll(ASSETS_TO_CACHE).catch(err => {
-                    console.warn('⚠️ Alcuni assets non sono stati cachati:', err);
+                    console.warn('⚠️ Alcuni assets non cachati:', err);
                 });
             })
-            .then(() => {
-                console.log('✅ Installazione completata');
-                return self.skipWaiting();
-            })
+            .then(() => self.skipWaiting())
     );
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('🔄 Service Worker: attivazione');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME && cacheName !== TILES_CACHE_NAME) {
-                        console.log('🗑️ Rimozione vecchia cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        }).then(() => {
-            console.log('✅ Attivazione completata');
-            return self.clients.claim();
-        })
+        }).then(() => self.clients.claim())
+        .then(() => notifyClientsUpdated())
     );
 });
 
@@ -82,6 +88,7 @@ self.addEventListener('fetch', (event) => {
     if (url.hostname.includes('google-analytics.com') ||
         url.hostname.includes('facebook.com/tr')) return;
 
+    // HTML: Stale-While-Revalidate — serve cache subito, aggiorna in background
     if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname === './') {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
@@ -102,38 +109,36 @@ self.addEventListener('fetch', (event) => {
 
     if (url.hostname.includes('tile.openstreetmap.org')) {
         event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    if (cachedResponse) return cachedResponse;
-                    return fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(TILES_CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                            trimTilesCache();
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503, headers: { 'Content-Type': 'image/png' } });
+            caches.match(event.request).then((cachedResponse) => {
+                if (cachedResponse) return cachedResponse;
+                return fetch(event.request).then((response) => {
+                    const responseClone = response.clone();
+                    caches.open(TILES_CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                        trimTilesCache();
                     });
-                })
+                    return response;
+                }).catch(() => {
+                    // FIX #10 V4.2.1 27/06/26: restituisce 404 senza Content-Type
+                    // invece di body vuoto con 'image/png', che causa errori di decodifica
+                    // PNG in Leaflet. Con 404, Leaflet gestisce il tile mancante con il
+                    // suo fallback nativo senza errori silenziosi nel canvas.
+                    return new Response('', { status: 404 });
+                });
+            })
         );
         return;
     }
 
     if (url.hostname.includes('raw.githubusercontent.com')) {
         event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    return cachedResponse || fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503 });
-                    });
-                })
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request).then((response) => {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => { cache.put(event.request, responseClone); });
+                    return response;
+                }).catch(() => new Response('', { status: 503 }));
+            })
         );
         return;
     }
@@ -141,36 +146,26 @@ self.addEventListener('fetch', (event) => {
     if (url.hostname.includes('fonts.googleapis.com') ||
         url.hostname.includes('fonts.gstatic.com')) {
         event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    return cachedResponse || fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503 });
-                    });
-                })
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request).then((response) => {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => { cache.put(event.request, responseClone); });
+                    return response;
+                }).catch(() => new Response('', { status: 503 }));
+            })
         );
         return;
     }
 
     if (url.hostname.includes('unpkg.com')) {
         event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    return cachedResponse || fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503 });
-                    });
-                })
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request).then((response) => {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => { cache.put(event.request, responseClone); });
+                    return response;
+                }).catch(() => new Response('', { status: 503 }));
+            })
         );
         return;
     }
@@ -179,9 +174,7 @@ self.addEventListener('fetch', (event) => {
         fetch(event.request)
             .then((response) => {
                 const responseClone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseClone);
-                });
+                caches.open(CACHE_NAME).then((cache) => { cache.put(event.request, responseClone); });
                 return response;
             })
             .catch(() => {

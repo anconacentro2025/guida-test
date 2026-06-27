@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 25/06/26 09:00 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 27/06/26 16:10 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.1</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.1 27/06/26 16:10</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.1">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.1 27/06/26 16:10">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -28,7 +28,7 @@
         body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
         a{color:inherit;text-decoration:none}
         button{font-family:'Outfit',sans-serif;cursor:pointer}
-        .header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.30)}
+        .header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.30);padding-top:env(safe-area-inset-top,0px)}
         .header-inner{display:flex;align-items:center;justify-content:space-between;padding:13px max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-left:max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-right:max(28px,calc(env(safe-area-inset-right,0px)+18px));border-bottom:1px solid rgba(200,164,90,.18)}
         .header-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;line-height:1.15;color:var(--white)}
         .header-sub{font-size:.65rem;font-weight:300;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
@@ -206,12 +206,21 @@
         /* === MAPPA FULL-SCREEN OVERLAY === */
         .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
         .map-fullscreen-overlay.active{display:flex;opacity:1}
-        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative;pointer-events:auto;isolation:isolate}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative;pointer-events:auto;isolation:isolate}
         .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
         .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;z-index:1002;position:relative;pointer-events:auto;-webkit-tap-highlight-color:rgba(200,164,90,.3);touch-action:manipulation;-webkit-appearance:none;appearance:none}
         .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
         .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
         .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
+
+        /* === BANNER AGGIORNAMENTO SW === */
+        #sw-update-banner{position:fixed;bottom:0;left:0;right:0;z-index:10000;background:var(--navy);border-top:2px solid var(--gold);padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.25);animation:slideUp .3s ease}
+        #sw-update-banner.visible{display:flex}
+        #sw-update-banner .sw-banner-text{font-size:.82rem;color:var(--white);line-height:1.4}
+        #sw-update-banner .sw-banner-text strong{color:var(--gold);display:block;margin-bottom:2px}
+        #sw-update-banner .sw-banner-btn{background:var(--gold);color:var(--navy);border:none;padding:9px 20px;border-radius:22px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;touch-action:manipulation;-webkit-appearance:none;flex-shrink:0}
+        #sw-update-banner .sw-banner-btn:active{transform:scale(.95)}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     </style>
 </head>
 <body>
@@ -229,7 +238,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.1 · <span id="release-time">25/06/26 09:00</span></div>
+                <div class="version-info">V4.2.1 · <span id="release-time">27/06/26 16:10</span></div>
             </div>
         </div>
     </header>
@@ -251,7 +260,16 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.1 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.1 27/06/26 16:10 · All rights reserved</div>
+
+    <!-- BANNER AGGIORNAMENTO SW -->
+    <div id="sw-update-banner" role="alert" aria-live="polite">
+        <div class="sw-banner-text">
+            <strong>🔄 Aggiornamento disponibile</strong>
+            Nuova versione della guida pronta.
+        </div>
+        <button class="sw-banner-btn" id="sw-update-btn">Aggiorna</button>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -264,6 +282,9 @@
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
     let distSortActive = false;
     let homeStaticMap = null;
+    let _countdownInterval = null; // FIX #5 V4.2.1 27/06/26: refresh countdown ogni minuto
+    // FIX #A V4.2.1 27/06/26: dirty flag per evitare re-render identici in renderAll
+    let _rf_lang = null, _rf_section = null, _rf_sub = null, _rf_detail = null, _rf_distSort = null;
 
     // === FULLSCREEN MAP VARIABLES ===
     let fullscreenMapInstance = null;
@@ -272,6 +293,7 @@
     let fsIsHome = false;
     let fsSubItineraryId = null;
     let fsListenersInitialized = false;
+    let _fsCloseHandler = null; // FIX #4 V4.2.1 27/06/26: handler persistente per evitare accumulo listener
 
     // Item 1 V4.2.1: debounce utility – previene chiamate ravvicinate (es. resize)
     function debounce(fn, delay) { let timer; return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); }; }
@@ -422,7 +444,7 @@
         const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
         return val || '';
     }
-    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
+    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} _rf_lang=null; /* FIX #A: invalida dirty flag per forzare re-render */ renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
     // Item 4 V4.2.1: controllo query undefined/null prima di encodeURIComponent
@@ -540,7 +562,13 @@
     function toggleGpsTracking(){
         if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;if(gpsMarker&&leafletMap){leafletMap.removeLayer(gpsMarker);gpsMarker=null;}if(gpsCircle&&leafletMap){leafletMap.removeLayer(gpsCircle);gpsCircle=null;}updateGpsUI();return;}
         if(!navigator.geolocation){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>⚠️ '+tr('GPS non supportato','GPS not supported','GPS nicht unterstützt','GPS nieobsługiwany')+'</strong><br>'+tr('Il tuo dispositivo non supporta la geolocalizzazione.','Your device does not support geolocation.','Ihr Gerät unterstützt keine Geolokalisierung.','Twoje urządzenie nie obsługuje geolokalizacji.');if(btnsEl)btnsEl.innerHTML='';return;}
-        gpsWatchId=navigator.geolocation.watchPosition((position)=>{const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},
+        // FIX #1 V4.2.1 27/06/26: throttle 4s per ridurre consumo batteria GPS
+        let _lastGpsUpdate = 0;
+        gpsWatchId=navigator.geolocation.watchPosition((position)=>{
+            const now=Date.now();
+            if(now-_lastGpsUpdate<4000)return; // throttle: ignora aggiornamenti più veloci di 4s
+            _lastGpsUpdate=now;
+            const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},
         // Item 9 V4.2.1: messaggi GPS specifici per ogni codice di errore
         (error)=>{
             const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');
@@ -555,7 +583,7 @@
             }
             if(textEl&&msg)textEl.innerHTML=msg;
             if(btnsEl&&error.code===error.PERMISSION_DENIED)btnsEl.innerHTML='';
-        },{enableHighAccuracy:true,timeout:10000,maximumAge:2000});updateGpsUI();
+        },{enableHighAccuracy:true,timeout:10000,maximumAge:5000});updateGpsUI();
     }
 
     // === FULLSCREEN MAP FUNCTIONS ===
@@ -602,21 +630,23 @@
         document.body.style.overflow = 'hidden';
         isFullscreenOpening = false; // guard rilasciato dopo apertura effettiva
 
-        // Fix iPhone V4.2.1: il bottone close riceve listener ad ogni apertura
-        // (non solo alla prima) perché su iOS il touchend è necessario esplicitamente
+        // FIX #4 V4.2.1 27/06/26: handler persistente — removeEventListener funziona solo se
+        // si rimuove la stessa istanza di funzione. La versione precedente creava _handler
+        // come nuova funzione ad ogni apertura, rendendo il removeEventListener un no-op
+        // e accumulando N listener touchend/click dopo N aperture del fullscreen.
         const closeBtn = document.getElementById('map-fs-close');
         if (closeBtn) {
-            const _handler = function(e) {
+            if (_fsCloseHandler) {
+                closeBtn.removeEventListener('touchend', _fsCloseHandler);
+                closeBtn.removeEventListener('click', _fsCloseHandler);
+            }
+            _fsCloseHandler = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                closeBtn.removeEventListener('touchend', _handler);
-                closeBtn.removeEventListener('click', _handler);
                 closeFullscreenMap();
             };
-            closeBtn.removeEventListener('touchend', _handler);
-            closeBtn.removeEventListener('click', _handler);
-            closeBtn.addEventListener('touchend', _handler, { passive: false });
-            closeBtn.addEventListener('click', _handler);
+            closeBtn.addEventListener('touchend', _fsCloseHandler, { passive: false });
+            closeBtn.addEventListener('click', _fsCloseHandler);
         }
 
         requestAnimationFrame(() => {
@@ -783,10 +813,36 @@
         }
     }
 
+    // FIX #5 V4.2.1 27/06/26: aggiorna il countdown ogni minuto senza re-render completo
+    function startCountdownRefresh() {
+        clearInterval(_countdownInterval);
+        _countdownInterval = setInterval(function() {
+            if (currentSection !== -1) { clearInterval(_countdownInterval); return; }
+            const el = document.querySelector('.checkout-countdown');
+            if (!el) { clearInterval(_countdownInterval); return; }
+            const newHtml = getCountdownHtml();
+            if (newHtml) {
+                const temp = document.createElement('div');
+                temp.innerHTML = newHtml;
+                el.outerHTML = temp.firstElementChild ? temp.innerHTML : newHtml;
+            } else {
+                el.remove();
+                clearInterval(_countdownInterval);
+            }
+        }, 60000);
+    }
+
     function renderAll(){
+        // FIX #A V4.2.1 27/06/26: skip re-render se nessuno stato rilevante è cambiato
+        const _same = (_rf_lang===currentLang && _rf_section===currentSection && _rf_sub===currentSubItinerary && _rf_detail===currentPlaceDetail && _rf_distSort===distSortActive);
+        if(_same) return;
+        _rf_lang=currentLang; _rf_section=currentSection; _rf_sub=currentSubItinerary; _rf_detail=currentPlaceDetail; _rf_distSort=distSortActive;
+
         document.getElementById('header-sub').textContent=tr(headerSubTr.it,headerSubTr.en,headerSubTr.de,headerSubTr.pl);
         document.documentElement.lang=currentLang;
         const hero=document.getElementById('hero'),nav=document.getElementById('nav'),cont=document.getElementById('content');
+        // FIX #5 V4.2.1 27/06/26: ferma il countdown refresh quando non si è più in home
+        if(currentSection!==-1) clearInterval(_countdownInterval);
         if(currentSection===-1&&leafletMap){if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;if(gpsMarker)leafletMap.removeLayer(gpsMarker);if(gpsCircle)leafletMap.removeLayer(gpsCircle);gpsMarker=null;gpsCircle=null;}leafletMap.remove();leafletMap=null;}
         hero.classList.toggle('section-mode',currentSection!==-1);
         if(currentSection===-1){nav.style.display='none';renderHome();return;}
@@ -816,6 +872,8 @@
         const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
         const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
         cont.innerHTML=html;
+        // FIX #5 V4.2.1 27/06/26: avvia refresh countdown se presente
+        if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
@@ -969,16 +1027,32 @@
     }
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
-        navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
-            reg.addEventListener('updatefound',()=>{
-                // Bug fix V4.2.1: rimosso listener statechange con reload,
-                // il reload è gestito unicamente da controllerchange sotto
-                // per evitare doppio window.location.reload()
-            });
-        }).catch(()=>{});
+        navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+
+        // Ascolta il messaggio SW_UPDATED inviato dal sw.js dopo activate+claim
+        navigator.serviceWorker.addEventListener('message',(event)=>{
+            if(event.data && event.data.type==='SW_UPDATED'){
+                const banner=document.getElementById('sw-update-banner');
+                const btn=document.getElementById('sw-update-btn');
+                if(banner) banner.classList.add('visible');
+                if(btn){
+                    const _tap=function(e){
+                        e.preventDefault();
+                        btn.removeEventListener('touchend',_tap);
+                        btn.removeEventListener('click',_tap);
+                        window.location.reload();
+                    };
+                    btn.addEventListener('touchend',_tap,{passive:false});
+                    btn.addEventListener('click',_tap);
+                }
+            }
+        });
+
+        // Fallback: controllerchange per browser che non supportano postMessage dal SW
         let refreshing=false;
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-            if(!refreshing){refreshing=true;window.location.reload();}
+            // Non ricaricare automaticamente — mostra il banner invece
+            // (il reload automatico è rimosso: disturba l'utente mentre naviga)
         });
     });
     window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='inline-flex';});
