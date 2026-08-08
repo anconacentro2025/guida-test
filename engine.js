@@ -11,7 +11,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.0-05080000';
+    const APP_CACHE_NAME = 'ancona-guida-v6.1-05080100';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1122,4 +1122,79 @@
     initFullscreenListeners();
     renderAll();
     setTimeout(()=>updateGpsUIFor(gpsState),300);
+
+    // V6.1: pannello diagnostico cache — raggiungibile aggiungendo ?debug=cache all'URL
+    // dell'app (es. https://tuosito.it/index.html?debug=cache). Utile per verificare da
+    // iPhone/iPad, senza Mac né strumenti sviluppatore, cosa contiene davvero la cache
+    // persistente ancona-guida-appfiles (dove vivono data.js/engine.js) e lo stato del
+    // service worker. Non è raggiungibile dalla normale navigazione dell'app.
+    async function renderCacheDebugPanel(){
+        const overlay=document.createElement('div');
+        overlay.style.cssText='position:fixed;inset:0;background:#0B1F33;color:#fff;z-index:99999;overflow-y:auto;padding:20px;padding-top:calc(20px + env(safe-area-inset-top,0px));font-family:monospace;font-size:12.5px;line-height:1.6;-webkit-font-smoothing:antialiased';
+        overlay.innerHTML='<h2 style="color:#C8A45A;font-family:sans-serif;margin-bottom:4px">🔍 Diagnostica Cache</h2><div style="opacity:.6;margin-bottom:16px;font-family:sans-serif;font-size:12px">Ancona Centro · '+APP_CACHE_NAME+'</div><div id="debug-content">Caricamento…</div><div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap"><button id="debug-close" style="padding:10px 18px;background:#C8A45A;color:#0B1F33;border:none;border-radius:8px;font-weight:700;font-family:sans-serif">Chiudi</button><button id="debug-reload" style="padding:10px 18px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;font-weight:700;font-family:sans-serif">Ricarica pagina</button><button id="debug-clear" style="padding:10px 18px;background:rgba(220,60,60,.25);color:#fff;border:1px solid rgba(220,60,60,.5);border-radius:8px;font-weight:700;font-family:sans-serif">Svuota tutte le cache</button></div>';
+        document.body.appendChild(overlay);
+        document.getElementById('debug-close').addEventListener('click',()=>overlay.remove());
+        document.getElementById('debug-reload').addEventListener('click',()=>location.reload());
+        document.getElementById('debug-clear').addEventListener('click',async()=>{
+            const names=await caches.keys();
+            for(const n of names) await caches.delete(n);
+            if(navigator.serviceWorker){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.unregister();}
+            alert('Cache svuotate e service worker disinstallato. Ricarica la pagina per reinstallarlo da zero.');
+        });
+
+        const contentEl=document.getElementById('debug-content');
+        let html='';
+
+        html+='<h3 style="color:#E2C07A;font-family:sans-serif">Service Worker</h3>';
+        if('serviceWorker' in navigator){
+            const reg=await navigator.serviceWorker.getRegistration();
+            if(reg){
+                html+='<div>Registrato: ✅</div>';
+                html+='<div>Scope: '+reg.scope+'</div>';
+                html+='<div>Active: '+(reg.active?('✅ state='+reg.active.state):'❌ nessuno')+'</div>';
+                html+='<div>Waiting (aggiornamento in coda): '+(reg.waiting?'⚠️ presente':'nessuno')+'</div>';
+                html+='<div>Installing: '+(reg.installing?'⏳ in corso':'nessuno')+'</div>';
+            } else {
+                html+='<div>❌ Nessun service worker registrato per questa pagina</div>';
+            }
+        } else {
+            html+='<div>❌ Service Worker non supportato da questo browser</div>';
+        }
+
+        html+='<h3 style="color:#E2C07A;font-family:sans-serif;margin-top:20px">Cache Storage</h3>';
+        try{
+            const cacheNames=await caches.keys();
+            if(!cacheNames.length) html+='<div>Nessuna cache trovata.</div>';
+            for(const name of cacheNames){
+                const isAppFiles=(name===APP_FILES_CACHE_NAME_FOR_DEBUG);
+                html+='<div style="margin-top:12px;padding:10px;border-radius:8px;background:'+(isAppFiles?'rgba(200,164,90,.15)':'rgba(255,255,255,.05)')+';border:1px solid '+(isAppFiles?'#C8A45A':'rgba(255,255,255,.15)')+'">';
+                html+='<div style="font-weight:700;color:'+(isAppFiles?'#E2C07A':'#fff')+';font-family:sans-serif">'+(isAppFiles?'⭐ ':'')+name+'</div>';
+                const cache=await caches.open(name);
+                const requests=await cache.keys();
+                html+='<div style="font-size:11px;opacity:.7;margin-top:4px;font-family:sans-serif">'+requests.length+' elementi</div>';
+                if(isAppFiles||requests.length<=15){
+                    html+='<ul style="margin:6px 0 0;padding-left:18px">';
+                    for(const req of requests){
+                        const u=new URL(req.url);
+                        html+='<li style="word-break:break-all">'+u.pathname+u.search+'</li>';
+                    }
+                    html+='</ul>';
+                }
+                html+='</div>';
+            }
+        }catch(e){
+            html+='<div>Errore leggendo le cache: '+e.message+'</div>';
+        }
+
+        contentEl.innerHTML=html;
+    }
+
+    // Nome della cache persistente (deve combaciare con APP_FILES_CACHE_NAME in sw.js;
+    // duplicato qui solo per evidenziarla nel pannello, nessuna dipendenza funzionale da sw.js).
+    const APP_FILES_CACHE_NAME_FOR_DEBUG='ancona-guida-appfiles';
+    try{
+        if(new URLSearchParams(window.location.search).get('debug')==='cache'){
+            window.addEventListener('load',renderCacheDebugPanel);
+        }
+    }catch(e){}
     
