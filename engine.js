@@ -1,8 +1,9 @@
+// ===== V6.5 · 09/08/26 14:45 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
-// Versione motore: v1 — bump solo quando si modifica la logica in questo file, indipendente
+// Versione motore: v4 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
     const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo'];
     const HOST_PHONE = '3356750269';
@@ -11,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.1-05080100';
+    const APP_CACHE_NAME = 'ancona-guida-v6.5-09081445';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -781,9 +782,20 @@
         const desc=tr(p.it,p.en,p.de,p.pl);
         const hoursBadge=getHoursBadge(p);
         const priceBadge=p.price?'<span class="price-badge" aria-label="Fascia di prezzo">'+p.price+'</span>':'';
+        // V6.3: galleria multi-foto (max 4) — p.photos è un array; p.photo (singolare) è
+        // mantenuto solo come fallback di compatibilità nel caso residuasse in qualche voce.
+        const photos=(p.photos&&p.photos.length?p.photos:(p.photo?[p.photo]:[])).slice(0,4);
         let photoHtml;
-        if(p.photo){const src=PHOTO_BASE+p.photo;photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" loading="lazy" id="img_'+index+'"></div>';}
-        else photoHtml='<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
+        if(photos.length){
+            let slidesHtml='';
+            photos.forEach((filename,i)=>{
+                const src=PHOTO_BASE+filename;
+                slidesHtml+='<div class="gallery-slide"><div class="detail-photo-placeholder" id="ph_'+index+'_'+i+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+' '+(i+1)+'" loading="lazy" id="img_'+index+'_'+i+'"></div>';
+            });
+            const dotsHtml=photos.length>1?('<div class="gallery-dots" id="dots_'+index+'">'+photos.map((_,i)=>'<span class="dot'+(i===0?' active':'')+'" data-idx="'+i+'"></span>').join('')+'</div>'):'';
+            photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-gallery" id="gallery_'+index+'">'+slidesHtml+'</div>'+dotsHtml+'</div>';
+        }
+        else photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
         let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
         if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
         // V5.0: sezione 📖 Approfondisci
@@ -810,7 +822,35 @@
         const prev=index>0?'<button class="nav-detail-btn" data-prev="'+(index-1)+'" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Vor.','Poprz.')+'</button>':'<span></span>';
         const next=index<total-1?'<button class="nav-detail-btn" data-next="'+(index+1)+'" aria-label="Luogo successivo">'+tr('Succ.','Next','Näch.','Nast.')+' ▶</button>':'<span></span>';
         const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div style="width:100%"><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+priceBadge+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:6px">'+desc+'</div>'+deepHtml+metaHtml+'</div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
-        setTimeout(()=>{const img=document.getElementById('img_'+index),placeholder=document.getElementById('ph_'+index);if(img){img.addEventListener('load',function(){this.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');});img.addEventListener('error',function(){photoFallback(wrapId);});if(img.complete){img.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');}}},0);
+        // V6.3: gestione caricamento/errore per-immagine + fallback completo solo se
+        // TUTTE le immagini della galleria falliscono; sincronizzazione dots via scroll.
+        setTimeout(()=>{
+            const total=photos.length;
+            if(!total)return;
+            let settled=0,errors=0;
+            const checkAllFailed=()=>{
+                if(settled===total&&errors===total)photoFallback(wrapId);
+            };
+            for(let i=0;i<total;i++){
+                const img=document.getElementById('img_'+index+'_'+i),placeholder=document.getElementById('ph_'+index+'_'+i);
+                if(!img)continue;
+                const onLoad=()=>{settled++;img.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');checkAllFailed();};
+                const onError=()=>{settled++;errors++;checkAllFailed();};
+                img.addEventListener('load',onLoad);
+                img.addEventListener('error',onError);
+                if(img.complete){if(img.naturalWidth>0)onLoad();else onError();}
+            }
+            if(total>1){
+                const galleryEl=document.getElementById('gallery_'+index),dotsEl=document.getElementById('dots_'+index);
+                if(galleryEl&&dotsEl){
+                    galleryEl.addEventListener('scroll',debounce(()=>{
+                        const w=galleryEl.clientWidth||1;
+                        const idx=Math.round(galleryEl.scrollLeft/w);
+                        dotsEl.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+                    },80));
+                }
+            }
+        },0);
         return html;
     }
 
