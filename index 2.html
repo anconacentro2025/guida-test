@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<!-- Appartamento Ancona Centro - Guida Ospiti V6.14 | 14/08/26 02:45 -->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ancona Centro · Guida Ospiti V6.14 14/08/26 02:45</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0B1F33">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
+    <meta name="apple-mobile-web-app-title" content="Ancona Guide">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
+    <meta property="og:title" content="Appartamento Ancona Centro · Guida V6.14 14/08/26 02:45">
+    <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        :root{--navy:#0B1F33;--navy-2:#163350;--navy-3:#1E4A70;--gold:#C8A45A;--gold-2:#E2C07A;--gold-3:#F5E6C0;--white:#FFFFFF;--bg:#F3F0EA;--bg-2:#EAE6DD;--muted:#6B7280;--text:#1A2332;--border:rgba(200,164,90,.22);--shadow:0 2px 16px rgba(11,31,51,.10)}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        html{scroll-behavior:smooth}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        a{color:inherit;text-decoration:none}
+        button{font-family:'Outfit',sans-serif;cursor:pointer}
+        .header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.30);padding-top:env(safe-area-inset-top,0px)}
+        .header-inner{display:flex;align-items:center;justify-content:space-between;padding:13px max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-left:max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-right:max(28px,calc(env(safe-area-inset-right,0px)+18px));border-bottom:1px solid rgba(200,164,90,.18)}
+        .header-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;line-height:1.15;color:var(--white)}
+        .header-sub{font-size:.65rem;font-weight:300;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+        .header-cin{font-size:.6rem;font-weight:300;opacity:.5;letter-spacing:.05em;margin-top:2px;color:var(--gold-3)}
+        .font-size-control{display:flex;gap:4px;margin-top:6px}
+        .font-size-control button{background:rgba(255,255,255,.08);border:1px solid rgba(200,164,90,.30);color:rgba(255,255,255,.75);font-size:.62rem;font-weight:600;padding:3px 7px;border-radius:6px;line-height:1.2}
+        .font-size-control button:active{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+        .font-size-control button#font-reset{font-size:.68rem}
+        .header-right{text-align:center}
+        .lang-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:22px;overflow:hidden;border:1px solid rgba(200,164,90,.30);justify-content:center}
+        .lang-btn{padding:5px 11px;font-size:.68rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,.55);transition:all .2s}
+        .lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600}
+        .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em}
+        .hero{width:100%;height:320px;overflow:hidden;position:relative;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 50%,var(--navy-3) 100%);transition:height .3s ease}
+        .hero.section-mode{height:68px}
+        @media(max-height:700px){.hero.section-mode{height:48px}}
+        .hero.section-mode .hero-caption{visibility:hidden}
+        .hero-img{width:100%;height:100%;object-fit:cover;display:block;opacity:.55}
+        .hero-overlay{position:absolute;inset:0;background:rgba(11,31,51,.25);pointer-events:none}
+        .hero-caption{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--white);text-align:center;padding:0 24px}
+        .hero-caption-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;line-height:1.1;letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.65)}
+        .gold-bar{height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+        .nav-scroll{display:flex;gap:7px;padding:11px 16px;overflow-x:auto;background:var(--navy-2);-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap}
+        .nav-scroll::-webkit-scrollbar{display:none}
+        .nav-pill{flex-shrink:0;padding:6px 13px;border-radius:22px;font-size:.68rem;font-weight:500;border:1.5px solid rgba(200,164,90,.35);background:transparent;color:rgba(255,255,255,.60);transition:all .2s;white-space:nowrap}
+        .nav-pill.active{background:var(--gold);border-color:var(--gold);color:var(--navy);font-weight:600}
+        .nav-pill:active{transform:scale(.95)}
+        .nav-pill-divider{flex-shrink:0;width:1px;align-self:stretch;background:rgba(200,164,90,.35);margin:2px 4px}
+        .nav-tile-divider{grid-column:1/-1;height:1px;background:var(--border);margin:4px 0 8px}
+        .home-welcome{padding:16px 16px 12px;background:var(--white);border-bottom:1px solid var(--bg-2);display:flex;align-items:center;gap:16px}
+        .home-welcome-left{flex-shrink:0}
+        .host-photo{width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);display:block}
+        .host-photo-placeholder{width:70px;height:70px;border-radius:50%;background:var(--bg-2);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--gold);border:2px solid var(--gold)}
+        .home-welcome-right{flex:1}
+        .home-welcome-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--navy);margin-bottom:4px}
+        .home-welcome-sub{font-size:.75rem;color:var(--muted)}
+        .home-social{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white)}
+        .home-social-label{color:rgba(255,255,255,.6);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em}
+        .home-social-links{display:flex;gap:14px;align-items:center;margin-top:4px}
+        .social-link{color:var(--gold-2);font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:4px;transition:color .2s}
+        .social-link:hover{color:var(--gold-3)}
+        .social-link:active{color:var(--gold)}
+        .home-social-text{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.4}
+        .install-btn{display:none;background:var(--gold);color:var(--navy);border:none;padding:10px 20px;border-radius:30px;font-weight:600;font-size:.82rem;margin:12px 16px 0;box-shadow:var(--shadow);width:calc(100% - 32px);text-align:center}
+        .home-whatsapp-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:#25D366;color:#fff;border:none;padding:9px 14px;border-radius:24px;font-weight:600;font-size:.72rem;box-shadow:var(--shadow);text-align:center;text-decoration:none;flex-shrink:0;white-space:nowrap}
+        .install-btn:hover{background:var(--gold-2)}
+        .nav-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 20px}
+        .nav-tile{background:var(--white);border-radius:14px;padding:16px 14px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:flex-start;gap:6px;transition:transform .15s,box-shadow .15s;border-left:3px solid var(--gold)}
+        .nav-tile:active{transform:scale(.97);box-shadow:none}
+        .nav-tile-icon{font-size:1.4rem;line-height:1}
+        .nav-tile-label{font-size:.8rem;font-weight:500;color:var(--navy);line-height:1.2}
+        .section-header{background:var(--navy);padding:16px 18px 14px;border-bottom:2px solid var(--gold)}
+        .section-header-inner{display:flex;align-items:center;gap:12px}
+        .section-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:rgba(200,164,90,.18);flex-shrink:0}
+        .section-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--white);line-height:1.1}
+        .cards{padding:14px 14px 0;display:flex;flex-direction:column;gap:10px}
+        .card{background:var(--white);border-radius:13px;overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05)}
+        .card-header{padding:12px 14px;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);border-bottom:1px solid var(--border)}
+        .card-header-icon{font-size:1rem}
+        .card-title{font-weight:500;font-size:.85rem;color:var(--white)}
+        .card-body{padding:12px 14px 14px;font-size:.82rem;line-height:1.6;color:var(--text)}
+        .card-body a{color:var(--navy-3);font-weight:500;text-decoration:underline;text-decoration-color:rgba(30,74,112,.3)}
+        .map-list-wrap{display:flex;height:min(340px,50vh);border-radius:13px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)}
+        .section-map-el{flex:1;min-width:0;z-index:1;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%)}
+        .place-btn-col{width:142px;overflow-y:auto;padding:5px;display:flex;flex-direction:column;gap:4px;background:var(--white);border-left:1px solid var(--bg-2);-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+        .place-btn-col::-webkit-scrollbar{width:3px}
+        .place-btn-col::-webkit-scrollbar-thumb{background:var(--bg-2);border-radius:3px}
+        .place-btn-mini{width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1px solid var(--bg-2);background:transparent;font-size:.65rem;color:var(--text);line-height:1.3;white-space:normal;transition:all .15s}
+        .place-btn-mini.selected,.place-btn-mini:active{background:var(--navy);color:var(--white);border-color:var(--navy);border-left:3px solid var(--gold)}
+        .map-marker-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--navy);border:2px solid var(--white);color:var(--white);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.40)}
+        .map-marker-num.cardeto,.map-marker-num.cittadella{background:#2E7D32}
+        .map-marker-num.selected{background:var(--gold);color:var(--navy);transform:scale(1.25);z-index:999!important}
+        .map-marker-num.has-sub{border-color:var(--gold);border-width:3px;cursor:pointer}
+        .map-marker-star{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#FFD700;border:2px solid var(--white);color:var(--navy);font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.40)}
+        .star-list-btn{width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1.5px solid #FFD700;background:#FFD700;font-size:.65rem;font-weight:700;color:var(--navy);line-height:1.3;cursor:pointer;transition:all .15s}
+        .star-list-btn:active{background:#e6c200;border-color:#e6c200}
+        .back-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:var(--navy-3);font-size:.82rem;font-weight:500;padding:6px 0 4px}
+        .back-btn:active{opacity:.6}
+        .detail-photo-wrap{width:100%;position:relative;background:var(--bg-2)}
+        .detail-photo-wrap>.detail-photo-link{height:200px}
+        /* V6.3: galleria multi-foto (max 4) — scroll-snap orizzontale nativo, senza librerie */
+        .detail-gallery{width:100%;height:200px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+        .detail-gallery::-webkit-scrollbar{display:none}
+        .gallery-slide{flex:0 0 100%;scroll-snap-align:start;position:relative;height:200px;background:var(--bg-2)}
+        .gallery-dots{display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 0;background:var(--white)}
+        .gallery-dots .dot{width:6px;height:6px;border-radius:50%;background:rgba(11,31,51,.18);transition:all .2s ease}
+        .gallery-dots .dot.active{background:var(--gold);width:16px;border-radius:3px}
+        /* V6.12: lightbox richiamabile da link inline nel testo — riusa .detail-gallery/.gallery-slide/.gallery-dots */
+        .lightbox-overlay{position:fixed;inset:0;background:rgba(11,31,51,.96);z-index:9998;display:flex;align-items:center;justify-content:center;animation:fadeUp .2s ease}
+        .lightbox-overlay .detail-gallery{width:100%;height:min(70vh,520px);scroll-snap-type:x mandatory}
+        .lightbox-overlay .gallery-slide{display:flex;align-items:center;justify-content:center;background:transparent}
+        .lightbox-overlay .detail-photo{width:100%;height:100%;object-fit:contain}
+        .lightbox-overlay .gallery-dots{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:0;right:0;background:transparent}
+        .lightbox-close{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:9999;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--white);width:40px;height:40px;border-radius:50%;font-size:1.1rem;line-height:1}
+        .inline-photo-link{background:none;border:none;padding:0;font:inherit;color:var(--navy-3);font-weight:500;text-decoration:underline;text-decoration-color:rgba(30,74,112,.3);cursor:pointer}
+        .detail-photo{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s;display:block}
+        .detail-photo.loaded{opacity:1}
+        .detail-photo-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,var(--bg-2),var(--bg));transition:opacity .3s;flex-direction:column;gap:6px;animation:shimmerPulse 1.8s ease-in-out infinite}
+        .detail-photo-placeholder.hidden{opacity:0;pointer-events:none;animation:none}
+        .detail-photo-link{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;text-decoration:none;color:inherit}
+        .placeholder-emoji{font-size:2.5rem;margin-bottom:4px}
+        .placeholder-text{font-size:.75rem;font-weight:500;color:var(--navy-3);text-align:center}
+        @keyframes shimmerPulse{0%{opacity:.4}50%{opacity:.8}100%{opacity:.4}}
+        .place-card{background:var(--white);border-radius:13px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)}
+        .place-body{padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+        .place-emoji-sm{font-size:1.1rem;min-width:22px;margin-top:2px}
+        .place-name{font-weight:600;font-size:.9rem;margin-bottom:2px;color:var(--navy)}
+        .place-desc{font-size:.77rem;color:var(--muted);line-height:1.5}
+        /* V5.0: sistema scheda strutturata */
+        .place-section-block{margin-top:10px;border-top:1px solid var(--border);padding-top:8px}
+        .place-deep-toggle{display:flex;align-items:center;gap:6px;background:rgba(11,31,51,.05);border:1px solid var(--border);color:var(--navy);font-size:.78rem;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;width:100%;text-align:left;transition:background .15s}
+        .place-deep-toggle:active{background:rgba(11,31,51,.1)}
+        .place-deep-toggle::after{content:'▼';font-size:.5rem;margin-left:auto;transition:transform .2s;color:var(--muted)}
+        .place-deep-toggle.open::after{transform:rotate(-180deg)}
+        .place-deep-body{display:none;margin-top:8px;font-size:.77rem;color:var(--muted);line-height:1.55}
+        .place-deep-body a{color:var(--navy-3);font-weight:500;text-decoration:underline;text-decoration-color:rgba(30,74,112,.3)}
+        .place-deep-body.open{display:block}
+        .place-deep-body p{margin:0 0 8px}
+        .place-deep-body b{color:var(--navy);font-weight:600}
+        .place-meta{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+        .place-meta-row{font-size:.74rem;color:var(--navy-3);display:flex;gap:7px;align-items:flex-start;line-height:1.45}
+        .place-meta-icon{flex-shrink:0;width:18px;font-size:.85rem}
+        /* V5.0: sezioni pratiche (Servizi, Appartamento) */
+        .practical-block{background:var(--white);border-radius:13px;margin-bottom:10px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden}
+        .practical-header{padding:12px 14px;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);display:flex;align-items:center;gap:10px}
+        .practical-icon{font-size:1.1rem}
+        .practical-title{font-weight:600;font-size:.85rem;color:var(--white)}
+        .practical-body{padding:12px 14px 14px;font-size:.82rem;line-height:1.6;color:var(--text)}
+        .practical-body a{color:var(--navy-3);font-weight:500;text-decoration:underline}
+        .practical-brief{font-weight:500;color:var(--navy);margin-bottom:6px;font-size:.83rem}
+        .practical-detail{color:var(--muted);font-size:.8rem;margin-bottom:6px}
+        .practical-tip{background:rgba(200,164,90,.1);border-left:3px solid var(--gold);padding:8px 10px;border-radius:0 6px 6px 0;font-size:.77rem;color:var(--navy-3);margin-top:6px}
+        .practical-tip strong{color:var(--navy);display:block;margin-bottom:2px;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+        .place-dist{font-size:.68rem;color:var(--gold);font-weight:600;margin-top:4px}
+        .section-list-header{padding:4px 2px 8px}
+        .section-list-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--navy)}
+        .place-row{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:12px;padding:10px 14px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05);transition:transform .15s}
+        .place-row:active{transform:scale(.98)}
+        .place-emoji{font-size:1.3rem;min-width:26px;text-align:center}
+        .place-info{flex:1;min-width:0}
+        .place-row-name{font-size:.85rem;font-weight:600;color:var(--navy)}
+        .place-row-dist{font-size:.7rem;color:var(--gold);font-weight:600;margin-top:2px}
+        .place-actions{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px}
+        .map-button{display:inline-block;font-size:.68rem;color:var(--navy);background:var(--bg);padding:4px 10px;border-radius:16px;border:1px solid var(--border);font-weight:500}
+        .map-button:active{background:var(--bg-2)}
+        .detail-nav{display:flex;justify-content:space-between;align-items:center;padding:8px 2px 4px}
+        .nav-detail-btn{background:var(--navy);color:var(--white);border:none;padding:8px 16px;border-radius:20px;font-size:.75rem;font-weight:500;transition:background .15s}
+        .nav-detail-btn:active{background:var(--navy-3)}
+        .detail-counter{font-size:.70rem;color:var(--muted)}
+        .contact-card{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);border-radius:13px;padding:20px;color:var(--white);text-align:center;border:1px solid rgba(200,164,90,.20)}
+        .contact-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;opacity:.5}
+        .contact-number{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--gold-2);margin:10px 0 12px;letter-spacing:.04em}
+        .contact-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+        .btn-wa{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:var(--white);padding:9px 18px;border-radius:24px;font-size:.8rem;font-weight:500;text-decoration:none}
+        .btn-call{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);color:var(--white);padding:9px 18px;border-radius:24px;font-size:.8rem;font-weight:500;text-decoration:none;border:1px solid rgba(255,255,255,.2)}
+        .contact-email{font-size:.78rem;opacity:.65;margin-top:6px}
+        .contact-email a{color:var(--gold-2)}
+        .emerg-card{background:var(--white);border-radius:13px;overflow:hidden;margin-top:10px;box-shadow:var(--shadow);border:1px solid var(--border)}
+        .emerg-row{display:flex;align-items:center;padding:12px 14px;gap:12px;border-bottom:1px solid var(--bg-2)}
+        .emerg-row:last-child{border-bottom:none}
+        .emerg-num{font-size:.8rem;font-weight:700;color:var(--navy-3);min-width:110px}
+        .emerg-desc{font-size:.8rem;color:var(--text)}
+        .rule-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bg-2)}
+        .rule-row:last-child{border-bottom:none}
+        .rule-icon{font-size:1.1rem}
+        .rule-text{font-size:.8rem;line-height:1.4}
+        .goto-home{display:flex;justify-content:center;margin:20px 0 30px}
+        .home-btn{background:var(--navy);color:var(--white);border:none;padding:10px 22px;border-radius:30px;font-size:.78rem;font-weight:500;display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow)}
+        .home-btn:active{transform:scale(.95)}
+        .copyright-footer{text-align:center;padding:12px 16px;font-size:.62rem;color:var(--muted);border-top:1px solid var(--bg-2);margin-top:8px}
+        .content{padding-bottom:40px}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .section{display:none}
+        .section.active{display:block;animation:fadeUp .28s ease}
+        .link-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--bg-2)}
+        .link-row:last-child{border-bottom:none}
+        .link-icon{font-size:1.2rem;min-width:24px}
+        .link-info{flex:1}
+        .link-name{font-size:.82rem;font-weight:500;color:var(--navy)}
+        .link-desc{font-size:.7rem;color:var(--muted);margin-top:1px}
+        .link-action{font-size:.68rem;color:var(--navy-3);background:var(--bg);padding:4px 9px;border-radius:14px;border:1px solid var(--border);white-space:nowrap}
+        .gps-container{position:relative}
+        .gps-box{background:#FFF8E7;border:2px solid var(--gold);border-radius:12px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .3s ease}
+        .gps-box.collapsed{display:none}
+        .gps-box .gps-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+        .gps-box .gps-icon{font-size:2rem;flex-shrink:0}
+        .gps-box .gps-text{flex:1;font-size:.85rem;line-height:1.5;color:var(--text)}
+        .gps-box .gps-text strong{color:var(--navy);font-weight:600}
+        .gps-box .gps-buttons{display:flex;gap:8px;flex-wrap:wrap}
+        .btn-gps-accept,.btn-gps-deny,.btn-gps-toggle{background:var(--navy);color:var(--white);border:none;padding:8px 16px;border-radius:30px;font-size:.8rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:all .25s;box-shadow:0 2px 8px rgba(11,31,51,.2)}
+        .btn-gps-accept:hover,.btn-gps-toggle:hover{background:var(--navy-3)}
+        .btn-gps-deny{background:transparent;color:var(--muted);box-shadow:none;border:1px solid var(--border)}
+        .btn-gps-deny:hover{background:var(--bg-2)}
+        .btn-gps-toggle.active{background:var(--gold);color:var(--navy);box-shadow:0 2px 8px rgba(200,164,90,.4)}
+        .btn-gps-toggle:active,.btn-gps-accept:active,.btn-gps-deny:active{transform:scale(.95)}
+        .gps-icon-overlay{position:absolute;bottom:20px;right:20px;z-index:1000;background:var(--white);border:2px solid var(--gold);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 2px 12px rgba(0,0,0,.15);cursor:pointer;transition:all .2s}
+        .gps-icon-overlay:hover{transform:scale(1.05)}
+        .gps-icon-overlay.active{background:var(--gold);border-color:var(--gold)}
+        .gps-blue-dot-wrap{position:relative;width:20px;height:20px}
+        .gps-blue-dot{width:14px;height:14px;background:#007AFF;border:2px solid var(--white);border-radius:50%;position:absolute;top:3px;left:3px;box-shadow:0 0 6px rgba(0,0,0,.3);z-index:2}
+        .gps-blue-dot-pulse{width:20px;height:20px;background:rgba(0,122,255,.4);border-radius:50%;position:absolute;top:0;left:0;animation:gpsPulse 2s infinite ease-out;z-index:1}
+        @keyframes gpsPulse{0%{transform:scale(.5);opacity:1}100%{transform:scale(1.9);opacity:0}}
+        .reach-sub-btn{flex:1;border:1px solid var(--border);padding:8px 4px;border-radius:8px;font-size:.72rem;font-weight:500;transition:all .2s;outline:none;background:var(--bg);color:var(--text)}
+        .reach-sub-btn.active{background:var(--navy);color:var(--white);font-weight:600}
+        .reach-content{font-size:.82rem;line-height:1.6;color:var(--text)}
+        .hours-badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:4px}
+        .price-badge{display:inline-block;font-size:.7rem;font-weight:600;color:var(--navy-3);background:rgba(212,175,55,.15);padding:1px 7px;border-radius:8px;margin-left:8px;letter-spacing:.04em;vertical-align:middle}
+        .hours-badge.open{background:#D1FAE5;color:#065F46}
+        .hours-badge.closed{background:#FEE2E2;color:#991B1B}
+        .hours-badge.holiday{background:#FEF3C7;color:#92400E}
+        .hours-text{font-size:.68rem;color:var(--muted);margin-top:2px}
+        .widgets-row{display:flex;gap:8px;margin:8px 16px 0;align-items:stretch}
+        .meteo-widget{background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:10px;padding:10px 12px;margin:0;flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px}
+        .pc-alert-widget{background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 100%);border-radius:10px;padding:10px 12px;margin:0;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:6px;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px;text-decoration:none}
+        .pc-alert-widget.level-2{background:linear-gradient(135deg,#8a6d00 0%,#b8860b 100%)}
+        .pc-alert-widget.level-3{background:linear-gradient(135deg,#a13d00 0%,#e65100 100%)}
+        .pc-alert-widget.level-4{background:linear-gradient(135deg,#7a0000 0%,#c62828 100%)}
+        .pc-alert-widget.flashing{animation:pcFlash 1.4s ease-in-out infinite}
+        @keyframes pcFlash{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 12px 3px rgba(255,255,255,.55)}}
+        .pc-alert-left{display:flex;align-items:center;gap:8px;min-width:0}
+        .pc-alert-icon{font-size:1.3rem;flex-shrink:0}
+        .pc-alert-title{font-weight:600;font-size:.72rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .pc-alert-desc{font-size:.6rem;color:rgba(255,255,255,.65);margin-top:1px}
+        .pc-alert-link{font-size:.62rem;background:rgba(255,255,255,.18);padding:3px 9px;border-radius:12px;white-space:nowrap;align-self:flex-start}
+        .cultura2028-banner{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0B1F33 0%,#1a3a5c 100%);border-radius:10px;padding:11px 14px;margin:8px 16px 0;border:1px solid rgba(200,164,90,.45);text-decoration:none;color:var(--white)}
+        .cultura2028-emoji{font-size:1.6rem;flex-shrink:0}
+        .cultura2028-title{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--gold);line-height:1.2}
+        .cultura2028-sub{font-size:.67rem;color:rgba(255,255,255,.6);margin-top:2px}
+        .cultura2028-arrow{margin-left:auto;font-size:.8rem;color:rgba(200,164,90,.6);flex-shrink:0}
+        .meteo-left{display:flex;align-items:center;gap:10px}
+        .meteo-icon{font-size:1.6rem}
+        .meteo-temp{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold-2)}
+        .meteo-desc{font-size:.65rem;color:rgba(255,255,255,.6);margin-top:1px;text-transform:capitalize}
+        .meteo-right{text-align:right;font-size:.62rem;color:rgba(255,255,255,.45)}
+
+        .dist-sort-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:14px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+        .dist-sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+        .phrase-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-2)}
+        .phrase-row:last-child{border-bottom:none}
+        .phrase-it{font-size:.8rem;font-weight:600;color:var(--navy);flex:1}
+        .phrase-tr{font-size:.75rem;color:var(--muted);flex:1;font-style:italic}
+        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+        .home-map-wrap:hover{transform:scale(1.01)}
+        .home-map-wrap:active{transform:scale(.98)}
+        .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:12px 16px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:0}
+        .countdown-left{flex:1;display:flex;flex-direction:column;gap:1px;padding-right:14px;border-right:1px solid rgba(245,158,11,.4)}
+        .countdown-left-label{font-size:.68rem;color:#92400E;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+        .countdown-left-date{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:#78350F;line-height:1.15;margin-top:1px}
+        .countdown-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-left:14px;gap:1px}
+        .countdown-center-label{font-size:.68rem;color:#92400E;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+        .countdown-center-value{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:#78350F;line-height:1.15}
+
+        /* === MAPPA FULL-SCREEN OVERLAY === */
+        .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
+        .map-fullscreen-overlay.active{display:flex;opacity:1}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative;pointer-events:auto;isolation:isolate}
+        .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
+        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;z-index:1002;position:relative;pointer-events:auto;-webkit-tap-highlight-color:rgba(200,164,90,.3);touch-action:manipulation;-webkit-appearance:none;appearance:none}
+        .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
+        .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
+        .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
+        .map-fullscreen-overlay .fs-gps-container{position:absolute;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:1400}
+        .map-fullscreen-overlay .fs-gps-container .gps-box{margin-bottom:0;max-width:480px;margin-left:auto;margin-right:auto}
+
+        /* === BANNER AGGIORNAMENTO SW === */
+        #sw-update-banner{position:fixed;bottom:0;left:0;right:0;z-index:10000;background:var(--navy);border-top:2px solid var(--gold);padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.25);animation:slideUp .3s ease}
+        #sw-update-banner.visible{display:flex}
+        #sw-update-banner .sw-banner-text{font-size:.82rem;color:var(--white);line-height:1.4}
+        #sw-update-banner .sw-banner-text strong{color:var(--gold);display:block;margin-bottom:2px}
+        #sw-update-banner .sw-banner-btn{background:var(--gold);color:var(--navy);border:none;padding:9px 20px;border-radius:22px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;touch-action:manipulation;-webkit-appearance:none;flex-shrink:0}
+        #sw-update-banner .sw-banner-btn:active{transform:scale(.95)}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <div class="header-title">Appartamento<br>Ancona Centro</div>
+                <div class="header-sub" id="header-sub">Guida Ospiti · Piazza Roma 3</div>
+                <div class="header-cin">CIN: IT042002C2QZRH9TPJ</div>
+                <div class="font-size-control" role="group" aria-label="Dimensione testo">
+                    <button id="font-decrease" type="button" aria-label="Riduci dimensione testo">A-</button>
+                    <button id="font-reset" type="button" aria-label="Dimensione testo normale">A</button>
+                    <button id="font-increase" type="button" aria-label="Aumenta dimensione testo">A+</button>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="lang-toggle" role="radiogroup" aria-label="Selezione lingua">
+                    <button class="lang-btn active" id="btn-it" role="radio" aria-checked="true" aria-label="Italiano">IT</button>
+                    <button class="lang-btn" id="btn-en" role="radio" aria-checked="false" aria-label="English">EN</button>
+                    <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
+                    <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
+                </div>
+                <div class="version-info">V6.14 · <span id="release-time">14/08/26 02:45</span></div>
+            </div>
+        </div>
+    </header>
+    <div class="hero" id="hero">
+        <img class="hero-img" id="heroImg" src="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg" alt="Ancona Centro" fetchpriority="high" onerror="this.style.display='none'">
+        <div class="hero-overlay" aria-hidden="true"></div>
+        <div class="hero-caption"><div class="hero-caption-title">Appartamento<br>Ancona Centro</div></div>
+    </div>
+    <div class="gold-bar" aria-hidden="true"></div>
+    <nav class="nav-scroll" id="nav" style="display:none" role="navigation" aria-label="Sezioni"></nav>
+    <main class="content" id="content" role="main"></main>
+
+    <!-- FULLSCREEN MAP OVERLAY -->
+    <div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
+        <div class="map-fs-header">
+            <span class="map-fs-title" id="map-fs-title">🗺️ Mappa</span>
+            <button class="map-fs-close" id="map-fs-close">✕ Chiudi</button>
+        </div>
+        <div id="fullscreenMap"></div>
+        <div class="fs-gps-container gps-container" id="fs-gps-container">
+            <div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div>
+            <div class="gps-icon-overlay" id="fs-gps-overlay-icon">📍</div>
+        </div>
+    </div>
+
+
+    <div class="copyright-footer">© 2026 Appartamento Ancona Centro · Guida V6.14 14/08/26 02:45 · All rights reserved</div>
+
+    <!-- BANNER AGGIORNAMENTO SW -->
+    <div id="sw-update-banner" role="alert" aria-live="polite">
+        <div class="sw-banner-text">
+            <strong>🔄 Aggiornamento disponibile</strong>
+            Nuova versione della guida pronta.
+        </div>
+        <button class="sw-banner-btn" id="sw-update-btn">Aggiorna</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- V6.0: script inline sostituito da due file esterni per caching indipendente.
+         data.js contiene i contenuti (bump ?v= ad ogni release di contenuto).
+         engine.js contiene la logica (bump ?v= solo quando si modifica la logica). -->
+    <script src="./data.js?v=6.14"></script>
+    <script src="./engine.js?v=6"></script>
+</body>
+</html>
