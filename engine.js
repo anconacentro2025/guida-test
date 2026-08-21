@@ -1,9 +1,9 @@
-// ===== V6.8 · 14/08/26 01:00 =====
+// ===== V6.14 · 20/08/26 17:40 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
-// Versione motore: v5 — bump solo quando si modifica la logica in questo file, indipendente
+// Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
     const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo'];
     const HOST_PHONE = '3356750269';
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.8-14080100';
+    const APP_CACHE_NAME = 'ancona-guida-v6.14-20081140';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -123,6 +123,23 @@
     }
 
     function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
+
+    // V6.12: lightbox riutilizzabile — richiamabile da un link inline nel testo (non solo
+    // dalla scheda di un luogo) per mostrare 1-4 foto scorrevoli senza uscire dall'app.
+    // Il parametro photosCsv è una stringa con i nomi file separati da virgola (più semplice
+    // da incorporare in un attributo onclick rispetto a un array letterale con virgolette).
+    function openLightbox(photosCsv){
+        closeLightbox();
+        const photos = photosCsv.split(',').map(f => f.trim());
+        const linkGalleryIndex = 'link-' + Math.random().toString(36).substr(2,9);
+        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), caption: '' };
+        openDetailGalleryFullscreen(linkGalleryIndex);
+    }
+    function closeLightbox(){
+        const overlay = document.querySelector('.lightbox-overlay');
+        if (overlay) overlay.remove();
+        document.body.style.overflow = '';
+    }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
     function openSubItinerary(subId) { currentSubItinerary=subId; currentPlaceDetail=-1; placeDataMap={}; if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -144,10 +161,28 @@
     }
 
 
-    function selectPlaceDetail(i) {
+    // V6.12: auto-expands photos array based on naming convention (base.webp, base-2.webp, base-3.webp, base-4.webp)
+    async function expandPhotosAsync(p) {
+        if (!p.photos || !p.photos.length) return;
+        const baseFile = p.photos[0];
+        const baseName = baseFile.replace(/\.webp$/, '');
+        const expandedPhotos = [baseFile];
+        for (let i = 2; i <= 4; i++) {
+            const filename = baseName + '-' + i + '.webp';
+            const url = PHOTO_BASE + filename;
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                if (response.ok) expandedPhotos.push(filename);
+            } catch (e) {}
+        }
+        p.photos = expandedPhotos.slice(0, 4);
+    }
+
+    async function selectPlaceDetail(i) {
         const items=currentSubItinerary?(appData.subItineraries[currentSubItinerary]||[]):currentSectionPlaces;
         const p=items[i];
         if(p&&p.isSubItinerary&&p.subId){openSubItinerary(p.subId);return;}
+        if(p) await expandPhotosAsync(p);
         currentPlaceDetail=i;
         if(leafletMap){leafletMap.remove();leafletMap=null;}
         renderAll();window.scrollTo({top:0,behavior:'smooth'});
@@ -687,6 +722,13 @@
         const countdownHtml=getCountdownHtml();
         const meteoHtml=meteoWidgetHtml();
         const pcAlertHtml=civilProtectionWidgetHtml();
+        // V5.1: home alleggerita — breve presentazione appartamento + Ancona, tutti i dettagli pratici sono in Appartamento
+        const introHtml='<div class="card" style="margin:8px 16px 0"><div class="card-body" style="font-size:.82rem;line-height:1.6;color:var(--text)">'+tr(
+            'Siete a Piazza Roma, nel cuore pedonale di Ancona: a pochi passi dal porto e dai principali monumenti. Questa guida vi accompagna alla scoperta della città e resta a disposizione per tutto il soggiorno, con itinerari, indirizzi e informazioni utili suggeriti dall\'host.',
+            'You\'re at Piazza Roma, in Ancona\'s pedestrian heart: steps from the port and the main monuments. This guide will accompany you around the city and stays available throughout your stay, with itineraries, addresses and useful information suggested by the host.',
+            'Sie befinden sich an der Piazza Roma, im Fußgängerherzen von Ancona: wenige Schritte vom Hafen und den wichtigsten Sehenswürdigkeiten entfernt. Dieser Führer begleitet Sie bei der Entdeckung der Stadt und steht Ihnen während des gesamten Aufenthalts zur Verfügung, mit Routen, Adressen und nützlichen Informationen, die vom Gastgeber vorgeschlagen werden.',
+            'Jesteście na Piazza Roma, w pieszym sercu Ankony: kilka kroków od portu i głównych zabytków. Ten przewodnik towarzyszy Wam w odkrywaniu miasta i pozostaje dostępny przez cały pobyt, z trasami, adresami i przydatnymi informacjami sugerowanymi przez gospodarza.'
+        )+'</div></div>';
         // V5.1: bottone Numeri Utili in evidenza, porta direttamente ai Contatti & Emergenze
         const socialInfoHtml='<div style="padding:6px 16px 0;font-size:.75rem;color:var(--muted);text-align:center">'+tr('Informazioni e aggiornamenti continui sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div>';
         // V5.5: banner Ancona Capitale Italiana della Cultura 2028 (dossier "Ancona. Questo adesso", ancona2028.it)
@@ -711,13 +753,14 @@
         if(id==='services')return renderServices();
         if(id==='usefulinfo')return renderUsefulInfo();
         if(id==='conero')return renderConero();
+        if(id==='portonovo')return renderPortonovo();
         const map={
             mustsee:()=>{if(currentSubItinerary)return appData.subItineraries[currentSubItinerary]||[];return appData.mustsee.slice().sort(sortMustSee);},
             passetto:()=>appData.passetto||[],
             cardeto:()=>appData.cardeto||[],
             porto:()=>appData.porto||[],
             beaches:()=>appData.beaches,
-            portonovo:()=>appData.portonovo||[],
+            portonovo:()=>appData.portonovo||{intro:{it:'',en:'',de:'',pl:''},points:[]},
             borghi:()=>appData.borghi||[]
         };
         if(map[id])return renderPlaceSection(map[id](),id);
@@ -770,6 +813,41 @@
         document.getElementById('dist-sort-btn')?.addEventListener('click',function(){distSortActive=!distSortActive;renderAll();});
     }
 
+    // V6.13: fullscreen gallery overlay con didascalia da itPhoto/enPhoto
+    let _detailGalleryData = {};
+    function openDetailGalleryFullscreen(index) {
+        const data = _detailGalleryData[index];
+        if (!data || !data.photos.length) return;
+        let slidesHtml = '';
+        data.photos.forEach((filename, i) => {
+            slidesHtml += '<div class="gallery-slide"><img class="detail-photo loaded" src="' + PHOTO_BASE + filename + '" alt="Foto ' + (i + 1) + '" id="fs-img-' + i + '"></div>';
+        });
+        const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
+        const captionHtml = data.caption ? '<div class="fs-gallery-caption">' + data.caption + '</div>' : '';
+        const overlay = document.createElement('div');
+        overlay.className = 'fullscreen-gallery-overlay';
+        overlay.innerHTML = '<button class="fs-gallery-close" aria-label="' + tr('Chiudi', 'Close', 'Schließen', 'Zamknij') + '">✕</button>' + captionHtml + '<div class="fs-detail-gallery" id="fs-gallery-' + index + '">' + slidesHtml + '</div>' + dotsHtml;
+        document.body.appendChild(overlay);
+        overlay.querySelector('.fs-gallery-close').addEventListener('click', closeDetailGalleryFullscreen);
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) closeDetailGalleryFullscreen(); });
+        if (data.photos.length > 1) {
+            const galleryEl = overlay.querySelector('#fs-gallery-' + index), dotsEl = overlay.querySelector('#fs-dots');
+            if (galleryEl && dotsEl) {
+                galleryEl.addEventListener('scroll', debounce(function () {
+                    const w = galleryEl.clientWidth || 1;
+                    const idx = Math.round(galleryEl.scrollLeft / w);
+                    dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+                }, 80));
+            }
+        }
+        document.body.style.overflow = 'hidden';
+    }
+    function closeDetailGalleryFullscreen() {
+        const overlay = document.querySelector('.fullscreen-gallery-overlay');
+        if (overlay) overlay.remove();
+        document.body.style.overflow = '';
+    }
+
     function renderAnyPlaceDetail(p,index,total,isSubMode){
         const wrapId='photowrap_'+index;placeDataMap[wrapId]=p;
         const desc=tr(p.it,p.en,p.de,p.pl);
@@ -778,6 +856,10 @@
         // V6.3: galleria multi-foto (max 4) — p.photos è un array; p.photo (singolare) è
         // mantenuto solo come fallback di compatibilità nel caso residuasse in qualche voce.
         const photos=(p.photos&&p.photos.length?p.photos:(p.photo?[p.photo]:[])).slice(0,4);
+        // V6.13: calcola photoTip prima di usarlo in photoHtml (per l'onclick del fullscreen)
+        const photoTip=tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
+        // Memorizzo i dati per il fullscreen
+        _detailGalleryData[index] = { photos: photos, caption: photoTip };
         let photoHtml;
         if(photos.length){
             let slidesHtml='';
@@ -786,7 +868,7 @@
                 slidesHtml+='<div class="gallery-slide"><div class="detail-photo-placeholder" id="ph_'+index+'_'+i+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+' '+(i+1)+'" loading="lazy" id="img_'+index+'_'+i+'"></div>';
             });
             const dotsHtml=photos.length>1?('<div class="gallery-dots" id="dots_'+index+'">'+photos.map((_,i)=>'<span class="dot'+(i===0?' active':'')+'" data-idx="'+i+'"></span>').join('')+'</div>'):'';
-            photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-gallery" id="gallery_'+index+'">'+slidesHtml+'</div>'+dotsHtml+'</div>';
+            photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-gallery" id="gallery_'+index+'" onclick="openDetailGalleryFullscreen('+index+')" style="cursor:pointer">'+slidesHtml+'</div>'+dotsHtml+'</div>';
         }
         else photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
         let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
@@ -800,7 +882,6 @@
         }
         // V5.0: meta-sezioni (👀 Da non perdere, 📸 Foto, ⏱ Tempo, 🚶 Prossima tappa)
         const noteStr=tr(p.itNote,p.enNote,p.deNote,p.plNote);
-        const photoTip=tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
         const timeStr=tr(p.itTime,p.enTime,p.deTime,p.plTime);
         let metaHtml='';
         if(noteStr||photoTip||timeStr){
@@ -859,22 +940,7 @@
     function renderApartment(){
         const a=appData.apartment;
         const r=a.reach;
-        const introHtml='<div class="card" style="margin-bottom:12px;border-left:3px solid var(--gold)"><div class="card-body" style="font-size:.82rem;line-height:1.6;color:var(--navy-3)">'+tr('L\'alloggio è nella piazza centrale di Ancona, in zona pedonale. Il n. 3 è dal lato della fontana dei cavalli, affianco alla Farmacia Zecchini. Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.<br><br>Per visitare centro storico e principali monumenti (vedi itinerari consigliati) il modo migliore è a piedi.','The apartment is in the central square of Ancona, in a pedestrian area. Number 3 is on the horse fountain side, next to Farmacia Zecchini. Ring the Frisoli bell at the main door, then take the lift to the fourth floor.<br><br>To visit the historic centre and main monuments (see recommended itineraries) the best way is on foot.','Die Unterkunft liegt am zentralen Platz von Ancona, in einer Fußgängerzone. Nr. 3 befindet sich auf der Seite des Pferdebrunnens, neben der Farmacia Zecchini. Läuten Sie bei Frisoli und fahren Sie mit dem Aufzug in den 4. Stock.<br><br>Historisches Zentrum und Sehenswürdigkeiten am besten zu Fuß erkunden.','Mieszkanie znajduje się na głównym placu Ankony, w strefie pieszej. Numer 3 po stronie fontanny z końmi, obok Farmacia Zecchini. Zadzwoń do Frisoli i jedź windą na 4. piętro.<br><br>Centrum historyczne najlepiej zwiedzać pieszo.')+'</div></div>';
-        const reachTitle=tr('📍 Come raggiungere l\'appartamento','📍 How to reach the apartment','📍 Anreise zur Wohnung','📍 Jak dotrzeć do mieszkania');
-        const reachCardHtml='<div class="card" style="margin-bottom:12px"><div class="card-header"><span class="card-header-icon">📍</span><span class="card-title">'+reachTitle+'</span></div><div class="card-body"><div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap"><button class="reach-sub-btn" data-reach="auto" style="flex:1;min-width:80px">🚗 '+tr('Auto','Car','Auto','Auto')+'</button><button class="reach-sub-btn" data-reach="treno" style="flex:1;min-width:80px">🚆 '+tr('Treno','Train','Zug','Pociąg')+'</button><button class="reach-sub-btn" data-reach="ferry" style="flex:1;min-width:80px">⛴️ '+tr('Traghetto','Ferry','Fähre','Prom')+'</button><button class="reach-sub-btn" data-reach="airport" style="flex:1;min-width:80px">✈️ '+tr('Aereo','Air','Flug','Lot')+'</button></div><div id="reach-content" class="reach-content">'+tr(r.auto.it,r.auto.en,r.auto.de,r.auto.pl)+'</div></div></div>';
-        window._reachTexts={auto:tr(r.auto.it,r.auto.en,r.auto.de,r.auto.pl),treno:tr(r.train.it,r.train.en,r.train.de,r.train.pl),ferry:tr(r.ferry.it,r.ferry.en,r.ferry.de,r.ferry.pl),airport:tr(r.airport.it,r.airport.en,r.airport.de,r.airport.pl)};
-        const cards=[
-            {icon:'🔑',title:tr('Check-in','Check-in','Check-in','Zameldowanie'),body:tr(a.checkin.it,a.checkin.en,a.checkin.de,a.checkin.pl)},
-            {icon:'🚪',title:tr('Check-out','Check-out','Check-out','Wymeldowanie'),body:tr(a.checkout.it,a.checkout.en,a.checkout.de,a.checkout.pl)},
-            {icon:'🔑',title:tr('Chiavi','Keys','Schlüssel','Klucze'),body:tr(a.keys.it,a.keys.en,a.keys.de,a.keys.pl)},
-            {icon:'🚪',title:tr('Citofono','Intercom','Gegensprechanlage','Domofon'),body:tr(a.access.it,a.access.en,a.access.de,a.access.pl)},
-            {icon:'📶',title:tr('Wi-Fi','Wi-Fi','WLAN','Wi-Fi'),body:tr(a.wifi.it,a.wifi.en,a.wifi.de,a.wifi.pl)},
-            {icon:'💧',title:tr('Qualità dell\'acqua del rubinetto','Tap water quality','Qualität des Leitungswassers','Jakość wody z kranu'),body:tr(a.water.it,a.water.en,a.water.de,a.water.pl)},
-            {icon:'♻️',title:tr('Raccolta differenziata','Recycling','Mülltrennung','Segregacja'),body:tr(a.recycling.it,a.recycling.en,a.recycling.de,a.recycling.pl)},
-            {icon:'🤫',title:tr('Silenzio','Quiet hours','Ruhezeiten','Cisza'),body:tr(a.quietHours.it,a.quietHours.en,a.quietHours.de,a.quietHours.pl)},
-            {icon:'📞',title:tr('Contatti host','Host contacts','Gastgeber-Kontakte','Kontakty z gospodarzem'),body:'WhatsApp / Signal / Telegram: <a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer">+39 '+HOST_PHONE+'</a><br>Telegram: <a href="https://t.me/gfrisoli" target="_blank" rel="noopener noreferrer">@gfrisoli</a><br>Email: <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a>'}
-        ];
-        let html=introHtml+reachCardHtml;
+        let html=reachCardHtml;
         for(let i=0;i<cards.length;i++)html+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+cards[i].icon+'</span><span class="card-title">'+cards[i].title+'</span></div><div class="card-body">'+cards[i].body+'</div></div>';
         return html;
     }
@@ -909,6 +975,22 @@
         // Mappa + lista dei punti (numerati, stesso pattern di Cardeto/Passetto)
         const btns=points.map((p,i)=>{const dn=getDisplayNumber(p,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';}).join('');
         html+='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa Monte Conero"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
+        return html;
+    }
+
+    function renderPortonovo(){
+        const p=appData.portonovo;
+        const points=p.points;
+        currentSectionPlaces=points;
+        for(let i=0;i<points.length;i++){const pt=points[i];pt._dist=(pt.lat&&pt.lng)?calcDistance(HOME_COORDS.lat,HOME_COORDS.lng,pt.lat,pt.lng):Infinity;}
+
+        if(currentPlaceDetail>=0&&currentPlaceDetail<points.length)return renderAnyPlaceDetail(points[currentPlaceDetail],currentPlaceDetail,points.length,false);
+
+        const introTxt=tr(p.intro.it,p.intro.en,p.intro.de,p.intro.pl);
+        let html='<div class="card" style="margin-bottom:8px"><div class="card-body" style="font-size:.82rem;line-height:1.6;color:var(--text)">'+introTxt+'</div></div>';
+        // Mappa + lista dei punti (numerati)
+        const btns=points.map((pt,i)=>{const dn=getDisplayNumber(pt,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+pt.name+'">'+dn+'. '+pt.name+'</button>';}).join('');
+        html+='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa Portonovo"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         return html;
     }
 
@@ -1123,6 +1205,14 @@
         }).catch(()=>{});
 
         let _reloading=false;
+        navigator.serviceWorker.addEventListener('message',(event)=>{
+            if(event.data&&event.data.type==='VERSION_UPDATED'){
+                if(!_reloading){
+                    _reloading=true;
+                    window.location.reload();
+                }
+            }
+        });
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
             if(_reloading)return;
             _reloading=true;
