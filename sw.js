@@ -1,36 +1,28 @@
-// ===== V6.14 · 21/08/26 08:50 =====
-// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V6.10 14/08/26
-// V6.0: aggiunta cache dedicata e persistente per data.js/engine.js (vedi APP_FILES_CACHE_NAME
-// più sotto). A differenza di CACHE_NAME, questa cache NON viene svuotata ad ogni release:
-// serve proprio a evitare che un piccolo aggiornamento di contenuto (data.js) costringa a
-// riscaricare anche la logica (engine.js) quando questa non è cambiata. L'invalidazione
-// avviene tramite la query string "?v=" nell'URL dei due file, scritta in index.html.
+// ===== V7.0 · 22/08/26 16:17 =====
+// Service Worker — Ancona Centro Guida Ospiti V7.0
+// V7.0: versioning centralizzato in version.json
+// Il SW ora legge SOLO da version.json (timestamp) per invalidare cache.
+// Non serve più aggiornare sw.js ad ogni release.
 
-// CACHE_NAME non è più hardcoded: viene ricevuto da index.html tramite postMessage
-// {type:'SET_CACHE_NAME', cacheName:'...'} subito dopo la registrazione.
-// Il valore di fallback copre il primo avvio prima che il messaggio arrivi.
-let CACHE_NAME = 'ancona-guida-v6.0-05080000';
+let CACHE_NAME = 'ancona-guida-v7.0-22081640';
 let TILES_CACHE_NAME = CACHE_NAME + '-tiles';
-const MAX_TILES = 200;
+const MAX_TILES = 60; // V7.0: ridotto da 200 a 60 per risparmiare storage
 
-// V6.0: nome FISSO, non derivato da CACHE_NAME — deve restare identico release dopo release,
-// altrimenti verrebbe cancellata dal cleanup in 'activate' a ogni bump di versione, vanificando
-// lo scopo (persistere data.js/engine.js tra una release e l'altra).
+// V6.0: nome FISSO, non derivato da CACHE_NAME — deve restare identico release dopo release
 const APP_FILES_CACHE_NAME = 'ancona-guida-appfiles';
-const MAX_APP_FILES = 6; // ~3 versioni di data.js + engine.js prima del trim
+const MAX_APP_FILES = 6;
 
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './manifest.json',
+    './version.json',
     'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg',
     'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg',
     'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png',
     'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-    // Nota: data.js/engine.js NON vanno precaricati qui — sono gestiti dal branch dedicato
-    // più sotto con cache-first-persistente, e vengono popolati al primo utilizzo reale.
 ];
 
 function offlineFallback() {
@@ -51,8 +43,6 @@ async function trimTilesCache() {
     }
 }
 
-// V6.0: trim leggero della cache persistente data.js/engine.js — evita accumulo indefinito
-// di vecchie versioni (ogni versione diversa di ?v= è una entry distinta nella cache).
 async function trimAppFilesCache() {
     const cache = await caches.open(APP_FILES_CACHE_NAME);
     const keys = await cache.keys();
@@ -63,8 +53,6 @@ async function trimAppFilesCache() {
         }
     }
 }
-
-
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -78,32 +66,48 @@ self.addEventListener('install', (event) => {
     );
 });
 
+// V7.0: legge version.json (no-store) e invalida cache se timestamp è diverso
 async function checkAndClearCacheIfVersionChanged() {
     try {
-        // Fetch index.html senza cache per leggere il meta version
-        const response = await fetch('./index.html', { cache: 'no-store' });
-        const html = await response.text();
+        const response = await fetch('./version.json', { cache: 'no-store' });
+        if (!response.ok) {
+            console.warn('⚠️ version.json non trovato (HTTP ' + response.status + ')');
+            return;
+        }
+        const versionData = await response.json();
+        const savedTimestamp = typeof self !== 'undefined' && self.registration ? 
+            localStorage.getItem('app-timestamp') : null;
         
-        // Estrai version dal meta tag usando regex
-        const versionMatch = html.match(/meta name="version" content="([^"]+)"/);
-        const newVersion = versionMatch ? versionMatch[1] : null;
-        const savedVersion = typeof self !== 'undefined' && self.registration ? localStorage.getItem('app-version') : null;
-        
-        if (newVersion && newVersion !== savedVersion) {
-            // Versione diversa — svuota tutti i cache
+        if (versionData.timestamp && versionData.timestamp !== savedTimestamp) {
+            console.log('🔄 Nuova versione rilevata:', versionData.appVersion, 'timestamp:', versionData.timestamp);
+            
+            // Invalida TUTTE le cache
             const cacheNames = await caches.keys();
             await Promise.all(cacheNames.map(name => caches.delete(name)));
-            localStorage.setItem('app-version', newVersion);
-            console.log('Cache cleared: version changed from', savedVersion, 'to', newVersion);
+            
+            // Salva la nuova versione
+            localStorage.setItem('app-version', versionData.appVersion);
+            localStorage.setItem('app-timestamp', versionData.timestamp);
+            localStorage.setItem('app-lastModified', versionData.lastModified);
+            
             // Notifica i client
             self.clients.matchAll().then(clients => {
-                clients.forEach(client => client.postMessage({ type: 'VERSION_UPDATED' }));
+                clients.forEach(client => {
+                    client.postMessage({ 
+                        type: 'VERSION_UPDATED',
+                        newVersion: versionData.appVersion,
+                        timestamp: versionData.timestamp
+                    });
+                });
             });
-        } else if (newVersion) {
-            localStorage.setItem('app-version', newVersion);
+        } else if (versionData.timestamp) {
+            // Salva comunque se non era stato fatto
+            localStorage.setItem('app-version', versionData.appVersion);
+            localStorage.setItem('app-timestamp', versionData.timestamp);
+            localStorage.setItem('app-lastModified', versionData.lastModified);
         }
     } catch (error) {
-        console.error('Cache version check failed:', error);
+        console.warn('⚠️ Version check fallito:', error);
     }
 }
 
@@ -113,8 +117,6 @@ self.addEventListener('activate', (event) => {
             return caches.keys().then((cacheNames) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
-                        // V6.0: APP_FILES_CACHE_NAME aggiunta alla whitelist — è l'unica cache
-                        // che deve sopravvivere anche quando CACHE_NAME cambia ad ogni release.
                         if (cacheName !== CACHE_NAME && cacheName !== TILES_CACHE_NAME && cacheName !== APP_FILES_CACHE_NAME) {
                             return caches.delete(cacheName);
                         }
@@ -133,8 +135,25 @@ self.addEventListener('fetch', (event) => {
     if (url.hostname.includes('google-analytics.com') ||
         url.hostname.includes('facebook.com/tr')) return;
 
-    // HTML: Network-First — prova sempre la rete, fallback alla cache solo se offline.
-    // Garantisce che l'utente veda sempre la versione aggiornata quando è connesso.
+    // version.json: sempre network-first, no-store
+    if (url.pathname.endsWith('/version.json')) {
+        event.respondWith(
+            fetch(event.request, { cache: 'no-store' }).then((response) => {
+                if (response.ok) {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+                }
+                return response;
+            }).catch(() => {
+                return caches.match(event.request).then(cached => cached || new Response('', { status: 503 }));
+            })
+        );
+        return;
+    }
+
+    // HTML: Network-First
     if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname === './') {
         event.respondWith(
             fetch(event.request).then((networkResponse) => {
@@ -150,11 +169,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // V6.0: data.js / engine.js — cache-first in una cache dedicata e persistente
-    // (non svuotata ad ogni release). La query string "?v=" nell'URL fa da chiave di
-    // versione: cambiando ?v= in index.html si ottiene automaticamente un cache-miss e
-    // il file viene riscaricato, mentre versioni invariate restano servite dalla cache
-    // senza nuova richiesta di rete — è il punto centrale dell'intera ottimizzazione.
+    // data.js / engine.js — cache-first in una cache dedicata e persistente
     if (url.pathname.endsWith('/data.js') || url.pathname.endsWith('/engine.js')) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
@@ -167,8 +182,6 @@ self.addEventListener('fetch', (event) => {
                     });
                     return response;
                 }).catch(() => {
-                    // Offline e mai cachato prima: non c'è un fallback sensato per questi file,
-                    // l'app non può funzionare senza. 503 esplicito invece di un errore silenzioso.
                     return new Response('', { status: 503 });
                 });
             })
@@ -188,10 +201,6 @@ self.addEventListener('fetch', (event) => {
                     });
                     return response;
                 }).catch(() => {
-                    // FIX #10 V4.2.1 27/06/26: restituisce 404 senza Content-Type
-                    // invece di body vuoto con 'image/png', che causa errori di decodifica
-                    // PNG in Leaflet. Con 404, Leaflet gestisce il tile mancante con il
-                    // suo fallback nativo senza errori silenziosi nel canvas.
                     return new Response('', { status: 404 });
                 });
             })
@@ -199,11 +208,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // V6.10: cambiata da cache-first a network-first (stessa strategia già usata per l'HTML).
-    // Prima, sostituire un file caricato su GitHub con lo stesso nome ma contenuto diverso
-    // (es. una foto migliore al posto di una vecchia) non aggiornava mai l'app: l'URL restava
-    // identico, quindi la cache-first continuava a servire la versione vecchia all'infinito.
-    // Ora si prova sempre la rete per primo; la cache interviene solo come fallback se offline.
+    // GitHub assets: network-first (stesso di V6.10)
     if (url.hostname.includes('raw.githubusercontent.com')) {
         event.respondWith(
             fetch(event.request).then((response) => {
@@ -264,10 +269,9 @@ self.addEventListener('message', (event) => {
         self.skipWaiting();
         return;
     }
-    // Riceve il CACHE_NAME da index.html — non serve più aggiornare sw.js ad ogni versione
+    // V7.0: CACHE_NAME non è più ricevuto via postMessage (derivato da version.json)
     if (event.data && event.data.type === 'SET_CACHE_NAME' && event.data.cacheName) {
         CACHE_NAME = event.data.cacheName;
         TILES_CACHE_NAME = CACHE_NAME + '-tiles';
-        // Nota: APP_FILES_CACHE_NAME NON viene derivata da CACHE_NAME — resta fissa di proposito.
     }
 });

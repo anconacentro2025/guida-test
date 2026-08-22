@@ -1,4 +1,4 @@
-// ===== V6.14 · 21/08/26 08:50 =====
+// ===== V7.0 · 22/08/26 16:17 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.14-20081140';
+    const APP_CACHE_NAME = 'ancona-guida-v7.0-22081640';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1233,6 +1233,20 @@
     window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
     window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
     
+    // V7.0: listener per VERSION_UPDATED dal SW
+    // Quando il SW rileva un cambio di versione (via version.json), invia questo messaggio
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'VERSION_UPDATED') {
+                console.log('🔄 Versione aggiornata:', event.data.newVersion);
+                const banner = document.getElementById('sw-update-banner');
+                if (banner) {
+                    banner.classList.add('visible');
+                }
+            }
+        });
+    }
+
     // Inizializza fullscreen listeners
     initFullscreenListeners();
     renderAll();
