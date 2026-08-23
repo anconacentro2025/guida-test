@@ -1,18 +1,18 @@
-// ===== V6.16 · 23/08/26 13:20 =====
+// ===== V6.17 · 23/08/26 13:50 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
 // Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
-    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo'];
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'itinerari'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.16-23081320';
+    const APP_CACHE_NAME = 'ancona-guida-v6.17-23081350';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -37,8 +37,13 @@
     ;
 
 ;
-    // V5.1: indice dopo cui inserire un separatore visibile nei pulsanti (nav pills e tile home)
-    const NAV_DIVIDER_AFTER_INDEX = 3;
+    // FIX 23/08/26: sostituisce NAV_DIVIDER_AFTER_INDEX (indice numerico fisso, fragile
+    // se l'array sections cambia ordine/lunghezza). Home e nav-pills ora mostrano solo
+    // questi 6 id; le 8 sezioni-itinerario (mustsee...borghi) confluiscono nel picker
+    // "Itinerari" invece di comparire come tile/pill separate. I link diretti tipo #mustsee
+    // continuano a funzionare: sectionHashMap non viene toccato per quegli id.
+    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','itinerari'];
+    const ITINERARY_IDS = ['mustsee','passetto','cardeto','porto','beaches','portonovo','conero','borghi'];
 
     ;
 
@@ -584,7 +589,18 @@
         hero.classList.toggle('section-mode',currentSection!==-1);
         if(currentSection===-1){nav.style.display='none';renderHome();return;}
         nav.style.display='flex';
-        nav.innerHTML=sections.map((s,i)=>(i===NAV_DIVIDER_AFTER_INDEX+1?'<span class="nav-pill-divider" aria-hidden="true"></span>':'')+'<button class="nav-pill'+(i===currentSection?' active':'')+'" data-index="'+i+'" role="tab" aria-selected="'+(i===currentSection?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>').join('');
+        nav.innerHTML=HOME_NAV_IDS.map(id=>{
+            const s=sections.find(sec=>sec.id===id);
+            const idx=sections.indexOf(s);
+            // Il pillolo "Itinerari" resta evidenziato anche quando si è dentro una delle
+            // 8 sotto-sezioni (mustsee, passetto, ecc.) raggiunte tramite il picker o un
+            // link diretto tipo #passetto — altrimenti nessun pillolo risulterebbe attivo.
+            const isActive=(id==='itinerari')
+                ? (currentSection===idx || ITINERARY_IDS.includes(sections[currentSection]&&sections[currentSection].id))
+                : (currentSection===idx);
+            const divider=(id==='itinerari')?'<span class="nav-pill-divider" aria-hidden="true"></span>':'';
+            return divider+'<button class="nav-pill'+(isActive?' active':'')+'" data-index="'+idx+'" role="tab" aria-selected="'+(isActive?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>';
+        }).join('');
         nav.querySelectorAll('.nav-pill').forEach(btn=>btn.addEventListener('click',function(){
             // U2 V5.0 01/07/26: feedback immediato al click — riduce opacità del contenuto
             // corrente prima che renderAll scriva nel DOM, eliminando la latenza percepita
@@ -596,7 +612,7 @@
         cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div></section>';
         document.getElementById('home-btn')?.addEventListener('click',function(){goTo(-1);});
         document.getElementById('sub-back-btn')?.addEventListener('click',closeSubItinerary);
-        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();
+        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();attachNavTileListeners();
         if(currentPlaceDetail<0&&!NO_GPS_SECTIONS.includes(s.id)){
             const cardsEl=cont.querySelector('.cards'),gpsContainer=document.createElement('div');gpsContainer.className='gps-container';
             gpsContainer.innerHTML='<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>';
@@ -726,7 +742,12 @@
 
     function renderHome(){
         const cont=document.getElementById('content'),hostImgSrc='https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg';
-        const tiles=sections.map((s,i)=>(i===NAV_DIVIDER_AFTER_INDEX+1?'<div class="nav-tile-divider" aria-hidden="true"></div>':'')+'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
+        const tiles=HOME_NAV_IDS.map(id=>{
+            const s=sections.find(sec=>sec.id===id);
+            const idx=sections.indexOf(s);
+            const divider=(id==='itinerari')?'<div class="nav-tile-divider" aria-hidden="true"></div>':'';
+            return divider+'<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
+        }).join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
         const countdownHtml=getCountdownHtml();
@@ -743,9 +764,27 @@
         loadMeteoWidget();
         loadCivilProtectionWidget();
 
-        document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
+        attachNavTileListeners();
         const installBtn=document.getElementById('install-btn');
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
+    }
+
+    // FIX 23/08/26: schermata "Itinerari" — griglia di tile che raccoglie le 8 sezioni
+    // di esplorazione (prima tutte separate in home/nav). Riusa .nav-grid/.nav-tile,
+    // lo stesso stile già usato in home, nessun CSS nuovo introdotto.
+    function renderItinerariPicker(){
+        const tiles=ITINERARY_IDS.map(id=>{
+            const s=sections.find(sec=>sec.id===id);
+            if(!s)return'';
+            const idx=sections.indexOf(s);
+            return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
+        }).join('');
+        return '<div class="nav-grid">'+tiles+'</div>';
+    }
+
+    // Helper condiviso: attacca il click alle .nav-tile sia in home sia nel picker Itinerari.
+    function attachNavTileListeners(){
+        document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
     }
 
     function renderSection(id){
@@ -754,6 +793,7 @@
         if(id==='restaurants')return renderRestaurants();
         if(id==='services')return renderServices();
         if(id==='usefulinfo')return renderUsefulInfo();
+        if(id==='itinerari')return renderItinerariPicker();
         if(id==='conero')return renderConero();
         if(id==='portonovo')return renderPortonovo();
         const map={

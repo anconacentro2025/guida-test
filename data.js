@@ -1,4 +1,4 @@
-// ===== V6.16 · 23/08/26 13:20 =====
+// ===== V6.17 · 23/08/26 13:50 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v6.5 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -227,7 +227,7 @@ const appData = {
               itTime:'10 minuti.',enTime:'10 minutes.',deTime:'10 Minuten.',plTime:'10 minut.',
               dist:'🚶 50 m – 1 min', mapQuery:'Arco Clementino Ancona', lat:43.6252604, lng:13.5049529 },
 
-            { order:'6b', name:'Lanterna Rossa', emoji:'🔴', photos:['lanterna-rossa.webp'],
+            { order:'6-bis', name:'Lanterna Rossa', emoji:'🔴', photos:['lanterna-rossa.webp'],
               it:'Per chi desidera proseguire la passeggiata, la Lanterna Rossa rappresenta una deviazione breve ma altamente consigliata.',
               en:'For those wishing to continue the walk, the Red Lighthouse is a short but highly recommended detour.',
               de:'Für alle, die den Spaziergang fortsetzen möchten, ist die Rote Laterne ein kurzer, aber sehr empfehlenswerter Umweg.',
@@ -618,7 +618,7 @@ const appData = {
               deLong:'<p>Es ist ein grünes Gebiet mit reicher Vegetation, mit aufwärts führenden und ebenen Wegen, geeignet zum Spazieren und für körperliche Aktivität. Die offizielle historisch-naturalistische Route durchquert das Citadellengebiet und misst etwa 1,5 km, mit einer Gehzeit von etwa 1 Stunde 45 Minuten und niedriger Schwierigkeit.</p><p>Es gibt auch einen Sinnespfad mit Braille-Beschilderung und einen ausgestatteten Weg für Calisthenics. Von höheren Punkten eröffnen sich Ausblicke auf die Stadt, den Hafen und zum Monte Conero.</p>',
               plLong:'<p>Jest to tereny zielone bogatej w roślinność, ze ścieżkami wznosząca się i poziomymi, przystosowanymi zarówno do spacerów jak i aktywności fizycznej. Oficjalna trasa historyczno-przyrodnicza przecina teren Cytadeli i mierzy około 1,5 km, ze wskazanym czasem przejścia 1 godzina 45 minut i niskim poziomem trudności.</p><p>Wewnątrz znajduje się również ścieżka sensoryczna do odkrywania roślin poprzez zapachy i tekstury z oznaczeniami również w alfabecie Braille\'a oraz wyposażona ścieżka do ćwiczeń kalisteniki. Z wyższych punktów otwierają się widoki na miasto, port i w kierunku Monte Conero.</p>',
               itTime:'1 ora 45 minuti.',enTime:'1 hour 45 minutes.',deTime:'1 Stunde 45 Minuten.',plTime:'1 godzina 45 minut.',
-              dist:'🥾 Naturalistico', mapQuery:'Parco della Cittadella Ancona', lat:43.6150000, lng:13.5140000 },
+              dist:'🥾 Naturalistico', mapQuery:'Parco della Cittadella Ancona', lat:43.6126358, lng:13.5115796 },
             { order:11, name:'Punto Panoramico', emoji:'🌄', photos:['punto-panoramico-cittadella.webp'],
               it:'L\'ultima tappa regala la ricompensa migliore: una vista spettacolare sulla città e sul porto, da un punto panoramico ancora poco conosciuto.',
               en:'The last stop offers the best reward: a spectacular view over the city and the port, from a still little-known panoramic point.',
@@ -1181,7 +1181,8 @@ const appData = {
         { id:'portonovo',   icon:'🏝️', it:'Baia di Portonovo',      en:'Portonovo Bay',         de:'Bucht von Portonovo',  pl:'Zatoka Portonovo' },
         { id:'conero',      icon:'🏔️', it:'Monte Conero',           en:'Monte Conero',          de:'Monte Conero',        pl:'Monte Conero' },
         { id:'borghi',      icon:'🏘️', it:'Borghi e dintorni',      en:'Villages & surrounds',  de:'Dörfer & Umgebung',    pl:'Miasteczka i okolice' },
-        { id:'usefulinfo',  icon:'ℹ️', it:'Informazioni utili',     en:'Useful Information',    de:'Nützliche Informationen', pl:'Przydatne informacje' }
+        { id:'usefulinfo',  icon:'ℹ️', it:'Informazioni utili',     en:'Useful Information',    de:'Nützliche Informationen', pl:'Przydatne informacje' },
+        { id:'itinerari',   icon:'🗺️', it:'Itinerari',              en:'Itineraries',           de:'Routen',               pl:'Trasy' }
     ]
 
-const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12 }
+const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12,'itinerari':13 }
