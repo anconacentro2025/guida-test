@@ -1,4 +1,4 @@
-// ===== V7.0 · 22/08/26 16:17 =====
+// ===== V6.16 · 23/08/26 13:20 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.0-22081640';
+    const APP_CACHE_NAME = 'ancona-guida-v6.16-23081320';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -82,7 +82,17 @@
     function getImgSearchUrl(p) { const q = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q); }
 
     // Item 2 V5.0: versione semplificata — solo testo orario statico, rimuove badge colorato
-    function getHoursBadge(p) { if (!p.hours) return ''; return '<div class="hours-text">🕐 ' + p.hours + '</div>'; }
+    // FIX 23/08/26: closedOn (giorno/i della settimana di chiusura, 0=domenica...6=sabato,
+    // stessa convenzione di Date.getDay()) era presente su 22 locali in data.js ma mai
+    // letto da nessuna funzione — il dato esisteva ma non veniva mai mostrato all'ospite.
+    function getHoursBadge(p) {
+        if (!p.hours) return '';
+        let closedTodayHtml = '';
+        if (Array.isArray(p.closedOn) && p.closedOn.length && p.closedOn.includes(new Date().getDay())) {
+            closedTodayHtml = '<div class="hours-badge closed">⚠️ ' + tr('Chiuso oggi', 'Closed today', 'Heute geschlossen', 'Dziś zamknięte') + '</div>';
+        }
+        return closedTodayHtml + '<div class="hours-text">🕐 ' + p.hours + '</div>';
+    }
 
     // Item 3 V5.0: aggiunta validazione regex formato data; no timezone hardcoded (usa locale browser)
     function getCountdownHtml() {
@@ -931,7 +941,43 @@
 
     function renderApartment(){
         const a=appData.apartment;
-        const r=a.reach;
+        const r=a.reach||{};
+
+        // FIX 23/08/26: reachCardHtml/cards non erano mai definiti da nessuna parte —
+        // ReferenceError ad ogni apertura della sezione. Ricostruita usando i campi reali
+        // di appData.apartment e l'infrastruttura .reach-sub-btn/.reach-content già presente
+        // in CSS ed engine.js (window._toggleReach, attachReachListeners) ma mai alimentata.
+        const reachTabs=[
+            {key:'auto',   icon:'🚗', label:tr('Auto','Car','Auto','Samochód')},
+            {key:'train',  icon:'🚆', label:tr('Treno','Train','Zug','Pociąg')},
+            {key:'ferry',  icon:'⛴️', label:tr('Traghetto','Ferry','Fähre','Prom')},
+            {key:'airport',icon:'✈️', label:tr('Aeroporto','Airport','Flughafen','Lotnisko')}
+        ];
+
+        // window._reachTexts DEVE essere popolato qui, prima del render: attachReachListeners()
+        // (chiamata da renderAll subito dopo l'inserimento nel DOM) legge subito da qui per
+        // riempire #reach-content con la tab attiva, senza un secondo giro di render.
+        window._reachTexts={};
+        reachTabs.forEach(t=>{
+            const entry=r[t.key];
+            window._reachTexts[t.key]=entry?tr(entry.it,entry.en,entry.de,entry.pl):'';
+        });
+        if(!reachTabs.some(t=>t.key===window._activeReachTab))window._activeReachTab='auto';
+
+        const reachTabsHtml=reachTabs.map(t=>'<button class="reach-sub-btn'+(t.key===window._activeReachTab?' active':'')+'" data-reach="'+t.key+'" aria-label="'+t.label+'">'+t.icon+' '+t.label+'</button>').join('');
+        const reachCardHtml='<div class="practical-block"><div class="practical-header"><span class="practical-icon" aria-hidden="true">🧭</span><span class="practical-title">'+tr('Come raggiungerci','How to reach us','Anreise','Jak do nas dotrzeć')+'</span></div><div class="practical-body"><div style="display:flex;gap:6px;margin-bottom:10px">'+reachTabsHtml+'</div><div class="reach-content" id="reach-content"></div></div></div>';
+
+        const cards=[
+            a.wifi       && {icon:'📶', title:tr('WiFi','WiFi','WLAN','WiFi'), body:tr(a.wifi.it,a.wifi.en,a.wifi.de,a.wifi.pl)},
+            a.access     && {icon:'🚪', title:tr('Accesso e citofono','Access & intercom','Zugang & Gegensprechanlage','Dostęp i domofon'), body:tr(a.access.it,a.access.en,a.access.de,a.access.pl)},
+            a.keys       && {icon:'🔑', title:tr('Consegna chiavi','Key handover','Schlüsselübergabe','Przekazanie kluczy'), body:tr(a.keys.it,a.keys.en,a.keys.de,a.keys.pl)},
+            a.checkin    && {icon:'🛬', title:tr('Check-in','Check-in','Check-in','Zameldowanie'), body:tr(a.checkin.it,a.checkin.en,a.checkin.de,a.checkin.pl)},
+            a.checkout   && {icon:'🛫', title:tr('Check-out','Check-out','Check-out','Wymeldowanie'), body:tr(a.checkout.it,a.checkout.en,a.checkout.de,a.checkout.pl)},
+            a.quietHours && {icon:'🤫', title:tr('Silenzio','Quiet hours','Ruhezeiten','Cisza nocna'), body:tr(a.quietHours.it,a.quietHours.en,a.quietHours.de,a.quietHours.pl)},
+            a.recycling  && {icon:'♻️', title:tr('Differenziata','Recycling','Mülltrennung','Segregacja odpadów'), body:tr(a.recycling.it,a.recycling.en,a.recycling.de,a.recycling.pl)},
+            a.water      && {icon:'🚰', title:tr('Acqua del rubinetto','Tap water','Leitungswasser','Woda z kranu'), body:tr(a.water.it,a.water.en,a.water.de,a.water.pl)}
+        ].filter(Boolean);
+
         let html=reachCardHtml;
         for(let i=0;i<cards.length;i++)html+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+cards[i].icon+'</span><span class="card-title">'+cards[i].title+'</span></div><div class="card-body">'+cards[i].body+'</div></div>';
         return html;
@@ -1233,20 +1279,6 @@
     window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
     window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
     
-    // V7.0: listener per VERSION_UPDATED dal SW
-    // Quando il SW rileva un cambio di versione (via version.json), invia questo messaggio
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'VERSION_UPDATED') {
-                console.log('🔄 Versione aggiornata:', event.data.newVersion);
-                const banner = document.getElementById('sw-update-banner');
-                if (banner) {
-                    banner.classList.add('visible');
-                }
-            }
-        });
-    }
-
     // Inizializza fullscreen listeners
     initFullscreenListeners();
     renderAll();
@@ -1288,6 +1320,20 @@
             }
         } else {
             html+='<div>❌ Service Worker non supportato da questo browser</div>';
+        }
+
+        html+='<h3 style="color:#E2C07A;font-family:sans-serif;margin-top:20px">Version Check (FIX 22/08/26)</h3>';
+        try{
+            const versionCache=await caches.open('ancona-guida-version-meta');
+            const match=await versionCache.match('https://internal.local/__app_version__');
+            const savedVersion=match?await match.text():null;
+            const currentMeta=document.querySelector('meta[name="version"]')?.getAttribute('content');
+            const isSynced=(savedVersion===currentMeta);
+            html+='<div>Versione salvata dal SW: <b>'+(savedVersion||'❌ nessuna (mai eseguito con successo)')+'</b></div>';
+            html+='<div>Versione corrente pagina: <b>'+(currentMeta||'?')+'</b></div>';
+            html+='<div style="margin-top:4px;color:'+(isSynced?'#4ADE80':'#F87171')+'">'+(isSynced?'✅ Sincronizzate':'⚠️ Disallineate — ricarica la pagina per far girare activate')+'</div>';
+        }catch(e){
+            html+='<div>Errore leggendo la cache di versione: '+e.message+'</div>';
         }
 
         html+='<h3 style="color:#E2C07A;font-family:sans-serif;margin-top:20px">Cache Storage</h3>';

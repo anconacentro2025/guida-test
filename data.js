@@ -1,4 +1,4 @@
-// ===== V6.14 · 21/08/26 08:50 =====
+// ===== V6.16 · 23/08/26 13:20 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v6.5 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -380,7 +380,7 @@ const appData = {
               plLong:'<p>Idąc dalej, przechodzimy przez XVI-wieczny Arco del Rastrello i docieramy na Piazza del Plebiscito.</p>',
               dist:'🚶 300 m – 4 min', mapQuery:'Pinacoteca Civica Podesti Ancona', lat:43.6208333, lng:13.5122222 },
 
-            { order:15, name:'Palazzo del Governo', emoji:'🏛️', photos:['palazzo-del-governo.webp'],
+            { order:16, name:'Palazzo del Governo', emoji:'🏛️', photos:['palazzo-del-governo.webp'],
               it:'Affacciato su Piazza del Plebiscito, è uno degli edifici simbolo della storia civile di Ancona.',
               itLong:'<p>Nato nella seconda metà del Trecento, fu ampliato nel Quattrocento e nel 1484 Francesco di Giorgio Martini ne ridisegnò l\'architettura in forme rinascimentali.</p><p>Entrando nel <button class="inline-photo-link" onclick="openLightbox(\'cortile-prefettura.webp\')">cortile</button> si incontrano due archi ogivali appartenenti alla costruzione più antica e una curiosa testimonianza della vita quotidiana della città: i campioni delle antiche <button class="inline-photo-link" onclick="openLightbox(\'misure.webp\')">misure</button> ufficiali per <button class="inline-photo-link" onclick="openLightbox(\'misura-mattone.webp\')">mattone</button>, <button class="inline-photo-link" onclick="openLightbox(\'misura-coppo.webp\')">coppo</button>, braccio e piede. Servivano per controllare che materiali e merci rispettassero gli standard stabiliti dalla città. Oggi il palazzo è sede della Prefettura.</p>',
               en:'Facing Piazza del Plebiscito, it is one of the landmark buildings of Ancona\'s civic history.',
@@ -391,7 +391,7 @@ const appData = {
               plLong:'<p>Zbudowany w drugiej połowie XIV wieku, został rozbudowany w XV wieku, a w 1484 roku Francesco di Giorgio Martini przeprojektował jego architekturę w formach renesansowych.</p><p>Wchodząc na <button class="inline-photo-link" onclick="openLightbox(\'cortile-prefettura.webp\')">dziedziniec</button>, można zobaczyć dwa ostrołukowe łuki należące do starszej budowli oraz ciekawe świadectwo codziennego życia miasta: oficjalne <button class="inline-photo-link" onclick="openLightbox(\'misure.webp\')">wzorce miar</button> dla <button class="inline-photo-link" onclick="openLightbox(\'misura-mattone.webp\')">cegły</button>, <button class="inline-photo-link" onclick="openLightbox(\'misura-coppo.webp\')">dachówki</button>, łokcia (braccio) i stopy (piede), służące do sprawdzania, czy materiały i towary spełniają standardy ustalone przez miasto. Dziś pałac jest siedzibą Prefektury.</p>',
               dist:'🚶 300 m – 4 min', mapQuery:'Palazzo del Governo Piazza del Plebiscito Ancona', lat:43.6197818, lng:13.5110925 },
 
-            { order:16, name:'Piazza del Plebiscito (Piazza del Papa)', emoji:'🗿', photos:['piazza-plebiscito.webp', 'piazza-plebiscito-2.webp'],
+            { order:17, name:'Piazza del Plebiscito (Piazza del Papa)', emoji:'🗿', photos:['piazza-plebiscito.webp', 'piazza-plebiscito-2.webp'],
               it:'Conosciuta da tutti gli anconetani come Piazza del Papa, è uno degli angoli più eleganti e vivaci del centro storico. Il suo nome popolare deriva dalla monumentale statua di Papa Clemente XII, collocata al centro della piazza per celebrare il pontefice che concesse ad Ancona il prestigioso status di Porto Franco.',
               en:'Known to all Ancona locals as Piazza del Papa, it is one of the most elegant and lively corners of the historic centre. Its popular name comes from the monumental statue of Pope Clement XII, placed at the centre of the square to celebrate the pontiff who granted Ancona the prestigious status of Free Port.',
               de:'Von allen Bewohnern Anconas als Piazza del Papa bekannt, einer der elegantesten und lebendigsten Ecken der Altstadt. Der volkstümliche Name stammt von der monumentalen Statue Papst Klemens\' XII., der Ancona den Freihafenstatus verlieh.',
@@ -411,7 +411,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 50 m – 1 min', mapQuery:'Piazza del Plebiscito Ancona', lat:43.6195337, lng:13.5116510 },
 
-            { order:17, name:'Corso Garibaldi', emoji:'🚶', photos:['corso-garibaldi.webp'],
+            { order:18, name:'Corso Garibaldi', emoji:'🚶', photos:['corso-garibaldi.webp'],
               it:'Corso Garibaldi è il salotto di Ancona.',
               en:'Corso Garibaldi is Ancona\'s drawing room.',
               de:'Corso Garibaldi ist der Salon von Ancona.',
@@ -427,7 +427,7 @@ const appData = {
               itTime:'15–20 minuti di passeggiata.',enTime:'15–20 min walking.',deTime:'15–20 Min. Spaziergang.',plTime:'15–20 min spaceru.',
               dist:'🚶 300 m – 4 min', mapQuery:'Corso Garibaldi Ancona', lat:43.617938, lng:13.512813 },
 
-            { order:18, name:'Piazza Cavour', emoji:'🌳', photos:['piazza-cavour.webp'],
+            { order:19, name:'Piazza Cavour', emoji:'🌳', photos:['piazza-cavour.webp'],
               it:'Realizzata nella seconda metà dell\'Ottocento, Piazza Cavour rappresenta il principale spazio monumentale della città moderna.',
               en:'Built in the second half of the 19th century, Piazza Cavour is the main monumental space of the modern city.',
               de:'In der zweiten Hälfte des 19. Jahrhunderts entstanden, ist die Piazza Cavour der wichtigste Monumentalplatz der modernen Stadt.',
@@ -443,7 +443,7 @@ const appData = {
               itTime:'10 minuti.',enTime:'10 minutes.',deTime:'10 Minuten.',plTime:'10 minut.',
               dist:'🚶 550 m – 7 min', mapQuery:'Piazza Cavour Ancona', lat:43.616938, lng:13.516813 },
 
-            { order:19, name:'Viale della Vittoria', emoji:'🌲', photos:['viale-della-vittoria.webp'],
+            { order:20, name:'Viale della Vittoria', emoji:'🌲', photos:['viale-della-vittoria.webp'],
               it:'Viale della Vittoria è uno dei percorsi più piacevoli di Ancona.',
               en:'Viale della Vittoria is one of Ancona\'s most pleasant routes.',
               de:'Viale della Vittoria ist einer der angenehmsten Wege Anconas.',
@@ -458,7 +458,7 @@ const appData = {
               plNote:'Historyczne kawiarnie i lodziarnie: przystanek przed morzem.',
               itTime:'15 minuti di passeggiata.',enTime:'15 min walking.',deTime:'15 Min. Spaziergang.',plTime:'15 min spaceru.',
               dist:'🚶 1350 m – 18 min', mapQuery:'Viale della Vittoria Ancona', lat:43.615563, lng:13.526063 },
-            { ...poiMonumentoCaduti, order:20 }
+            { ...poiMonumentoCaduti, order:21 }
         ],
 
         passetto: [
@@ -601,25 +601,14 @@ const appData = {
               plLong:'<p>Plan pięciu bastionów to jeden z najlepszych przykładów XVI-wiecznej inżynierii wojskowej.</p><p>Dziś Cittadella to duży park publiczny, gdzie historia i natura współistnieją harmonijnie.</p>',
               itTime:'20–30 minuti.',enTime:'20–30 minutes.',deTime:'20–30 Minuten.',plTime:'20–30 minut.',
               dist:'📍 Punto principale', mapQuery:'Fortezza della Cittadella Ancona', lat:43.6138415, lng:13.5080277 },
-            { order:10, name:'Ingresso Parco della Cittadella', emoji:'🚪', photos:['ingresso-cittadella.webp'],
+            { order:9, name:'Ingresso Parco della Cittadella', emoji:'🚪', photos:['ingresso-cittadella.webp'],
               it:'Da qui si entra nel verde del parco che circonda la fortezza, un\'oasi tranquilla nel quartiere Capodimonte poco frequentata dai turisti.',
               en:'From here you enter the greenery of the park surrounding the fortress, a quiet oasis in the Capodimonte district rarely visited by tourists.',
               de:'Von hier aus betritt man das Grün des Parks rund um die Festung, eine ruhige Oase im Stadtteil Capodimonte.',
               pl:'Stąd wchodzimy w zieleń parku otaczającego fortecę, spokojną oazę w dzielnicy Capodimonte.',
               itTime:'5 minuti.',enTime:'5 minutes.',deTime:'5 Minuten.',plTime:'5 minut.',
               dist:'🚶 200 m – 3 min', mapQuery:'Ingresso Parco Cittadella Ancona', lat:43.6110909, lng:13.5127611 },
-            { order:10, name:'Punto Panoramico', emoji:'🌄', photos:['punto-panoramico-cittadella.webp'],
-              it:'L\'ultima tappa regala la ricompensa migliore: una vista spettacolare sulla città e sul porto, da un punto panoramico ancora poco conosciuto.',
-              en:'The last stop offers the best reward: a spectacular view over the city and the port, from a still little-known panoramic point.',
-              de:'Die letzte Station bietet die beste Belohnung: einen spektakulären Blick über die Stadt und den Hafen von einem noch wenig bekannten Aussichtspunkt.',
-              pl:'Ostatni przystanek to najlepsza nagroda: spektakularny widok na miasto i port z wciąż mało znanego punktu widokowego.',
-              itLong:'<p>Il panorama spazia dal porto al centro storico fino alle colline marchigiane, offrendo una prospettiva completamente diversa rispetto a quella del Colle Guasco o del Passetto.</p>',
-              enLong:'<p>The view sweeps from the port to the historic centre and on to the Marche hills, offering a perspective entirely different from that of the Guasco Hill or the Passetto.</p>',
-              deLong:'<p>Der Blick reicht vom Hafen über die Altstadt bis zu den Hügeln der Marken und bietet eine völlig andere Perspektive als der Colle Guasco oder das Passetto.</p>',
-              plLong:'<p>Panorama rozciąga się od portu przez centrum historyczne aż po wzgórza Marchii, oferując zupełnie inną perspektywę niż wzgórze Guasco czy Passetto.</p>',
-              itTime:'10 minuti.',enTime:'10 minutes.',deTime:'10 Minuten.',plTime:'10 minut.',
-              dist:'🚶 150 m – 2 min', mapQuery:'Punto Panoramico Cittadella Ancona', lat:43.6119493, lng:13.5116621 },
-            { order:9, name:'Parco della Cittadella', emoji:'🌲', photos:['parco-cittadella.webp'],
+            { order:10, name:'Parco della Cittadella', emoji:'🌲', photos:['parco-cittadella.webp'],
               it:'Il Parco della Cittadella occupa l\'antico campo trincerato della fortezza cinquecentesca progettata da Antonio da Sangallo il Giovane.',
               en:'The Cittadella Park occupies the ancient fortified camp of the 16th-century fortress designed by Antonio da Sangallo the Younger.',
               de:'Der Citadellenpark nimmt das alte Lagerfeld der Festung aus dem 16. Jahrhundert ein, die von Antonio da Sangallo dem Jüngeren entworfen wurde.',
@@ -629,7 +618,18 @@ const appData = {
               deLong:'<p>Es ist ein grünes Gebiet mit reicher Vegetation, mit aufwärts führenden und ebenen Wegen, geeignet zum Spazieren und für körperliche Aktivität. Die offizielle historisch-naturalistische Route durchquert das Citadellengebiet und misst etwa 1,5 km, mit einer Gehzeit von etwa 1 Stunde 45 Minuten und niedriger Schwierigkeit.</p><p>Es gibt auch einen Sinnespfad mit Braille-Beschilderung und einen ausgestatteten Weg für Calisthenics. Von höheren Punkten eröffnen sich Ausblicke auf die Stadt, den Hafen und zum Monte Conero.</p>',
               plLong:'<p>Jest to tereny zielone bogatej w roślinność, ze ścieżkami wznosząca się i poziomymi, przystosowanymi zarówno do spacerów jak i aktywności fizycznej. Oficjalna trasa historyczno-przyrodnicza przecina teren Cytadeli i mierzy około 1,5 km, ze wskazanym czasem przejścia 1 godzina 45 minut i niskim poziomem trudności.</p><p>Wewnątrz znajduje się również ścieżka sensoryczna do odkrywania roślin poprzez zapachy i tekstury z oznaczeniami również w alfabecie Braille\'a oraz wyposażona ścieżka do ćwiczeń kalisteniki. Z wyższych punktów otwierają się widoki na miasto, port i w kierunku Monte Conero.</p>',
               itTime:'1 ora 45 minuti.',enTime:'1 hour 45 minutes.',deTime:'1 Stunde 45 Minuten.',plTime:'1 godzina 45 minut.',
-              dist:'🥾 Naturalistico', mapQuery:'Parco della Cittadella Ancona', lat:43.6150000, lng:13.5140000 }
+              dist:'🥾 Naturalistico', mapQuery:'Parco della Cittadella Ancona', lat:43.6150000, lng:13.5140000 },
+            { order:11, name:'Punto Panoramico', emoji:'🌄', photos:['punto-panoramico-cittadella.webp'],
+              it:'L\'ultima tappa regala la ricompensa migliore: una vista spettacolare sulla città e sul porto, da un punto panoramico ancora poco conosciuto.',
+              en:'The last stop offers the best reward: a spectacular view over the city and the port, from a still little-known panoramic point.',
+              de:'Die letzte Station bietet die beste Belohnung: einen spektakulären Blick über die Stadt und den Hafen von einem noch wenig bekannten Aussichtspunkt.',
+              pl:'Ostatni przystanek to najlepsza nagroda: spektakularny widok na miasto i port z wciąż mało znanego punktu widokowego.',
+              itLong:'<p>Il panorama spazia dal porto al centro storico fino alle colline marchigiane, offrendo una prospettiva completamente diversa rispetto a quella del Colle Guasco o del Passetto.</p>',
+              enLong:'<p>The view sweeps from the port to the historic centre and on to the Marche hills, offering a perspective entirely different from that of the Guasco Hill or the Passetto.</p>',
+              deLong:'<p>Der Blick reicht vom Hafen über die Altstadt bis zu den Hügeln der Marken und bietet eine völlig andere Perspektive als der Colle Guasco oder das Passetto.</p>',
+              plLong:'<p>Panorama rozciąga się od portu przez centrum historyczne aż po wzgórza Marchii, oferując zupełnie inną perspektywę niż wzgórze Guasco czy Passetto.</p>',
+              itTime:'10 minuti.',enTime:'10 minutes.',deTime:'10 Minuten.',plTime:'10 minut.',
+              dist:'🚶 150 m – 2 min', mapQuery:'Punto Panoramico Cittadella Ancona', lat:43.6119493, lng:13.5116621 }
         ],
 
         porto: [
