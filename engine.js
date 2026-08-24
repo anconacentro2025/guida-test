@@ -1,4 +1,4 @@
-// ===== V6.17 · 23/08/26 13:50 =====
+// ===== V6.19 · 24/08/26 12:20 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.17-23081350';
+    const APP_CACHE_NAME = 'ancona-guida-v6.19-24081220';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -745,8 +745,10 @@
         const tiles=HOME_NAV_IDS.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             const idx=sections.indexOf(s);
-            const divider=(id==='itinerari')?'<div class="nav-tile-divider" aria-hidden="true"></div>':'';
-            return divider+'<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
+            // FIX 23/08/26: divisore rimosso qui — grid-column:1/-1 lo fa occupare l'intera
+            // riga della griglia a 2 colonne, spingendo la tile successiva (Itinerari) da
+            // sola su un nuovo rigo invece di lasciarla affianco a Informazioni utili.
+            return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
         }).join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
@@ -1169,14 +1171,14 @@
                'Ancona is also a city where the sun rises and sets over the sea, offering some truly spectacular viewpoints, perfect for starting or ending the day.',
                'Ancona ist auch eine Stadt, in der die Sonne über dem Meer auf- und untergeht, mit spektakulären Aussichtspunkten.',
                'Ankona to także miasto, w którym słońce wschodzi i zachodzi nad morzem, oferując spektakularne punkty widokowe.'),
-            tr('Per ammirare il tramonto con il sole che scende sul mare i luoghi che consiglio maggiormente sono: Colle Guasco, Parco del Cardeto, Belvedere Casanova a Capodimonte, Bar Giuliani, Bar Amarcord. Ogni punto regala una prospettiva diversa sulla città e sul mare.',
+            tr('Per ammirare il <button class="inline-photo-link" onclick="openLightbox(\'tramonti.webp\')">tramonto</button> con il sole che scende sul mare i luoghi che consiglio maggiormente sono: Colle Guasco, Parco del Cardeto, Belvedere Casanova a Capodimonte, Bar Giuliani, Bar Amarcord. Ogni punto regala una prospettiva diversa sulla città e sul mare.',
                'To admire the sunset over the sea, the spots I recommend most are: Colle Guasco, Parco del Cardeto, Belvedere Casanova in Capodimonte, Bar Giuliani, Bar Amarcord. Each offers a different perspective on the city and the sea.',
                'Empfohlene Orte für den Sonnenuntergang: Colle Guasco, Parco del Cardeto, Belvedere Casanova in Capodimonte, Bar Giuliani, Bar Amarcord.',
                'Polecane miejsca na zachód słońca: Colle Guasco, Parco del Cardeto, Belvedere Casanova w Capodimonte, Bar Giuliani, Bar Amarcord.'));
 
         html+=practicalBlock('🌄',
             tr('Alba al Passetto','Dawn at the Passetto','Sonnenaufgang am Passetto','Świt na Passetto'),
-            tr('Assistere all\'alba dal Passetto è una delle esperienze più suggestive che Ancona possa offrire.',
+            tr('Assistere all\'<button class="inline-photo-link" onclick="openLightbox(\'alba.webp\')">alba</button> dal Passetto è una delle esperienze più suggestive che Ancona possa offrire.',
                'Watching the dawn from the Passetto is one of the most evocative experiences Ancona can offer.',
                'Der Sonnenaufgang vom Passetto aus ist eines der eindrucksvollsten Erlebnisse, die Ancona bietet.',
                'Świt oglądany z Passetto to jedno z najbardziej sugestywnych doświadczeń, jakie oferuje Ankona.'),
@@ -1258,6 +1260,39 @@
         L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
     }
 
+    // FIX 23/08/26: interruttore promosso a scope condiviso (prima era locale al blocco
+    // service worker) — serve anche al nuovo controllo BUILD_NUMBER qui sotto, per evitare
+    // che i due meccanismi (aggiornamento SW e controllo build) possano ricaricare la
+    // pagina due volte in sequenza.
+    let _reloading=false;
+
+    // FIX 23/08/26: controllo build a 3 cifre, più semplice e più frequente del controllo
+    // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
+    // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
+    // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
+    const BUILD_NUMBER = 619;
+    let _lastBuildCheck = 0;
+    async function checkBuildNumber(){
+        if(_reloading)return;
+        const now=Date.now();
+        if(now-_lastBuildCheck<30000)return; // throttle: non più di 1 controllo ogni 30s
+        _lastBuildCheck=now;
+        try{
+            const res=await fetch('./build.txt',{cache:'no-store'});
+            if(!res.ok)return;
+            const remoteBuild=(await res.text()).trim();
+            if(remoteBuild && remoteBuild!==String(BUILD_NUMBER)){
+                _reloading=true;
+                if('caches' in window){
+                    try{const names=await caches.keys();await Promise.all(names.map(n=>caches.delete(n)));}catch(e){}
+                }
+                window.location.reload();
+            }
+        }catch(e){ /* offline o rete assente: nessuna azione forzata */ }
+    }
+    window.addEventListener('load', checkBuildNumber);
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkBuildNumber(); });
+
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
         navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
             // Invia APP_CACHE_NAME al SW (attivo, in waiting o in installazione)
@@ -1282,7 +1317,6 @@
             });
         }).catch(()=>{});
 
-        let _reloading=false;
         navigator.serviceWorker.addEventListener('message',(event)=>{
             if(event.data&&event.data.type==='VERSION_UPDATED'){
                 if(!_reloading){
@@ -1297,6 +1331,7 @@
             window.location.reload();
         });
     });
+
 
     function showUpdateBanner(swWaiting){
         const banner=document.getElementById('sw-update-banner');

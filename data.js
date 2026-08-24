@@ -1,4 +1,4 @@
-// ===== V6.17 · 23/08/26 13:50 =====
+// ===== V6.19 · 24/08/26 12:20 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v6.5 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -151,7 +151,18 @@ const appData = {
               itTime:'10 min (esterno). 2 ore con spettacolo.',enTime:'10 min (exterior). 2h with show.',deTime:'10 Min. (Außen). 2 Std. mit Vorstellung.',plTime:'10 min (zewnątrz). 2 godz. ze spektaklem.',
               dist:'🚶 350 m – 5 min', mapQuery:'Teatro delle Muse Ancona', lat:43.6192483, lng:13.5099488 },
 
-            { order:3, name:'Loggia dei Mercanti', emoji:'🏛️', photos:['loggia-mercanti.webp'],
+            { order:3, name:'Ex Chiesa e Portale di Sant\'Agostino', emoji:'🚪', photos:['san-agostino.webp'],
+              it:'Dell\'antica chiesa di Sant\'Agostino, oggi scomparsa, resta il magnifico portale rinascimentale, opera di Giorgio Orsini da Sebenico, uno dei maggiori architetti e scultori attivi ad Ancona nel Quattrocento. Realizzato nella seconda metà del XV secolo, è riccamente decorato con motivi vegetali, figure e dettagli di grande raffinatezza. Il portale testimonia l\'importanza del complesso agostiniano e rappresenta una delle più significative testimonianze del Rinascimento ad Ancona.',
+              en:'Of the ancient Church of Sant\'Agostino, now vanished, only the magnificent Renaissance portal survives, the work of Giorgio Orsini da Sebenico, one of the greatest architects and sculptors active in Ancona in the 15th century. Built in the second half of the 15th century, it is richly decorated with plant motifs, figures and details of great refinement. The portal bears witness to the importance of the Augustinian complex and represents one of the most significant testimonies of the Renaissance in Ancona.',
+              de:'Von der antiken, heute verschwundenen Kirche Sant\'Agostino ist nur das prächtige Renaissanceportal erhalten, ein Werk von Giorgio Orsini da Sebenico, einem der bedeutendsten Architekten und Bildhauer, die im 15. Jahrhundert in Ancona tätig waren. In der zweiten Hälfte des 15. Jahrhunderts errichtet, ist es reich verziert mit Pflanzenmotiven, Figuren und Details von großer Finesse. Das Portal zeugt von der Bedeutung des Augustinerkomplexes und stellt eines der bedeutendsten Renaissance-Zeugnisse Anconas dar.',
+              pl:'Z antycznego, dziś nieistniejącego kościoła Sant\'Agostino zachował się jedynie wspaniały renesansowy portal, dzieło Giorgio Orsiniego da Sebenico, jednego z najwybitniejszych architektów i rzeźbiarzy działających w Ankonie w XV wieku. Zbudowany w drugiej połowie XV wieku, jest bogato zdobiony motywami roślinnymi, postaciami i detalami o wielkiej finezji. Portal świadczy o znaczeniu kompleksu augustiańskiego i stanowi jedno z najważniejszych świadectw renesansu w Ankonie.',
+              itLong:'<p>Giorgio Orsini da Sebenico (Juraj Dalmatinac), lo stesso maestro a cui si deve il progetto della Loggia dei Mercanti, lavorò ad Ancona per diversi decenni nella seconda metà del Quattrocento, lasciando in città alcune delle testimonianze più raffinate dello stile gotico-rinascimentale adriatico. Il portale di Sant\'Agostino, con la sua ricca decorazione a motivi vegetali intrecciati e figure scolpite nella pietra, è considerato una delle sue opere più mature.</p><p>Della chiesa e del convento agostiniano che un tempo sorgevano attorno a questo portale non restano che poche tracce: come molti altri edifici religiosi della città, il complesso subì nel corso dei secoli soppressioni, riconversioni e danni, fino alla sua quasi totale scomparsa. Il portale, sopravvissuto isolato, è oggi una delle testimonianze più preziose e meno conosciute del centro storico.</p>',
+              enLong:'<p>Giorgio Orsini da Sebenico (Juraj Dalmatinac) — the same master behind the design of the Loggia dei Mercanti — worked in Ancona for several decades in the second half of the 15th century, leaving the city some of the finest examples of Adriatic Gothic-Renaissance style. The portal of Sant\'Agostino, with its rich decoration of interwoven plant motifs and figures carved in stone, is considered one of his most mature works.</p><p>Of the church and Augustinian convent that once stood around this portal, only a few traces remain: like many other religious buildings in the city, the complex underwent suppressions, conversions and damage over the centuries, until its almost total disappearance. The portal, surviving in isolation, is today one of the most precious and least-known testimonies of the historic centre.</p>',
+              deLong:'<p>Giorgio Orsini da Sebenico (Juraj Dalmatinac) — derselbe Meister, der auch die Loggia dei Mercanti entwarf — wirkte in der zweiten Hälfte des 15. Jahrhunderts mehrere Jahrzehnte lang in Ancona und hinterließ der Stadt einige der feinsten Beispiele des adriatischen gotisch-Renaissance-Stils. Das Portal von Sant\'Agostino, mit seiner reichen Verzierung aus ineinander verschlungenen Pflanzenmotiven und in Stein gemeißelten Figuren, gilt als eines seiner reifsten Werke.</p><p>Von der Kirche und dem Augustinerkloster, die einst um dieses Portal herum standen, sind nur wenige Spuren erhalten: Wie viele andere religiöse Gebäude der Stadt erlebte der Komplex im Laufe der Jahrhunderte Auflösungen, Umnutzungen und Schäden, bis er fast vollständig verschwand. Das isoliert erhaltene Portal ist heute eines der kostbarsten und am wenigsten bekannten Zeugnisse der Altstadt.</p>',
+              plLong:'<p>Giorgio Orsini da Sebenico (Juraj Dalmatinac) — ten sam mistrz, któremu zawdzięczamy projekt Loggia dei Mercanti — pracował w Ankonie przez kilka dekad w drugiej połowie XV wieku, pozostawiając miastu jedne z najwspanialszych przykładów adriatyckiego stylu gotycko-renesansowego. Portal Sant\'Agostino, z bogatą dekoracją z przeplatających się motywów roślinnych i rzeźbionych w kamieniu postaci, uznawany jest za jedno z jego najdojrzalszych dzieł.</p><p>Z kościoła i klasztoru augustiańskiego, które niegdyś otaczały ten portal, zachowało się niewiele śladów: podobnie jak wiele innych budowli sakralnych miasta, kompleks na przestrzeni wieków przechodził kasaty, przekształcenia i zniszczenia, aż do niemal całkowitego zniknięcia. Ocalały w odosobnieniu portal jest dziś jednym z najcenniejszych i najmniej znanych świadectw historycznego centrum.</p>',
+              dist:'🚶 ~300 m – 4 min', mapQuery:'Portale di Sant\'Agostino Ancona', lat:43.6182374, lng:13.5094010 },
+
+            { order:4, name:'Loggia dei Mercanti', emoji:'🏛️', photos:['loggia-mercanti.webp'],
               it:'La Loggia dei Mercanti è uno dei più raffinati esempi di architettura gotico-rinascimentale di Ancona.',
               en:'The Loggia dei Mercanti is one of Ancona\'s finest examples of Gothic-Renaissance architecture.',
               de:'Die Loggia dei Mercanti ist eines der feinsten Beispiele gotisch-Renaissance-Architektur Anconas.',
@@ -171,7 +182,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 50 m – 1 min', mapQuery:'Loggia dei Mercanti Ancona', lat:43.6199818, lng:13.5098563 },
 
-            { order:4, name:'Chiesa di Santa Maria della Piazza', emoji:'⛪', photos:['santa-maria-piazza.webp'],
+            { order:5, name:'Chiesa di Santa Maria della Piazza', emoji:'⛪', photos:['santa-maria-piazza.webp'],
               it:'La Chiesa di Santa Maria della Piazza è uno dei più preziosi esempi di architettura romanica delle Marche.',
               en:'The Church of Santa Maria della Piazza is one of the most precious examples of Romanesque architecture in the Marche.',
               de:'Die Kirche Santa Maria della Piazza ist eines der wertvollsten Beispiele romanischer Architektur der Marken.',
@@ -191,7 +202,7 @@ const appData = {
               itTime:'15–20 minuti.',enTime:'15–20 minutes.',deTime:'15–20 Minuten.',plTime:'15–20 minut.',
               dist:'🚶 100 m – 2 min', mapQuery:'Santa Maria della Piazza Ancona', lat:43.6205592, lng:13.5103676 },
 
-            { order:5, name:'Arco di Traiano', emoji:'🏛️', photos:['arco-traiano.webp'],
+            { order:6, name:'Arco di Traiano', emoji:'🏛️', photos:['arco-traiano.webp'],
               it:'L\'Arco di Traiano è il monumento romano più celebre di Ancona e uno dei meglio conservati dell\'intero Adriatico.',
               en:'The Arch of Trajan is the most celebrated Roman monument in Ancona, one of the best preserved on the entire Adriatic.',
               de:'Der Trajansbogen ist das bekannteste römische Monument Anconas und eines der besterhaltenen der gesamten Adria.',
@@ -211,7 +222,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 300 m – 4 min', mapQuery:'Arco di Traiano Ancona', lat:43.6252706, lng:13.5066018 },
 
-            { order:6, name:'Arco Clementino', emoji:'🏛️', photos:['arco-clementino.webp'],
+            { order:7, name:'Arco Clementino', emoji:'🏛️', photos:['arco-clementino.webp'],
               it:'L\'Arco Clementino rappresenta il passaggio tra la città romana e quella settecentesca.',
               en:'The Arch of Clement marks the passage between Roman Ancona and the 18th-century city.',
               de:'Der Clementinische Bogen markiert den Übergang zwischen dem römischen und dem barocken Ancona.',
@@ -227,7 +238,7 @@ const appData = {
               itTime:'10 minuti.',enTime:'10 minutes.',deTime:'10 Minuten.',plTime:'10 minut.',
               dist:'🚶 50 m – 1 min', mapQuery:'Arco Clementino Ancona', lat:43.6252604, lng:13.5049529 },
 
-            { order:'6-bis', name:'Lanterna Rossa', emoji:'🔴', photos:['lanterna-rossa.webp'],
+            { order:'7-bis', name:'Lanterna Rossa', emoji:'🔴', photos:['lanterna-rossa.webp'],
               it:'Per chi desidera proseguire la passeggiata, la Lanterna Rossa rappresenta una deviazione breve ma altamente consigliata.',
               en:'For those wishing to continue the walk, the Red Lighthouse is a short but highly recommended detour.',
               de:'Für alle, die den Spaziergang fortsetzen möchten, ist die Rote Laterne ein kurzer, aber sehr empfehlenswerter Umweg.',
@@ -247,7 +258,7 @@ const appData = {
               itTime:'20–30 minuti.',enTime:'20–30 minutes.',deTime:'20–30 Minuten.',plTime:'20–30 minut.',
               dist:'🚶 200 m – 3 min', mapQuery:'Lanterna Rossa Ancona', lat:43.6255485, lng:13.4942123 },
 
-            { order:7, name:'Resti del Porto Romano', emoji:'⚓', photos:['porto-romano.webp'],
+            { order:8, name:'Resti del Porto Romano', emoji:'⚓', photos:['porto-romano.webp'],
               it:'Percorrendo il lungomare in direzione del centro storico si incontrano i suggestivi resti dell\'antico Porto Romano, testimonianza dell\'importanza strategica che Ancona rivestiva già oltre duemila anni fa.',
               en:'Walking along the seafront towards the historic centre, you encounter the evocative remains of the ancient Roman Port, testimony to the strategic importance Ancona already held over two thousand years ago.',
               de:'Entlang der Promenade in Richtung Altstadt begegnet man den eindrucksvollen Überresten des antiken Römischen Hafens, Zeugnis der strategischen Bedeutung Anconas vor über zweitausend Jahren.',
@@ -263,7 +274,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 300 m – 4 min', mapQuery:'Porto Romano Ancona', lat:43.6235224, lng:13.5095720 },
 
-            { order:8, name:'Palazzo degli Anziani', emoji:'🏛️', photos:['palazzo-anziani.webp'],
+            { order:9, name:'Palazzo degli Anziani', emoji:'🏛️', photos:['palazzo-anziani.webp'],
               it:'Il Palazzo degli Anziani è uno dei luoghi più rappresentativi della storia civile di Ancona.',
               en:'The Palazzo degli Anziani is one of the most representative places of Ancona\'s civic history.',
               de:'Der Palazzo degli Anziani ist einer der repräsentativsten Orte der Zivilgeschichte Anconas.',
@@ -279,7 +290,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 350 m – 5 min', mapQuery:'Palazzo degli Anziani Ancona', lat:43.6226783, lng:13.5105215 },
 
-            { order:9, name:'Museo Archeologico Nazionale', emoji:'🏺', photos:['museo-archeologico.webp'],
+            { order:10, name:'Museo Archeologico Nazionale', emoji:'🏺', photos:['museo-archeologico.webp'],
               it:'Ospitato nello splendido Palazzo Ferretti, il Museo Archeologico Nazionale delle Marche custodisce una delle collezioni più importanti dell\'Italia centrale.',
               en:'Housed in the splendid Palazzo Ferretti, the National Archaeological Museum of the Marche holds one of the most important collections in central Italy.',
               de:'Im prächtigen Palazzo Ferretti untergebracht, bewahrt das Nationale Archäologische Museum der Marken eine der bedeutendsten Sammlungen Mittelitaliens.',
@@ -299,7 +310,7 @@ const appData = {
               itTime:'1–2 ore.',enTime:'1–2 hours.',deTime:'1–2 Stunden.',plTime:'1–2 godziny.',
               dist:'🚶 150 m – 2 min', mapQuery:'Museo Archeologico Nazionale Marche Ancona', lat:43.6234656, lng:13.5109808 },
 
-            { order:10, name:'Cattedrale di San Ciriaco', emoji:'⛪', photos:['duomo-san-ciriaco.webp'],
+            { order:11, name:'Cattedrale di San Ciriaco', emoji:'⛪', photos:['duomo-san-ciriaco.webp'],
               it:'La Cattedrale di San Ciriaco è il simbolo assoluto di Ancona e il luogo che meglio rappresenta l\'anima della città.',
               en:'The Cathedral of San Ciriaco is Ancona\'s absolute symbol, the place that best represents the city\'s soul.',
               de:'Die Kathedrale San Ciriaco ist das absolute Symbol Anconas und der Ort, der die Seele der Stadt am besten verkörpert.',
@@ -319,7 +330,7 @@ const appData = {
               itTime:'20–30 minuti.',enTime:'20–30 minutes.',deTime:'20–30 Minuten.',plTime:'20–30 minut.',
               dist:'🚶 400 m – 6 min', mapQuery:'Cattedrale San Ciriaco Ancona', lat:43.6251216, lng:13.5100370 },
 
-            { order:11, name:'Anfiteatro Romano', emoji:'🏟️', photos:['anfiteatro-romano.webp'],
+            { order:12, name:'Anfiteatro Romano', emoji:'🏟️', photos:['anfiteatro-romano.webp'],
               it:'Pochi visitatori immaginano che sotto le strade e gli edifici del centro storico si nasconda uno dei più importanti siti archeologici della città.',
               en:'Few visitors imagine that beneath the streets and buildings of the historic centre lies one of the city\'s most important archaeological sites.',
               de:'Nur wenige Besucher ahnen, dass sich unter den Straßen und Gebäuden der Altstadt eine der wichtigsten archäologischen Stätten der Stadt verbirgt.',
@@ -335,7 +346,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 200 m – 3 min', mapQuery:'Anfiteatro Romano Ancona', lat:43.6247408, lng:13.5117513 },
 
-            { order:12, name:'Ancona sotto le bombe', emoji:'💣', photos:['guerra.webp'],
+            { order:13, name:'Ancona sotto le bombe', emoji:'💣', photos:['guerra.webp'],
               it:'Il 1° novembre 1943 Ancona fu colpita da un devastante bombardamento alleato che colpì il porto e il centro storico e distrusse interi quartieri causando centinaia di vittime.',
               en:'On 1 November 1943, Ancona was struck by a devastating Allied bombing that hit the port and historic centre and destroyed entire neighbourhoods, causing hundreds of casualties.',
               de:'Am 1. November 1943 wurde Ancona von einem verheerenden alliierten Bombardement getroffen, das den Hafen und die Altstadt traf und ganze Stadtteile zerstörte und Hunderte von Opfern forderte.',
@@ -347,7 +358,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'📍 Centro storico', mapQuery:'Bombardamento Ancona 1943', lat:43.6210000, lng:13.5120000 },
 
-            { order:13, name:'Chiesa del Gesù', emoji:'⛪', photos:['chiesa-gesu.webp'],
+            { order:14, name:'Chiesa del Gesù', emoji:'⛪', photos:['chiesa-gesu.webp'],
               it:'Monumento commissionato dal conte Nappi nel 1605.',
               en:'Monument commissioned by Count Nappi in 1605.',
               de:'Monument, das 1605 von Graf Nappi in Auftrag gegeben wurde.',
@@ -358,7 +369,7 @@ const appData = {
               plLong:'<p>W 1733 roku Jezuici powierzyli Luigiemu Vanvitellemu projekt rozbudowy kościoła, zrealizowany z wklęsłą fasadą nawiązującą do kształtu portu.</p><p>Kontynuując w dół Via Pizzecolli, jedną z najstarszych ulic miasta, docieramy do Piazza San Francesco, gdzie wznosi się kościół o tej samej nazwie.</p>',
               dist:'🚶 600 m – 8 min', mapQuery:'Chiesa del Gesù Ancona', lat:43.6226099, lng:13.5111676 },
 
-            { order:14, name:'San Francesco alle Scale', emoji:'⛪', photos:['san-francesco-scale.webp'],
+            { order:15, name:'San Francesco alle Scale', emoji:'⛪', photos:['san-francesco-scale.webp'],
               it:'Dall\'alto di una gradinata, la Chiesa di San Francesco delle Scale prospetta su Piazza San Francesco, con un notevole effetto scenografico.',
               en:'From the top of a flight of steps, the Church of San Francesco delle Scale overlooks Piazza San Francesco, with a remarkable scenic effect.',
               de:'Von der Spitze einer Treppe überblickt die Kirche San Francesco delle Scale die Piazza San Francesco mit bemerkenswerter szenischer Wirkung.',
@@ -369,7 +380,7 @@ const appData = {
               plLong:'<p>Fasada ze wspaniałym wenecko-gotyckim portalem w kształcie tabernakulum, wykonanym z kamienia z Brioni przez Giorgio da Sebenico w połowie XV wieku (1455). We wnętrzu znakomite dzieła, od Lotta po Tibaldiego.</p><p>Schodząc Via Pizzecolli, docieramy do Pinakoteki Miejskiej (Pinacoteca civica).</p>',
               dist:'🚶 450 m – 6 min', mapQuery:'Chiesa di San Francesco alle Scale Ancona', lat:43.6214786, lng:13.5118841 },
 
-            { order:15, name:'Pinacoteca Civica F. Podesti', emoji:'🖼️', photos:['pinacoteca-podesti.webp'],
+            { order:16, name:'Pinacoteca Civica F. Podesti', emoji:'🖼️', photos:['pinacoteca-podesti.webp'],
               it:'Pinacoteca civica con opere di importanti autori tra cui Tiziano, Lotto, Crivelli, Guercino.',
               en:'Civic art gallery with works by important artists including Titian, Lotto, Crivelli, Guercino.',
               de:'Städtische Gemäldegalerie mit Werken bedeutender Künstler wie Tizian, Lotto, Crivelli, Guercino.',
@@ -380,7 +391,7 @@ const appData = {
               plLong:'<p>Idąc dalej, przechodzimy przez XVI-wieczny Arco del Rastrello i docieramy na Piazza del Plebiscito.</p>',
               dist:'🚶 300 m – 4 min', mapQuery:'Pinacoteca Civica Podesti Ancona', lat:43.6208333, lng:13.5122222 },
 
-            { order:16, name:'Palazzo del Governo', emoji:'🏛️', photos:['palazzo-del-governo.webp'],
+            { order:17, name:'Palazzo del Governo', emoji:'🏛️', photos:['palazzo-del-governo.webp'],
               it:'Affacciato su Piazza del Plebiscito, è uno degli edifici simbolo della storia civile di Ancona.',
               itLong:'<p>Nato nella seconda metà del Trecento, fu ampliato nel Quattrocento e nel 1484 Francesco di Giorgio Martini ne ridisegnò l\'architettura in forme rinascimentali.</p><p>Entrando nel <button class="inline-photo-link" onclick="openLightbox(\'cortile-prefettura.webp\')">cortile</button> si incontrano due archi ogivali appartenenti alla costruzione più antica e una curiosa testimonianza della vita quotidiana della città: i campioni delle antiche <button class="inline-photo-link" onclick="openLightbox(\'misure.webp\')">misure</button> ufficiali per <button class="inline-photo-link" onclick="openLightbox(\'misura-mattone.webp\')">mattone</button>, <button class="inline-photo-link" onclick="openLightbox(\'misura-coppo.webp\')">coppo</button>, braccio e piede. Servivano per controllare che materiali e merci rispettassero gli standard stabiliti dalla città. Oggi il palazzo è sede della Prefettura.</p>',
               en:'Facing Piazza del Plebiscito, it is one of the landmark buildings of Ancona\'s civic history.',
@@ -391,7 +402,7 @@ const appData = {
               plLong:'<p>Zbudowany w drugiej połowie XIV wieku, został rozbudowany w XV wieku, a w 1484 roku Francesco di Giorgio Martini przeprojektował jego architekturę w formach renesansowych.</p><p>Wchodząc na <button class="inline-photo-link" onclick="openLightbox(\'cortile-prefettura.webp\')">dziedziniec</button>, można zobaczyć dwa ostrołukowe łuki należące do starszej budowli oraz ciekawe świadectwo codziennego życia miasta: oficjalne <button class="inline-photo-link" onclick="openLightbox(\'misure.webp\')">wzorce miar</button> dla <button class="inline-photo-link" onclick="openLightbox(\'misura-mattone.webp\')">cegły</button>, <button class="inline-photo-link" onclick="openLightbox(\'misura-coppo.webp\')">dachówki</button>, łokcia (braccio) i stopy (piede), służące do sprawdzania, czy materiały i towary spełniają standardy ustalone przez miasto. Dziś pałac jest siedzibą Prefektury.</p>',
               dist:'🚶 300 m – 4 min', mapQuery:'Palazzo del Governo Piazza del Plebiscito Ancona', lat:43.6197818, lng:13.5110925 },
 
-            { order:17, name:'Piazza del Plebiscito (Piazza del Papa)', emoji:'🗿', photos:['piazza-plebiscito.webp', 'piazza-plebiscito-2.webp'],
+            { order:18, name:'Piazza del Plebiscito (Piazza del Papa)', emoji:'🗿', photos:['piazza-plebiscito.webp', 'piazza-plebiscito-2.webp'],
               it:'Conosciuta da tutti gli anconetani come Piazza del Papa, è uno degli angoli più eleganti e vivaci del centro storico. Il suo nome popolare deriva dalla monumentale statua di Papa Clemente XII, collocata al centro della piazza per celebrare il pontefice che concesse ad Ancona il prestigioso status di Porto Franco.',
               en:'Known to all Ancona locals as Piazza del Papa, it is one of the most elegant and lively corners of the historic centre. Its popular name comes from the monumental statue of Pope Clement XII, placed at the centre of the square to celebrate the pontiff who granted Ancona the prestigious status of Free Port.',
               de:'Von allen Bewohnern Anconas als Piazza del Papa bekannt, einer der elegantesten und lebendigsten Ecken der Altstadt. Der volkstümliche Name stammt von der monumentalen Statue Papst Klemens\' XII., der Ancona den Freihafenstatus verlieh.',
@@ -411,7 +422,7 @@ const appData = {
               itTime:'10–15 minuti.',enTime:'10–15 minutes.',deTime:'10–15 Minuten.',plTime:'10–15 minut.',
               dist:'🚶 50 m – 1 min', mapQuery:'Piazza del Plebiscito Ancona', lat:43.6195337, lng:13.5116510 },
 
-            { order:18, name:'Corso Garibaldi', emoji:'🚶', photos:['corso-garibaldi.webp'],
+            { order:19, name:'Corso Garibaldi', emoji:'🚶', photos:['corso-garibaldi.webp'],
               it:'Corso Garibaldi è il salotto di Ancona.',
               en:'Corso Garibaldi is Ancona\'s drawing room.',
               de:'Corso Garibaldi ist der Salon von Ancona.',
@@ -427,7 +438,7 @@ const appData = {
               itTime:'15–20 minuti di passeggiata.',enTime:'15–20 min walking.',deTime:'15–20 Min. Spaziergang.',plTime:'15–20 min spaceru.',
               dist:'🚶 300 m – 4 min', mapQuery:'Corso Garibaldi Ancona', lat:43.617938, lng:13.512813 },
 
-            { order:19, name:'Piazza Cavour', emoji:'🌳', photos:['piazza-cavour.webp'],
+            { order:20, name:'Piazza Cavour', emoji:'🌳', photos:['piazza-cavour.webp'],
               it:'Realizzata nella seconda metà dell\'Ottocento, Piazza Cavour rappresenta il principale spazio monumentale della città moderna.',
               en:'Built in the second half of the 19th century, Piazza Cavour is the main monumental space of the modern city.',
               de:'In der zweiten Hälfte des 19. Jahrhunderts entstanden, ist die Piazza Cavour der wichtigste Monumentalplatz der modernen Stadt.',
@@ -443,7 +454,7 @@ const appData = {
               itTime:'10 minuti.',enTime:'10 minutes.',deTime:'10 Minuten.',plTime:'10 minut.',
               dist:'🚶 550 m – 7 min', mapQuery:'Piazza Cavour Ancona', lat:43.616938, lng:13.516813 },
 
-            { order:20, name:'Viale della Vittoria', emoji:'🌲', photos:['viale-della-vittoria.webp'],
+            { order:21, name:'Viale della Vittoria', emoji:'🌲', photos:['viale-della-vittoria.webp'],
               it:'Viale della Vittoria è uno dei percorsi più piacevoli di Ancona.',
               en:'Viale della Vittoria is one of Ancona\'s most pleasant routes.',
               de:'Viale della Vittoria ist einer der angenehmsten Wege Anconas.',
@@ -458,7 +469,7 @@ const appData = {
               plNote:'Historyczne kawiarnie i lodziarnie: przystanek przed morzem.',
               itTime:'15 minuti di passeggiata.',enTime:'15 min walking.',deTime:'15 Min. Spaziergang.',plTime:'15 min spaceru.',
               dist:'🚶 1350 m – 18 min', mapQuery:'Viale della Vittoria Ancona', lat:43.615563, lng:13.526063 },
-            { ...poiMonumentoCaduti, order:21 }
+            { ...poiMonumentoCaduti, order:22 }
         ],
 
         passetto: [
@@ -1090,7 +1101,7 @@ const appData = {
                   de:'Das Wahrzeichen-Gericht der maritimen Tradition der Stadt. Viele Fischarten mit Tomaten, Zwiebeln, Öl, Safran und Essig — die goldene Farbe und der unverwechselbare Geschmack.',
                   pl:'Flagowe danie morskiej tradycji miasta. Wiele gatunków ryb z pomidorami, cebulą, oliwą, szafranem i octem — złoty kolor i niepowtarzalny smak.' },
                 { name:'Sardoncini Scottadito', emoji:'🐟',
-                  it:'Uno dei piatti più amati della tradizione anconetana. Le alici dell\'Adriatico vengono cotte alla griglia e servite ben calde, tanto da doverle mangiare "scottandosi le dita", da cui deriva il loro nome. Semplici e saporiti, sono perfetti accompagnati da pane e un bicchiere di vino bianco locale.',
+                  it:'I <button class="inline-photo-link" onclick="openLightbox(\'sardoncini.webp\')">sardoncini</button> scottadito sono uno dei piatti più amati della tradizione anconetana. Le alici dell\'Adriatico vengono cotte alla griglia e servite ben calde, tanto da doverle mangiare "scottandosi le dita", da cui deriva il loro nome. Semplici e saporiti, sono perfetti accompagnati da pane e un bicchiere di vino bianco locale.',
                   en:'One of the most beloved dishes of the Ancona tradition. Adriatic anchovies are grilled and served piping hot, so hot you have to eat them "burning your fingers" — hence the name. Simple and flavourful, perfect with bread and a glass of local white wine.',
                   de:'Eines der beliebtesten Gerichte Anconas. Adria-Sardellen werden gegrillt und heiß serviert. Einfach und schmackhaft, perfekt mit Brot und einem Glas lokalem Weißwein.',
                   pl:'Jedno z ulubionych dań tradycji ankońskiej. Sardele z Adriatyku grillowane i podawane na gorąco. Proste i smaczne, doskonałe z chlebem i kieliszkiem lokalnego białego wina.' },
@@ -1100,10 +1111,10 @@ const appData = {
                   de:'Typische Spezialität der Küste Anconas mit intensivem, aromatischem Geschmack. Meeresschnecken in Tomatensauce mit wildem Fenchel, Knoblauch und Gewürzen.',
                   pl:'Typowy specjał wybrzeża Ankony o intensywnym, aromatycznym smaku. Ślimaki morskie duszone w pomidorach z dzikim koperkiem, czosnkiem i przyprawami.' },
                 { name:'Moscioli Selvatici di Portonovo', emoji:'🦪',
-                  it:'I Moscioli di Portonovo sono mitili selvatici che crescono naturalmente sulle rocce del Monte Conero. Sono un presidio Slow Food e rappresentano una delle eccellenze gastronomiche delle Marche. A differenza delle comuni cozze allevate, i moscioli vengono raccolti esclusivamente in mare aperto da pescatori autorizzati. La raccolta è rigorosamente regolamentata per preservare questo prezioso habitat naturale e avviene solo in determinati periodi dell\'anno. Il loro sapore intenso e iodato è molto apprezzato dagli intenditori. Possono essere gustati semplicemente aperti in padella oppure utilizzati in primi piatti e zuppe di mare.',
-                  en:'The Moscioli of Portonovo are wild mussels that grow naturally on the rocks of Monte Conero. They are a Slow Food Presidium and one of the gastronomic excellences of the Marche. Unlike common farmed mussels, moscioli are collected exclusively in open sea by authorised fishermen. Collection is strictly regulated to preserve this precious natural habitat and only takes place during certain periods of the year. Their intense, iodine-rich flavour is highly appreciated by connoisseurs. They can be enjoyed simply pan-opened or used in first courses and seafood soups.',
-                  de:'Die Moscioli von Portonovo sind wilde Muscheln, die natürlich auf den Felsen des Monte Conero wachsen. Sie sind ein Slow-Food-Presidio und eine der gastronomischen Exzellenzen der Marken. Im Gegensatz zu gewöhnlichen Zuchtmuscheln werden Moscioli ausschließlich im offenen Meer von autorisierten Fischern gesammelt. Ihr intensiver, jodhaltiger Geschmack wird von Kennern sehr geschätzt.',
-                  pl:'Moscioli z Portonovo to dzikie małże rosnące naturalnie na skałach Monte Conero. Są prezydium Slow Food i jednym z gastronomicznych skarbów Marchii. W przeciwieństwie do zwykłych hodowlanych małży, moscioli zbierane są wyłącznie na otwartym morzu przez uprawnionych rybaków. Ich intensywny, jodowy smak jest bardzo ceniony przez smakoszy.' },
+                  it:'I <button class="inline-photo-link" onclick="openLightbox(\'moscioli.webp\')">Moscioli</button> di Portonovo sono mitili selvatici che crescono naturalmente sulle rocce del Monte Conero. Sono un presidio Slow Food e rappresentano una delle eccellenze gastronomiche delle Marche. A differenza delle comuni cozze allevate, i moscioli vengono raccolti esclusivamente in mare aperto da pescatori autorizzati. La raccolta è rigorosamente regolamentata per preservare questo prezioso habitat naturale e avviene solo in determinati periodi dell\'anno. Il loro sapore intenso e iodato è molto apprezzato dagli intenditori. Possono essere gustati semplicemente aperti in padella oppure utilizzati in primi piatti e zuppe di mare.',
+                  en:'The <button class="inline-photo-link" onclick="openLightbox(\'moscioli.webp\')">Moscioli</button> of Portonovo are wild mussels that grow naturally on the rocks of Monte Conero. They are a Slow Food Presidium and one of the gastronomic excellences of the Marche. Unlike common farmed mussels, moscioli are collected exclusively in open sea by authorised fishermen. Collection is strictly regulated to preserve this precious natural habitat and only takes place during certain periods of the year. Their intense, iodine-rich flavour is highly appreciated by connoisseurs. They can be enjoyed simply pan-opened or used in first courses and seafood soups.',
+                  de:'Die <button class="inline-photo-link" onclick="openLightbox(\'moscioli.webp\')">Moscioli</button> von Portonovo sind wilde Muscheln, die natürlich auf den Felsen des Monte Conero wachsen. Sie sind ein Slow-Food-Presidio und eine der gastronomischen Exzellenzen der Marken. Im Gegensatz zu gewöhnlichen Zuchtmuscheln werden Moscioli ausschließlich im offenen Meer von autorisierten Fischern gesammelt. Ihr intensiver, jodhaltiger Geschmack wird von Kennern sehr geschätzt.',
+                  pl:'<button class="inline-photo-link" onclick="openLightbox(\'moscioli.webp\')">Moscioli</button> z Portonovo to dzikie małże rosnące naturalnie na skałach Monte Conero. Są prezydium Slow Food i jednym z gastronomicznych skarbów Marchii. W przeciwieństwie do zwykłych hodowlanych małży, moscioli zbierane są wyłącznie na otwartym morzu przez uprawnionych rybaków. Ich intensywny, jodowy smak jest bardzo ceniony przez smakoszy.' },
                 { name:'Stoccafisso all\'Anconetana', emoji:'🐟',
                   it:'Lo Stoccafisso all\'Anconetana è uno dei piatti più rappresentativi della tradizione cittadina, frutto degli antichi rapporti commerciali tra Ancona e il Nord Europa. Lo stoccafisso arrivava ad Ancona sulle navi mercantili provenienti dalla Norvegia e venne presto adottato dalla cucina locale. La ricetta tradizionale prevede una lunga cottura con patate, pomodoro, vino bianco, olio extravergine, olive e aromi mediterranei. Il risultato è un piatto delicato ma ricco di gusto, che ancora oggi rappresenta uno dei simboli della gastronomia marchigiana.',
                   en:'Stoccafisso all\'Anconetana is one of the most representative dishes of the city\'s tradition, the result of ancient trade relations between Ancona and Northern Europe. Stockfish arrived in Ancona on merchant ships from Norway and was soon adopted by local cuisine. The traditional recipe involves long cooking with potatoes, tomato, white wine, extra virgin olive oil, olives and Mediterranean aromatics. The result is a delicate yet flavour-rich dish that still represents one of the symbols of Marche gastronomy.',
@@ -1171,7 +1182,7 @@ const appData = {
     const sections = [
         { id:'apartment',   icon:'🏠', it:'Appartamento',           en:'Apartment',             de:'Wohnung',              pl:'Mieszkanie' },
         { id:'contact',     icon:'📞', it:'Contatti, Emergenze & Social',   en:'Contacts, Emergency & Social',  de:'Kontakt, Notfälle & Social',   pl:'Kontakt, alarmy i Social' },
-        { id:'services',    icon:'🔧', it:'Servizi',                en:'Services',              de:'Dienstleistungen',     pl:'Usługi' },
+        { id:'services',    icon:'🔧', it:'Servizi & Market',       en:'Services & Market',     de:'Dienste & Markt',      pl:'Usługi i market' },
         { id:'restaurants', icon:'🍽️', it:'Ristoranti, Bar e Pub',  en:'Restaurants, Bars & Pubs', de:'Restaurants, Bars & Pubs', pl:'Restauracje, bary i puby' },
         { id:'mustsee',     icon:'🚶', it:'Centro Storico',        en:'Historic Centre',       de:'Historisches Zentrum', pl:'Centrum historyczne' },
         { id:'passetto',    icon:'🌊', it:'Il Passetto',            en:'The Passetto',          de:'Der Passetto',         pl:'Passetto' },
