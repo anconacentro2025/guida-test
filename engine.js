@@ -1,4 +1,4 @@
-// ===== V6.19 · 24/08/26 12:20 =====
+// ===== V6.20 · 25/08/26 08:20 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.19-24081220';
+    const APP_CACHE_NAME = 'ancona-guida-v6.20-25080820';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -143,17 +143,42 @@
     // dalla scheda di un luogo) per mostrare 1-4 foto scorrevoli senza uscire dall'app.
     // Il parametro photosCsv è una stringa con i nomi file separati da virgola (più semplice
     // da incorporare in un attributo onclick rispetto a un array letterale con virgolette).
-    function openLightbox(photosCsv){
+    // FIX 24/08/26: prima ogni foto andava elencata a mano (limite noto, vedi handoff.md:
+    // "Link inline: linkare manualmente per adesso"). Ora, come già succede per le foto
+    // principali dei luoghi (expandPhotosAsync), si tenta l'auto-detect delle varianti
+    // -2/-3/-4 per ciascun file passato, fino al limite di 4 foto totali. Resa async per
+    // via delle richieste HEAD di verifica — gli onclick esistenti non attendono il
+    // risultato, quindi restano invariati e continuano a funzionare senza modifiche.
+    async function openLightbox(photosCsv){
         closeLightbox();
-        const photos = photosCsv.split(',').map(f => f.trim());
+        const baseFiles = photosCsv.split(',').map(f => f.trim()).filter(Boolean);
+        let photos = [];
+        for (const baseFile of baseFiles) {
+            if (photos.length >= 4) break;
+            if (!photos.includes(baseFile)) photos.push(baseFile);
+            // Se il file è già una variante (es. anelli-2.webp), non provare ad espanderlo
+            // ulteriormente: eviterebbe richieste inutili per pattern tipo anelli-2-2.webp.
+            if (/-[234]\.webp$/.test(baseFile)) continue;
+            const baseName = baseFile.replace(/\.webp$/, '');
+            for (let i = 2; i <= 4 && photos.length < 4; i++) {
+                const filename = baseName + '-' + i + '.webp';
+                if (photos.includes(filename)) continue;
+                try {
+                    const response = await fetch(PHOTO_BASE + filename, { method: 'HEAD' });
+                    if (response.ok) photos.push(filename);
+                } catch (e) {}
+            }
+        }
         const linkGalleryIndex = 'link-' + Math.random().toString(36).substr(2,9);
         _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), caption: '' };
         openDetailGalleryFullscreen(linkGalleryIndex);
     }
+    // FIX 24/08/26: puntava a '.lightbox-overlay', una classe CSS non più creata da nessuna
+    // parte (residuo di un'implementazione precedente, sostituita da .fullscreen-gallery-
+    // overlay in V6.13). Di fatto non chiudeva mai nulla: aprendo due link in sequenza
+    // rapida, il primo restava aperto sotto il secondo invece di chiudersi.
     function closeLightbox(){
-        const overlay = document.querySelector('.lightbox-overlay');
-        if (overlay) overlay.remove();
-        document.body.style.overflow = '';
+        closeDetailGalleryFullscreen();
     }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
@@ -1270,7 +1295,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 619;
+    const BUILD_NUMBER = 620;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
