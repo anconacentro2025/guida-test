@@ -833,8 +833,7 @@
             porto:()=>appData.porto||[],
             beaches:()=>appData.beaches,
             portonovo:()=>appData.portonovo||{intro:{it:'',en:'',de:'',pl:''},points:[]},
-            borghi:()=>appData.borghi||[],
-            parking:()=>appData.services.parking||[]
+            borghi:()=>appData.borghi||[]
         };
         if(map[id])return renderPlaceSection(map[id](),id);
         console.warn('Sezione non trovata:',id);return'';

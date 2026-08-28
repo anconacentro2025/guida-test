@@ -1191,8 +1191,7 @@ const appData = {
         { id:'conero',      icon:'🏔️', it:'Monte Conero',           en:'Monte Conero',          de:'Monte Conero',        pl:'Monte Conero' },
         { id:'borghi',      icon:'🏘️', it:'Borghi e dintorni',      en:'Villages & surrounds',  de:'Dörfer & Umgebung',    pl:'Miasteczka i okolice' },
         { id:'usefulinfo',  icon:'ℹ️', it:'Informazioni utili',     en:'Useful Information',    de:'Nützliche Informationen', pl:'Przydatne informacje' },
-        { id:'itinerari',   icon:'🗺️', it:'Itinerari',              en:'Itineraries',           de:'Routen',               pl:'Trasy' },
-        { id:'parking',     icon:'🅿️', it:'Parcheggi',              en:'Parking',               de:'Parkplätze',           pl:'Parkingi' }
+        { id:'itinerari',   icon:'🗺️', it:'Itinerari',              en:'Itineraries',           de:'Routen',               pl:'Trasy' }
     ]
 
-const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12,'itinerari':13,'parking':14 }
+const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12,'itinerari':13 }
