@@ -1,4 +1,4 @@
-// ===== V6.23 · 27/08/26 19:50 =====
+// ===== V6.23 · 28/08/26 08:50 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -42,7 +42,7 @@
     // questi 6 id; le 8 sezioni-itinerario (mustsee...borghi) confluiscono nel picker
     // "Itinerari" invece di comparire come tile/pill separate. I link diretti tipo #mustsee
     // continuano a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','itinerari'];
+    const HOME_NAV_IDS = ['apartment','contact','services','parking','restaurants','usefulinfo','itinerari'];
     const ITINERARY_IDS = ['mustsee','passetto','cardeto','porto','beaches','portonovo','conero','borghi'];
 
     ;
