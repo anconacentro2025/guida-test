@@ -1,4 +1,4 @@
-// ===== V6.22-TEST-MUSEO · 28/08/26 12:10 =====
+// ===== V6.22-TEST-PARKING · 28/08/26 12:20 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v6.5 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -1181,6 +1181,7 @@ const appData = {
         { id:'apartment',   icon:'🏠', it:'Appartamento',           en:'Apartment',             de:'Wohnung',              pl:'Mieszkanie' },
         { id:'contact',     icon:'📞', it:'Contatti, Emergenze & Social',   en:'Contacts, Emergency & Social',  de:'Kontakt, Notfälle & Social',   pl:'Kontakt, alarmy i Social' },
         { id:'services',    icon:'🔧', it:'Servizi & Market',       en:'Services & Market',     de:'Dienste & Markt',      pl:'Usługi i market' },
+        { id:'parking',     icon:'🅿️', it:'Parcheggi',              en:'Parking',               de:'Parkplätze',           pl:'Parkingi' },
         { id:'restaurants', icon:'🍽️', it:'Ristoranti, Bar e Pub',  en:'Restaurants, Bars & Pubs', de:'Restaurants, Bars & Pubs', pl:'Restauracje, bary i puby' },
         { id:'mustsee',     icon:'🚶', it:'Centro Storico',        en:'Historic Centre',       de:'Historisches Zentrum', pl:'Centrum historyczne' },
         { id:'passetto',    icon:'🌊', it:'Il Passetto',            en:'The Passetto',          de:'Der Passetto',         pl:'Passetto' },
@@ -1194,4 +1195,4 @@ const appData = {
         { id:'itinerari',   icon:'🗺️', it:'Itinerari',              en:'Itineraries',           de:'Routen',               pl:'Trasy' }
     ]
 
-const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12,'itinerari':13 }
+const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'parking':3,'restaurants':4,'mustsee':5,'passetto':6,'cardeto':7,'porto':8,'beaches':9,'portonovo':10,'conero':11,'borghi':12,'usefulinfo':13,'itinerari':14 }
