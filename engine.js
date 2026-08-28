@@ -1,4 +1,4 @@
-// ===== V6.22 · 26/08/26 20:20 =====
+// ===== V6.23 · 27/08/26 19:50 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -833,7 +833,8 @@
             porto:()=>appData.porto||[],
             beaches:()=>appData.beaches,
             portonovo:()=>appData.portonovo||{intro:{it:'',en:'',de:'',pl:''},points:[]},
-            borghi:()=>appData.borghi||[]
+            borghi:()=>appData.borghi||[],
+            parking:()=>appData.services.parking||[]
         };
         if(map[id])return renderPlaceSection(map[id](),id);
         console.warn('Sezione non trovata:',id);return'';
