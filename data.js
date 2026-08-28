@@ -1,4 +1,4 @@
-// ===== V6.22-TEST-COLONNA · 28/08/26 12:00 =====
+// ===== V6.22-TEST-MUSEO · 28/08/26 12:10 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v6.5 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -689,7 +689,7 @@ const appData = {
               deTime:'20–30 Min. (außen). 1 Std. mit Museum.',
               plTime:'20–30 min (zewnątrz). 1 godz. z muzeum.',
               dist:'🚶 1100 m – 14 min', mapQuery:'Mole Vanvitelliana Ancona', lat:43.6143735, lng:13.504058,
-              extraMap:{ label:'🖐️ Museo Tattile Omero', query:'Museo Tattile Statale Omero Ancona' } },
+              extraMap:{ label:'🖐️ Museo Tattile Omero', url:'https://museoomero.it/en/museum/plan-your-visit/' } },
             { name:'Marina Dorica', emoji:'⛵', photos:['marina-dorica.webp'],
               it:'Uno dei più grandi porti turistici dell\'Adriatico e il lato più moderno della vocazione marinara di Ancona.',
               en:'One of the largest tourist marinas on the Adriatic and the most modern side of Ancona\'s maritime vocation.',
