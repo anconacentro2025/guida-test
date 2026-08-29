@@ -1,4 +1,4 @@
-// ===== V6.23 · 29/08/26 10:30 =====
+// ===== V6.24 · 29/08/26 15:55 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.22-26082020';
+    const APP_CACHE_NAME = 'ancona-guida-v6.24-29082655';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -30,6 +30,15 @@
     let fsSubItineraryId = null;
     let fsListenersInitialized = false;
     let _fsCloseHandler = null; // FIX #4 V5.0 27/06/26: handler persistente per evitare accumulo listener
+
+    // V6.23: Auto-generate sectionHashMap da sections[] per evitare desincronizzazione
+    // Questo è l'unica fonte di verità — aggiungere sezione = modificare SOLO sections in data.js
+    let sectionHashMap = {};
+    if (typeof sections !== 'undefined' && Array.isArray(sections)) {
+        sections.forEach((sec, idx) => {
+            sectionHashMap[sec.id] = idx;
+        });
+    }
 
     // Item 1 V5.0: debounce utility – previene chiamate ravvicinate (es. resize)
     function debounce(fn, delay) { let timer; return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); }; }
@@ -1298,7 +1307,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 622;
+    const BUILD_NUMBER = 624;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
