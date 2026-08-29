@@ -1,4 +1,4 @@
-// ===== V6.22-ROLLBACK-PARKING · 28/08/26 12:25 =====
+// ===== V6.22-PARKING-VIRTUALE · 28/08/26 12:30 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v6.5 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -1194,4 +1194,4 @@ const appData = {
         { id:'itinerari',   icon:'🗺️', it:'Itinerari',              en:'Itineraries',           de:'Routen',               pl:'Trasy' }
     ]
 
-const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12,'itinerari':13 }
+const sectionHashMap = { 'apartment':0,'contact':1,'services':2,'restaurants':3,'mustsee':4,'passetto':5,'cardeto':6,'porto':7,'beaches':8,'portonovo':9,'conero':10,'borghi':11,'usefulinfo':12,'itinerari':13,'parking':14 }
