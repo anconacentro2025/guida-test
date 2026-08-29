@@ -1,4 +1,4 @@
-// ===== V6.23 · 29/08/26 15:50 =====
+// ===== V6.25 · 29/08/26 16:00 =====
 // Service Worker — Affittacamere Ancona Centro · Guida Ospiti V6.24 29/08/26
 // V6.0: aggiunta cache dedicata e persistente per data.js/engine.js (vedi APP_FILES_CACHE_NAME
 // più sotto). A differenza di CACHE_NAME, questa cache NON viene svuotata ad ogni release:
@@ -9,15 +9,17 @@
 // CACHE_NAME non è più hardcoded: viene ricevuto da index.html tramite postMessage
 // {type:'SET_CACHE_NAME', cacheName:'...'} subito dopo la registrazione.
 // Il valore di fallback copre il primo avvio prima che il messaggio arrivi.
-let CACHE_NAME = 'ancona-guida-v6.23-29082650';
+let CACHE_NAME = 'ancona-guida-v6.24-29082655';
 let TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 
-// V6.0: nome FISSO, non derivato da CACHE_NAME — deve restare identico release dopo release,
-// altrimenti verrebbe cancellata dal cleanup in 'activate' a ogni bump di versione, vanificando
-// lo scopo (persistere data.js/engine.js tra una release e l'altra).
-const APP_FILES_CACHE_NAME = 'ancona-guida-appfiles';
-const MAX_APP_FILES = 6; // ~3 versioni di data.js + engine.js prima del trim
+// V6.25 FIX: APP_FILES_CACHE_NAME ora include BUILD_NUMBER (ricevuto da engine.js via postMessage).
+// Ad ogni release, BUILD_NUMBER cambia → APP_FILES_CACHE_NAME cambia → cache separata
+// Questo previene il bug dove data.js V6.24 veniva servito quando si caricava V6.23.
+// Valore di fallback per primo avvio prima che il messaggio da engine.js arrivi.
+const APP_FILES_CACHE_NAME_PREFIX = 'ancona-guida-appfiles';
+let APP_FILES_CACHE_NAME = 'ancona-guida-appfiles-fallback';
+const MAX_APP_FILES = 3; // 1 versione attuale + 2 versioni vecchie per rollback d'emergenza
 
 // FIX 22/08/26: nome FISSO come APP_FILES_CACHE_NAME — deve sopravvivere al cleanup
 // in 'activate'. Usata come sostituto di localStorage (NON disponibile in un Service
@@ -147,11 +149,19 @@ self.addEventListener('activate', (event) => {
             return caches.keys().then((cacheNames) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
-                        // V6.0: APP_FILES_CACHE_NAME aggiunta alla whitelist — è l'unica cache
-                        // che deve sopravvivere anche quando CACHE_NAME cambia ad ogni release.
-                        // VERSION_META_CACHE_NAME idem: deve persistere per poter fare il confronto
-                        // di versione al prossimo 'activate'.
-                        if (cacheName !== CACHE_NAME && cacheName !== TILES_CACHE_NAME && cacheName !== APP_FILES_CACHE_NAME && cacheName !== VERSION_META_CACHE_NAME) {
+                        // V6.25: APP_FILES_CACHE_NAME ora include BUILD_NUMBER (es. 'ancona-guida-appfiles-624')
+                        // Cancella i vecchi cache di appfiles dalle release precedenti, mantieni solo il corrente.
+                        // Whitelist: CACHE_NAME, TILES_CACHE_NAME, APP_FILES_CACHE_NAME (current), VERSION_META_CACHE_NAME
+                        const isOldAppFilesCache = cacheName.startsWith(APP_FILES_CACHE_NAME_PREFIX) && cacheName !== APP_FILES_CACHE_NAME;
+                        
+                        if (cacheName !== CACHE_NAME && 
+                            cacheName !== TILES_CACHE_NAME && 
+                            cacheName !== APP_FILES_CACHE_NAME && 
+                            cacheName !== VERSION_META_CACHE_NAME &&
+                            !isOldAppFilesCache) {
+                            return caches.delete(cacheName);
+                        } else if (isOldAppFilesCache) {
+                            // Cancella esplicitamente i vecchi cache di appfiles (da release precedenti)
                             return caches.delete(cacheName);
                         }
                     })
@@ -309,6 +319,10 @@ self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SET_CACHE_NAME' && event.data.cacheName) {
         CACHE_NAME = event.data.cacheName;
         TILES_CACHE_NAME = CACHE_NAME + '-tiles';
-        // Nota: APP_FILES_CACHE_NAME NON viene derivata da CACHE_NAME — resta fissa di proposito.
+        // V6.25: Ricevi BUILD_NUMBER da engine.js e usa per derivare APP_FILES_CACHE_NAME
+        // Così ad ogni release, APP_FILES_CACHE_NAME cambia → cache separata → zero conflitti
+        if (event.data.buildNumber) {
+            APP_FILES_CACHE_NAME = APP_FILES_CACHE_NAME_PREFIX + '-' + event.data.buildNumber;
+        }
     }
 });
