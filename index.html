@@ -132,7 +132,10 @@
         .fullscreen-gallery-overlay .gallery-dots{position:absolute;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:0;right:0;background:transparent}
         .fs-gallery-close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:9999;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:var(--white);width:44px;height:44px;border-radius:50%;font-size:1.3rem;line-height:1;cursor:pointer;font-weight:300;transition:all .2s ease}
         .fs-gallery-close:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5)}
-        .fs-gallery-caption{padding:16px calc(16px + env(safe-area-inset-left,0px)) 8px calc(16px + env(safe-area-inset-right,0px));color:rgba(255,255,255,.8);font-size:.9rem;line-height:1.4;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
+        .fs-gallery-caption{position:fixed;bottom:40px;right:20px;width:300px;max-height:300px;background:rgba(11,31,51,.95);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:0;color:rgba(255,255,255,.8);font-size:.9rem;line-height:1.4;text-align:center;z-index:9998;box-shadow:0 4px 16px rgba(0,0,0,.4);display:flex;flex-direction:column;resize:both;overflow:hidden;touch-action:none;user-select:none}
+        .fs-caption-header{background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1);padding:8px 12px;cursor:move;flex-shrink:0;font-weight:500;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+        .fs-caption-body{padding:12px;overflow-y:auto;flex:1}
+        .fs-caption-resize{position:absolute;bottom:0;right:0;width:16px;height:16px;background:linear-gradient(135deg,transparent 50%,rgba(255,255,255,.3) 50%);cursor:se-resize;flex-shrink:0}
         .lightbox-close{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:9999;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:var(--white);width:40px;height:40px;border-radius:50%;font-size:1.1rem;line-height:1}
         .inline-photo-link{background:none;border:none;padding:0;font:inherit;color:var(--navy-3);font-weight:500;text-decoration:underline;text-decoration-color:rgba(30,74,112,.3);cursor:pointer}
         .detail-photo{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s;display:block}

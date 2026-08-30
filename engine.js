@@ -904,13 +904,22 @@
             slidesHtml += '<div class="gallery-slide"><img class="detail-photo loaded" src="' + PHOTO_BASE + filename + '" alt="Foto ' + (i + 1) + '" id="fs-img-' + i + '"></div>';
         });
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
-        const captionHtml = data.caption ? '<div class="fs-gallery-caption">' + data.caption + '</div>' : '';
+        
+        // V7.0: Caption resa draggable e resizable
+        const captionHtml = data.caption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
+            '<div class="fs-caption-header">Dettagli</div>' +
+            '<div class="fs-caption-body">' + data.caption + '</div>' +
+            '<div class="fs-caption-resize"></div>' +
+            '</div>') : '';
+        
         const overlay = document.createElement('div');
         overlay.className = 'fullscreen-gallery-overlay';
-        overlay.innerHTML = '<button class="fs-gallery-close" aria-label="' + tr('Chiudi', 'Close', 'Schließen', 'Zamknij') + '">✕</button>' + captionHtml + '<div class="fs-detail-gallery" id="fs-gallery-' + index + '">' + slidesHtml + '</div>' + dotsHtml;
+        overlay.innerHTML = '<button class="fs-gallery-close" aria-label="' + tr('Chiudi', 'Close', 'Schließen', 'Zamknij') + '">✕</button>' + '<div class="fs-detail-gallery" id="fs-gallery-' + index + '">' + slidesHtml + '</div>' + dotsHtml + captionHtml;
         document.body.appendChild(overlay);
+        
         overlay.querySelector('.fs-gallery-close').addEventListener('click', closeDetailGalleryFullscreen);
         overlay.addEventListener('click', function (e) { if (e.target === overlay) closeDetailGalleryFullscreen(); });
+        
         if (data.photos.length > 1) {
             const galleryEl = overlay.querySelector('#fs-gallery-' + index), dotsEl = overlay.querySelector('#fs-dots');
             if (galleryEl && dotsEl) {
@@ -921,6 +930,113 @@
                 }, 80));
             }
         }
+        
+        // V7.0: Rendi caption draggable e resizable
+        if (data.caption) {
+            const captionEl = overlay.querySelector('#fs-caption-' + index);
+            const headerEl = captionEl.querySelector('.fs-caption-header');
+            const resizeEl = captionEl.querySelector('.fs-caption-resize');
+            const storageKey = 'fs-caption-pos-' + index;
+            
+            // Carica posizione salvata
+            const savedPos = sessionStorage.getItem(storageKey);
+            if (savedPos) {
+                try {
+                    const pos = JSON.parse(savedPos);
+                    captionEl.style.left = pos.left + 'px';
+                    captionEl.style.bottom = pos.bottom + 'px';
+                    captionEl.style.width = pos.width + 'px';
+                    captionEl.style.height = pos.height + 'px';
+                    captionEl.style.right = 'auto'; // Usa left invece di right
+                } catch (e) {}
+            }
+            
+            // Drag
+            let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
+            headerEl.addEventListener('mousedown', startDrag);
+            headerEl.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                const rect = captionEl.getBoundingClientRect();
+                dragOffsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                dragOffsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('touchmove', doDrag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+                e.preventDefault();
+            }
+            
+            function doDrag(e) {
+                if (!isDragging) return;
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - dragOffsetX;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - dragOffsetY;
+                captionEl.style.left = Math.max(0, Math.min(x, window.innerWidth - captionEl.offsetWidth)) + 'px';
+                captionEl.style.bottom = 'auto';
+                captionEl.style.top = Math.max(0, Math.min(y, window.innerHeight - captionEl.offsetHeight)) + 'px';
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', doDrag);
+                document.removeEventListener('touchmove', doDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+                // Salva posizione
+                const rect = captionEl.getBoundingClientRect();
+                sessionStorage.setItem(storageKey, JSON.stringify({
+                    left: parseInt(captionEl.style.left) || rect.left,
+                    bottom: parseInt(captionEl.style.bottom) || 0,
+                    width: captionEl.offsetWidth,
+                    height: captionEl.offsetHeight
+                }));
+            }
+            
+            // Resize
+            let isResizing = false, resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
+            resizeEl.addEventListener('mousedown', startResize);
+            resizeEl.addEventListener('touchstart', startResize);
+            
+            function startResize(e) {
+                isResizing = true;
+                resizeStartX = e.touches ? e.touches[0].clientX : e.clientX;
+                resizeStartY = e.touches ? e.touches[0].clientY : e.clientY;
+                resizeStartW = captionEl.offsetWidth;
+                resizeStartH = captionEl.offsetHeight;
+                document.addEventListener('mousemove', doResize);
+                document.addEventListener('touchmove', doResize);
+                document.addEventListener('mouseup', stopResize);
+                document.addEventListener('touchend', stopResize);
+                e.preventDefault();
+            }
+            
+            function doResize(e) {
+                if (!isResizing) return;
+                const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                const newW = Math.max(200, resizeStartW + (currentX - resizeStartX));
+                const newH = Math.max(150, resizeStartH + (currentY - resizeStartY));
+                captionEl.style.width = newW + 'px';
+                captionEl.style.height = newH + 'px';
+            }
+            
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('mousemove', doResize);
+                document.removeEventListener('touchmove', doResize);
+                document.removeEventListener('mouseup', stopResize);
+                document.removeEventListener('touchend', stopResize);
+                // Salva posizione
+                sessionStorage.setItem(storageKey, JSON.stringify({
+                    left: parseInt(captionEl.style.left) || 0,
+                    bottom: parseInt(captionEl.style.bottom) || 0,
+                    width: captionEl.offsetWidth,
+                    height: captionEl.offsetHeight
+                }));
+            }
+        }
+        
         document.body.style.overflow = 'hidden';
     }
     function closeDetailGalleryFullscreen() {
