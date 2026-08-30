@@ -1,4 +1,4 @@
-// ===== V6.26 · 29/08/26 16:45 =====
+// ===== V6.26 · 29/08/26 16:50 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -182,7 +182,16 @@
             }
         }
         const linkGalleryIndex = 'link-' + Math.random().toString(36).substr(2,9);
-        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), caption: caption || '' };
+        
+        // Gestione retrocompatibile: caption può essere stringa o array
+        let captions = [];
+        if (Array.isArray(caption)) {
+            captions = caption;
+        } else if (caption) {
+            captions = [caption];
+        }
+        
+        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), captions: captions };
         openDetailGalleryFullscreen(linkGalleryIndex);
     }
     // FIX 24/08/26: puntava a '.lightbox-overlay', una classe CSS non più creata da nessuna
