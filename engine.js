@@ -1,4 +1,4 @@
-// ===== V7.0 · 31/08/26 13:30 =====
+// ===== V6.26 · 31/08/26 13:41 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -1003,7 +1003,7 @@
         });
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
         
-        // V7.0: Caption resa draggable e resizable
+        // V6.26: Caption resa draggable e resizable
         const captions = data.captions || (data.caption ? [data.caption] : []);
         const currentCaption = captions[0] || '';
         const captionHtml = currentCaption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
@@ -1031,7 +1031,7 @@
             }
         }
         
-        // V7.0: Rendi caption draggable e resizable
+        // V6.26: Rendi caption draggable e resizable
         if (currentCaption) {
             const captionEl = overlay.querySelector('#fs-caption-' + index);
             const headerEl = captionEl.querySelector('.fs-caption-header');
