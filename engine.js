@@ -51,7 +51,7 @@
     // questi 6 id; le 8 sezioni-itinerario (mustsee...borghi) confluiscono nel picker
     // "Itinerari" invece di comparire come tile/pill separate. I link diretti tipo #mustsee
     // continuano a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','itinerari'];
+    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','parcheggi','itinerari'];
     const ITINERARY_IDS = ['mustsee','passetto','cardeto','porto','beaches','portonovo','conero','borghi'];
 
     ;
@@ -796,13 +796,14 @@
         }).join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
+        const searchBtnHtml='<button class="home-search-btn" onclick="document.getElementById(\'search-modal\').style.display=\'flex\';document.getElementById(\'search-input\').focus()" aria-label="Ricerca">🔍 '+tr('Cerca','Search','Suchen','Szukaj')+'</button>';
         const countdownHtml=getCountdownHtml();
         const meteoHtml=meteoWidgetHtml();
         const pcAlertHtml=civilProtectionWidgetHtml();
         const socialInfoHtml='<div style="padding:6px 16px 0;font-size:.75rem;color:var(--muted);text-align:center">'+tr('Informazioni e aggiornamenti continui sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div>';
         // V5.5: banner Ancona Capitale Italiana della Cultura 2028 (dossier "Ancona. Questo adesso", ancona2028.it)
         const cultura2028Html='<a href="https://ancona2028.it/" target="_blank" rel="noopener noreferrer" class="cultura2028-banner"><span class="cultura2028-emoji" aria-hidden="true">🎭</span><div><div class="cultura2028-title">Ancona 2028</div><div class="cultura2028-sub">'+tr('Capitale Italiana della Cultura','Italian Capital of Culture','Italienische Kulturhauptstadt','Włoska Stolica Kultury')+'</div></div><span class="cultura2028-arrow" aria-hidden="true">→</span></a>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siete in Piazza Roma, nel cuore pedonale di Ancona, a pochi passi dal porto e dai principali monumenti della città. Questa guida vi accompagnerà durante tutto il soggiorno, con itinerari, luoghi da scoprire, indirizzi selezionati e informazioni utili, raccolti e consigliati personalmente dall\'host.','You are in Piazza Roma, in the heart of Ancona\'s pedestrian centre, just steps from the port and the city\'s main monuments. This guide will accompany you throughout your stay, with itineraries, places to discover, selected addresses and useful information, personally collected and recommended by your host.','Sie sind auf der Piazza Roma, im Herzen von Anconas Fußgängerzone, nur wenige Schritte vom Hafen und den wichtigsten Denkmälern der Stadt entfernt. Dieser Leitfaden begleitet Sie während Ihres gesamten Aufenthalts mit Routen, Orten zum Entdecken, ausgewählten Adressen und nützlichen Informationen, die persönlich von Ihrem Gastgeber zusammengestellt und empfohlen wurden.','Jesteście na Piazza Roma, w sercu pieszej strefy Ankony, zaledwie kilka kroków od portu i głównych zabytków miasta. Ten przewodnik będzie Wam towarzyszyć przez cały pobyt, z trasami, miejscami do odkrycia, wybranymi adresami i przydatnymi informacjami, osobiście zebranymi i rekomendowanymi przez gospodarza.')+'</div></div>'+whatsappBtnHtml+'</div>'+socialInfoHtml+installBtnHtml+countdownHtml+'<div class="widgets-row">'+meteoHtml+pcAlertHtml+'</div>'+cultura2028Html+'<div class="nav-grid">'+tiles+'</div>'+'</section>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siete in Piazza Roma, nel cuore pedonale di Ancona, a pochi passi dal porto e dai principali monumenti della città. Questa guida vi accompagnerà durante tutto il soggiorno, con itinerari, luoghi da scoprire, indirizzi selezionati e informazioni utili, raccolti e consigliati personalmente dall\'host.','You are in Piazza Roma, in the heart of Ancona\'s pedestrian centre, just steps from the port and the city\'s main monuments. This guide will accompany you throughout your stay, with itineraries, places to discover, selected addresses and useful information, personally collected and recommended by your host.','Sie sind auf der Piazza Roma, im Herzen von Anconas Fußgängerzone, nur wenige Schritte vom Hafen und den wichtigsten Denkmälern der Stadt entfernt. Dieser Leitfaden begleitet Sie während Ihres gesamten Aufenthalts mit Routen, Orten zum Entdecken, ausgewählten Adressen und nützlichen Informationen, die persönlich von Ihrem Gastgeber zusammengestellt und empfohlen wurden.','Jesteście na Piazza Roma, w sercu pieszej strefy Ankony, zaledwie kilka kroków od portu i głównych zabytków miasta. Ten przewodnik będzie Wam towarzyszyć przez cały pobyt, z trasami, miejscami do odkrycia, wybranymi adresami i przydatnymi informacjami, osobiście zebranymi i rekomendowanymi przez gospodarza.')+'</div></div><div class="home-buttons">'+whatsappBtnHtml+searchBtnHtml+'</div>'+'</div>'+socialInfoHtml+installBtnHtml+countdownHtml+'<div class="widgets-row">'+meteoHtml+pcAlertHtml+'</div>'+cultura2028Html+'<div class="nav-grid">'+tiles+'</div>'+'</section>';
         cont.innerHTML=html;
         // FIX #5 V5.0 27/06/26: avvia refresh countdown se presente
         if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);
@@ -833,11 +834,100 @@
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
     }
 
+    function globalSearch(query){
+        if(!query||query.trim().length<2){closeSearchModal();return;}
+        query=query.toLowerCase();
+        let results=[];
+        
+        // 1. Cerca negli array di sezioni (POI)
+        const allSections=[appData.mustsee,appData.passetto,appData.cardeto,appData.porto,appData.beaches,appData.services.parking,appData.restaurants];
+        for(let secArray of allSections){
+            if(!secArray||!Array.isArray(secArray))continue;
+            for(let poi of secArray){
+                if(poi.name&&poi.name.toLowerCase().includes(query)){
+                    results.push({type:'poi',name:poi.name,section:poi.section||'',text:'',poi:poi});
+                }
+            }
+        }
+        
+        // 2. Cerca nei testi lunghi (itLong, enLong, ecc.)
+        const textFields=['itLong','enLong','deLong','plLong'];
+        for(let secArray of allSections){
+            if(!secArray||!Array.isArray(secArray))continue;
+            for(let poi of secArray){
+                for(let field of textFields){
+                    if(poi[field]&&poi[field].toLowerCase().includes(query)){
+                        const excerpt=poi[field].substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
+                        results.push({type:'text',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi});
+                    }
+                }
+            }
+        }
+        
+        if(results.length===0){
+            showSearchResults([],query);
+        }else{
+            showSearchResults(results,query);
+        }
+    }
+    
+    function showSearchResults(results,query){
+        const modal=document.getElementById('search-modal');
+        const resultsList=document.getElementById('search-results-list');
+        const counter=document.getElementById('search-counter');
+        
+        if(results.length===0){
+            resultsList.innerHTML='<div class="search-no-results">'+tr('Nessun risultato per ','No results for ','Keine Ergebnisse für ','Brak wyników dla ')+'<strong>'+query+'</strong></div>';
+            counter.textContent='0';
+            modal.style.display='flex';
+            return;
+        }
+        
+        currentSearchResults=results;
+        currentSearchIndex=0;
+        updateSearchDisplay();
+        modal.style.display='flex';
+    }
+    
+    function updateSearchDisplay(){
+        if(currentSearchResults.length===0)return;
+        const result=currentSearchResults[currentSearchIndex];
+        const resultsList=document.getElementById('search-results-list');
+        const counter=document.getElementById('search-counter');
+        
+        counter.textContent=(currentSearchIndex+1)+' di '+currentSearchResults.length;
+        
+        resultsList.innerHTML='<div class="search-result-item" onclick="navigateToSearchResult('+currentSearchIndex+')">'+
+            '<div class="search-result-name">'+result.name+'</div>'+
+            '<div class="search-result-text">'+result.text+'</div>'+
+            '</div>';
+    }
+    
+    function navigateToSearchResult(index){
+        if(!currentSearchResults[index])return;
+        const result=currentSearchResults[index];
+        closeSearchModal();
+        // Naviga alla sezione del POI
+        if(result.poi.section){
+            selectNav(result.poi.section);
+        }
+    }
+    
+    function closeSearchModal(){
+        const modal=document.getElementById('search-modal');
+        if(modal)modal.style.display='none';
+        document.getElementById('search-input').value='';
+    }
+    
+    let currentSearchResults=[];
+    let currentSearchIndex=0;
+
     function renderSection(id){
         if(id==='contact')return renderContact();
         if(id==='apartment')return renderApartment();
         if(id==='restaurants')return renderRestaurants();
         if(id==='services')return renderServices();
+        if(id==='parcheggi')return renderPlaceSection(appData.services.parking||[],'parcheggi');
         if(id==='usefulinfo')return renderUsefulInfo();
         if(id==='itinerari')return renderItinerariPicker();
         if(id==='conero')return renderConero();
@@ -1064,8 +1154,8 @@
         const photos=(p.photos&&p.photos.length?p.photos:(p.photo?[p.photo]:[])).slice(0,4);
         // V6.13: calcola photoTip prima di usarlo in photoHtml (per l'onclick del fullscreen)
         const photoTip=tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
-        // Memorizzo i dati per il fullscreen
-        _detailGalleryData[index] = { photos: photos, caption: photoTip };
+        // Memorizzo i dati per il fullscreen (caption vuoto — didascalia solo se esplicita)
+        _detailGalleryData[index] = { photos: photos, caption: '' };
         let photoHtml;
         if(photos.length){
             let slidesHtml='';
