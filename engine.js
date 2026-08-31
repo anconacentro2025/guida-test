@@ -1,4 +1,4 @@
-// ===== V7.0 · 31/08/26 08:17 =====
+// ===== V7.0 · 31/08/26 13:30 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -835,7 +835,7 @@
     }
 
     function globalSearch(query){
-        if(!query||query.trim().length<2){closeSearchModal();return;}
+        if(!query||query.trim().length===0){closeSearchModal();return;}
         query=query.toLowerCase();
         let results=[];
         
@@ -915,8 +915,9 @@
     
     function closeSearchModal(){
         const modal=document.getElementById('search-modal');
-        if(modal)modal.style.display='none';
-        document.getElementById('search-input').value='';
+        const input=document.getElementById('search-input');
+        if(modal) modal.style.display='none';
+        if(input) input.value='';
     }
     
     let currentSearchResults=[];
