@@ -1,4 +1,4 @@
-// ===== V6.26 · 29/08/26 16:50 =====
+// ===== V6.26 · 31/08/26 08:07 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -161,15 +161,16 @@
     // FIX 26/08/26: aggiunto secondo parametro opzionale 'caption' — prima era cablato a
     // vuoto ('') senza modo di valorizzarlo. Le chiamate esistenti (senza secondo parametro)
     // continuano a funzionare identiche a prima: nessuna didascalia, nessuna rottura.
-    async function openLightbox(photosCsv, caption){
+    async function openLightbox(photosCsv, caption, noexpand){
         closeLightbox();
         const baseFiles = photosCsv.split(',').map(f => f.trim()).filter(Boolean);
         let photos = [];
         for (const baseFile of baseFiles) {
             if (photos.length >= 4) break;
             if (!photos.includes(baseFile)) photos.push(baseFile);
-            // Se il file è già una variante (es. anelli-2.webp), non provare ad espanderlo
-            // ulteriormente: eviterebbe richieste inutili per pattern tipo anelli-2-2.webp.
+            // Se noexpand=true, NON cercare varianti automatiche
+            if (noexpand) continue;
+            // Se il file è già una variante (es. anelli-2.webp), non provare ad espanderlo ulteriormente
             if (/-[234]\.webp$/.test(baseFile)) continue;
             const baseName = baseFile.replace(/\.webp$/, '');
             for (let i = 2; i <= 4 && photos.length < 4; i++) {
@@ -182,15 +183,12 @@
             }
         }
         const linkGalleryIndex = 'link-' + Math.random().toString(36).substr(2,9);
-        
-        // Gestione retrocompatibile: caption può essere stringa o array
         let captions = [];
         if (Array.isArray(caption)) {
             captions = caption;
         } else if (caption) {
             captions = [caption];
         }
-        
         _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), captions: captions };
         openDetailGalleryFullscreen(linkGalleryIndex);
     }
@@ -915,9 +913,11 @@
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
         
         // V7.0: Caption resa draggable e resizable
-        const captionHtml = data.caption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
-            '<div class="fs-caption-header">Dettagli</div>' +
-            '<div class="fs-caption-body">' + data.caption + '</div>' +
+        const captions = data.captions || (data.caption ? [data.caption] : []);
+        const currentCaption = captions[0] || '';
+        const captionHtml = currentCaption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
+            '<div class="fs-caption-header">≡ Dettagli</div>' +
+            '<div class="fs-caption-body">' + currentCaption + '</div>' +
             '<div class="fs-caption-resize"></div>' +
             '</div>') : '';
         
@@ -941,7 +941,7 @@
         }
         
         // V7.0: Rendi caption draggable e resizable
-        if (data.caption) {
+        if (currentCaption) {
             const captionEl = overlay.querySelector('#fs-caption-' + index);
             const headerEl = captionEl.querySelector('.fs-caption-header');
             const resizeEl = captionEl.querySelector('.fs-caption-resize');
