@@ -1,4 +1,4 @@
-// ===== V6.26 · 31/08/26 13:41 =====
+// ===== V7.0 · 01/09/26 13:02 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -794,16 +794,17 @@
             // sola su un nuovo rigo invece di lasciarla affianco a Informazioni utili.
             return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
         }).join('');
+        const searchTile='<button class="nav-tile" onclick="document.getElementById(\'search-modal\').style.display=\'flex\';document.getElementById(\'search-input\').focus()" aria-label="'+tr('Cerca','Search','Suchen','Szukaj')+'"><div class="nav-tile-icon" aria-hidden="true">🔍</div><div class="nav-tile-label">'+tr('Cerca','Search','Suchen','Szukaj')+'</div></button>';
+        const tilesWithSearch=searchTile+tiles;
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
-        const searchBtnHtml='<button class="home-search-btn" onclick="document.getElementById(\'search-modal\').style.display=\'flex\';document.getElementById(\'search-input\').focus()" aria-label="Ricerca">🔍 '+tr('Cerca','Search','Suchen','Szukaj')+'</button>';
         const countdownHtml=getCountdownHtml();
         const meteoHtml=meteoWidgetHtml();
         const pcAlertHtml=civilProtectionWidgetHtml();
         const socialInfoHtml='<div style="padding:6px 16px 0;font-size:.75rem;color:var(--muted);text-align:center">'+tr('Informazioni e aggiornamenti continui sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div>';
         // V5.5: banner Ancona Capitale Italiana della Cultura 2028 (dossier "Ancona. Questo adesso", ancona2028.it)
         const cultura2028Html='<a href="https://ancona2028.it/" target="_blank" rel="noopener noreferrer" class="cultura2028-banner"><span class="cultura2028-emoji" aria-hidden="true">🎭</span><div><div class="cultura2028-title">Ancona 2028</div><div class="cultura2028-sub">'+tr('Capitale Italiana della Cultura','Italian Capital of Culture','Italienische Kulturhauptstadt','Włoska Stolica Kultury')+'</div></div><span class="cultura2028-arrow" aria-hidden="true">→</span></a>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siete in Piazza Roma, nel cuore pedonale di Ancona, a pochi passi dal porto e dai principali monumenti della città. Questa guida vi accompagnerà durante tutto il soggiorno, con itinerari, luoghi da scoprire, indirizzi selezionati e informazioni utili, raccolti e consigliati personalmente dall\'host.','You are in Piazza Roma, in the heart of Ancona\'s pedestrian centre, just steps from the port and the city\'s main monuments. This guide will accompany you throughout your stay, with itineraries, places to discover, selected addresses and useful information, personally collected and recommended by your host.','Sie sind auf der Piazza Roma, im Herzen von Anconas Fußgängerzone, nur wenige Schritte vom Hafen und den wichtigsten Denkmälern der Stadt entfernt. Dieser Leitfaden begleitet Sie während Ihres gesamten Aufenthalts mit Routen, Orten zum Entdecken, ausgewählten Adressen und nützlichen Informationen, die persönlich von Ihrem Gastgeber zusammengestellt und empfohlen wurden.','Jesteście na Piazza Roma, w sercu pieszej strefy Ankony, zaledwie kilka kroków od portu i głównych zabytków miasta. Ten przewodnik będzie Wam towarzyszyć przez cały pobyt, z trasami, miejscami do odkrycia, wybranymi adresami i przydatnymi informacjami, osobiście zebranymi i rekomendowanymi przez gospodarza.')+'</div></div><div class="home-buttons">'+whatsappBtnHtml+searchBtnHtml+'</div>'+'</div>'+socialInfoHtml+installBtnHtml+countdownHtml+'<div class="widgets-row">'+meteoHtml+pcAlertHtml+'</div>'+cultura2028Html+'<div class="nav-grid">'+tiles+'</div>'+'</section>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siete in Piazza Roma, nel cuore pedonale di Ancona, a pochi passi dal porto e dai principali monumenti della città. Questa guida vi accompagnerà durante tutto il soggiorno, con itinerari, luoghi da scoprire, indirizzi selezionati e informazioni utili, raccolti e consigliati personalmente dall\'host.','You are in Piazza Roma, in the heart of Ancona\'s pedestrian centre, just steps from the port and the city\'s main monuments. This guide will accompany you throughout your stay, with itineraries, places to discover, selected addresses and useful information, personally collected and recommended by your host.','Sie sind auf der Piazza Roma, im Herzen von Anconas Fußgängerzone, nur wenige Schritte vom Hafen und den wichtigsten Denkmälern der Stadt entfernt. Dieser Leitfaden begleitet Sie während Ihres gesamten Aufenthalts mit Routen, Orten zum Entdecken, ausgewählten Adressen und nützlichen Informationen, die persönlich von Ihrem Gastgeber zusammengestellt und empfohlen wurden.','Jesteście na Piazza Roma, w sercu pieszej strefy Ankony, zaledwie kilka kroków od portu i głównych zabytków miasta. Ten przewodnik będzie Wam towarzyszyć przez cały pobyt, z trasami, miejscami do odkrycia, wybranymi adresami i przydatnymi informacjami, osobiście zebranymi i rekomendowanymi przez gospodarza.')+'</div></div>'+'</section>';
         cont.innerHTML=html;
         // FIX #5 V5.0 27/06/26: avvia refresh countdown se presente
         if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);
@@ -826,7 +827,7 @@
             const idx=sections.indexOf(s);
             return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
         }).join('');
-        return '<div class="nav-grid">'+tiles+'</div>';
+        return '<div class="nav-grid">'+tilesWithSearch+'</div>';
     }
 
     // Helper condiviso: attacca il click alle .nav-tile sia in home sia nel picker Itinerari.
@@ -910,19 +911,17 @@
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
         closeSearchModal();
-        // Naviga direttamente alla sezione e POI
-        currentSection=sectionHashMap[result.poi.section]||0;
-        currentPlaceDetail=-1;
-        currentSectionPlaces=[];
-        renderContent();
-        // Trova e apri il POI specifico
+        // Naviga alla sezione target
+        selectNav(result.poi.section);
+        // Aspetta il rendering della sezione, poi apri il POI
         setTimeout(()=>{
-            const placeIndex=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
-            if(placeIndex>=0){
-                currentPlaceDetail=placeIndex;
-                renderContent();
+            if(currentSectionPlaces && currentSectionPlaces.length){
+                const placeIdx=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
+                if(placeIdx>=0){
+                    selectPlaceDetail(placeIdx);
+                }
             }
-        },100);
+        },350);
     }
     
     function closeSearchModal(){
@@ -1528,7 +1527,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 702;
+    const BUILD_NUMBER = 704;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
