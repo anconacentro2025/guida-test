@@ -1,4 +1,4 @@
-// ===== V7.0 · 31/08/26 23:00 =====
+// ===== V6.26 · 31/08/26 13:41 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -900,9 +900,9 @@
         
         counter.textContent=(currentSearchIndex+1)+' di '+currentSearchResults.length;
         
-        resultsList.innerHTML='<div class="search-result-item" onclick="navigateToSearchResult('+currentSearchIndex+')">'+
-            '<div class="search-result-name">'+result.name+'</div>'+
-            '<div class="search-result-text">'+result.text+'</div>'+
+        resultsList.innerHTML='<div class="search-result-item search-result-active" style="background:#e8f5e9;border-left:4px solid var(--navy-2);padding:12px;border-radius:8px;cursor:pointer" onclick="navigateToSearchResult('+currentSearchIndex+')">'+
+            '<div class="search-result-name" style="font-weight:600;color:var(--navy-2);margin-bottom:8px">'+result.name+'</div>'+
+            '<div class="search-result-text" style="font-size:.85rem;color:#333;line-height:1.4">'+result.text+'</div>'+
             '</div>';
     }
     
@@ -1013,7 +1013,7 @@
         });
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
         
-        // V7.0: Caption resa draggable e resizable
+        // V6.26: Caption resa draggable e resizable
         const captions = data.captions || (data.caption ? [data.caption] : []);
         const currentCaption = captions[0] || '';
         const captionHtml = currentCaption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
@@ -1041,7 +1041,7 @@
             }
         }
         
-        // V7.0: Rendi caption draggable e resizable
+        // V6.26: Rendi caption draggable e resizable
         if (currentCaption) {
             const captionEl = overlay.querySelector('#fs-caption-' + index);
             const headerEl = captionEl.querySelector('.fs-caption-header');
@@ -1339,9 +1339,8 @@
 
     function renderServices(){
         const s=appData.services;
-        const allPlaces=[...s.supermarkets,...s.parking,...(s.other||[])];
+        const allPlaces=[...s.supermarkets,...(s.other||[])];
         const smLen=s.supermarkets.length;
-        const pkLen=s.parking.length;
         currentSectionPlaces=allPlaces;
         for(let i=0;i<allPlaces.length;i++){const p=allPlaces[i];p._dist=(p.lat&&p.lng)?calcDistance(HOME_COORDS.lat,HOME_COORDS.lng,p.lat,p.lng):Infinity;}
 
@@ -1358,18 +1357,12 @@
             const hours=getHoursBadge(p);
             html+='<div class="place-row" onclick="selectServiceItem('+i+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div>'+hours+'</div></div>';
         }
-        // Parcheggi
-        html+='<div class="section-list-header" style="margin-top:8px"><span class="section-list-title">'+tr('Parcheggi','Parking','Parkplätze','Parkingi')+'</span></div>';
-        for(let i=0;i<s.parking.length;i++){
-            const p=s.parking[i];
-            html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
-        }
         // Altri servizi (lavanderia, ecc.)
         if(s.other&&s.other.length){
             html+='<div class="section-list-header" style="margin-top:8px"><span class="section-list-title">'+tr('Altri servizi','Other services','Weitere Dienstleistungen','Inne usługi')+'</span></div>';
             for(let i=0;i<s.other.length;i++){
                 const p=s.other[i];
-                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+pkLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+pkLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
+                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
             }
         }
         window._servicePlaces=allPlaces;
