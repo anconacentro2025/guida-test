@@ -910,17 +910,19 @@
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
         closeSearchModal();
-        // Naviga alla sezione
-        if(result.poi.section){
-            selectNav(result.poi.section);
-            // Aspetta che la sezione si renderizzi, poi seleziona il POI
-            setTimeout(()=>{
-                const placeIndex=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
-                if(placeIndex>=0){
-                    selectPlaceDetail(placeIndex);
-                }
-            },200);
-        }
+        // Naviga direttamente alla sezione e POI
+        currentSection=sectionHashMap[result.poi.section]||0;
+        currentPlaceDetail=-1;
+        currentSectionPlaces=[];
+        renderContent();
+        // Trova e apri il POI specifico
+        setTimeout(()=>{
+            const placeIndex=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
+            if(placeIndex>=0){
+                currentPlaceDetail=placeIndex;
+                renderContent();
+            }
+        },100);
     }
     
     function closeSearchModal(){
@@ -1526,7 +1528,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 701;
+    const BUILD_NUMBER = 702;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
