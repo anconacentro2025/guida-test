@@ -1,4 +1,4 @@
-// ===== V7.0 · 01/09/26 13:10 =====
+// ===== V7.0 · 01/09/26 13:17 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -846,24 +846,29 @@
         const textField=`${currentLang}Long`;
         
         // 1. Cerca negli array di sezioni (POI) - solo nomi
-        const allSections=[appData.mustsee,appData.passetto,appData.cardeto,appData.porto,appData.beaches,appData.services.parking,appData.restaurants];
+        const allSections=[appData.mustsee,appData.passetto,appData.cardeto,appData.porto,appData.beaches,appData.parking,appData.restaurants];
+        // 2. Aggiungi usefulinfo.gastronomy
+        if(appData.usefulinfo&&appData.usefulinfo.gastronomy)allSections.push(appData.usefulinfo.gastronomy);
+        if(appData.usefulinfo&&appData.usefulinfo.nightlife)allSections.push(appData.usefulinfo.nightlife);
+        if(appData.usefulinfo&&appData.usefulinfo.shopping)allSections.push(appData.usefulinfo.shopping);
+        
         for(let secArray of allSections){
             if(!secArray||!Array.isArray(secArray))continue;
             for(let poi of secArray){
                 if(poi.name&&poi.name.toLowerCase().includes(query)){
-                    results.push({type:'poi',name:poi.name,section:poi.section||'',text:'',poi:poi});
+                    results.push({type:'poi',name:poi.name,section:poi.section||'usefulinfo',text:'',poi:poi});
                 }
             }
         }
         
-        // 2. Cerca solo nel campo testo della lingua corrente
+        // 3. Cerca solo nel campo testo della lingua corrente
         for(let secArray of allSections){
             if(!secArray||!Array.isArray(secArray))continue;
             for(let poi of secArray){
                 const textContent=poi[textField]||'';
                 if(textContent&&textContent.toLowerCase().includes(query)){
                     const excerpt=textContent.substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
-                    results.push({type:'text',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi});
+                    results.push({type:'text',name:poi.name||'',section:poi.section||'usefulinfo',text:excerpt,poi:poi});
                 }
             }
         }
@@ -911,17 +916,22 @@
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
         closeSearchModal();
-        // Naviga alla sezione target
-        selectNav(result.poi.section);
-        // Aspetta il rendering della sezione, poi apri il POI
+        // Trova l'indice della sezione
+        const sectionId=result.poi.section||'usefulinfo';
+        const sectionIdx=sections.findIndex(s=>s.id===sectionId);
+        if(sectionIdx===-1)return;
+        // Naviga alla sezione
+        goTo(sectionIdx);
+        // Aspetta il rendering, poi apri il dettaglio
         setTimeout(()=>{
-            if(currentSectionPlaces && currentSectionPlaces.length){
+            if(currentSectionPlaces&&currentSectionPlaces.length){
                 const placeIdx=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
                 if(placeIdx>=0){
-                    selectPlaceDetail(placeIdx);
+                    currentPlaceDetail=placeIdx;
+                    renderContent();
                 }
             }
-        },350);
+        },400);
     }
     
     function closeSearchModal(){
@@ -1527,7 +1537,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 705;
+    const BUILD_NUMBER = 706;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
