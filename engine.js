@@ -1,4 +1,4 @@
-// ===== V7.0 · 01/09/26 13:17 =====
+// ===== V7.0 · 01/09/26 13:32 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -827,7 +827,7 @@
             const idx=sections.indexOf(s);
             return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
         }).join('');
-        return '<div class="nav-grid">'+tilesWithSearch+'</div>';
+        return '<div class="nav-grid">'+tiles+'</div>';
     }
 
     // Helper condiviso: attacca il click alle .nav-tile sia in home sia nel picker Itinerari.
@@ -835,41 +835,47 @@
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
     }
 
+    function getAllPois(){
+        const all=[];
+        // Sezioni principali
+        if(appData.mustsee)all.push(...appData.mustsee.map(p=>{p.section='mustsee';return p;}));
+        if(appData.passetto)all.push(...appData.passetto.map(p=>{p.section='passetto';return p;}));
+        if(appData.cardeto)all.push(...appData.cardeto.map(p=>{p.section='cardeto';return p;}));
+        if(appData.porto)all.push(...appData.porto.map(p=>{p.section='porto';return p;}));
+        if(appData.beaches)all.push(...appData.beaches.map(p=>{p.section='beaches';return p;}));
+        if(appData.parking)all.push(...appData.parking.map(p=>{p.section='parcheggi';return p;}));
+        if(appData.restaurants)all.push(...appData.restaurants.map(p=>{p.section='restaurants';return p;}));
+        // Usefulinfo sottosezioni
+        if(appData.usefulinfo?.gastronomy)all.push(...appData.usefulinfo.gastronomy.map(p=>{p.section='usefulinfo';return p;}));
+        if(appData.usefulinfo?.nightlife)all.push(...appData.usefulinfo.nightlife.map(p=>{p.section='usefulinfo';return p;}));
+        if(appData.usefulinfo?.shopping)all.push(...appData.usefulinfo.shopping.map(p=>{p.section='usefulinfo';return p;}));
+        return all;
+    }
     function globalSearch(query){
         if(!query||query.trim().length===0){closeSearchModal();return;}
         query=query.toLowerCase();
         let results=[];
         
-        // Mappa lingua a suffisso campo
-        const langMap={it:'It',en:'En',de:'De',pl:'Pl'};
-        const fieldSuffix=langMap[currentLang]||'It';
-        const textField=`${currentLang}Long`;
+        // Usa il campo testo della lingua corrente
+        const textFieldMap={it:'itLong',en:'enLong',de:'deLong',pl:'plLong'};
+        const textField=textFieldMap[currentLang]||'itLong';
         
-        // 1. Cerca negli array di sezioni (POI) - solo nomi
-        const allSections=[appData.mustsee,appData.passetto,appData.cardeto,appData.porto,appData.beaches,appData.parking,appData.restaurants];
-        // 2. Aggiungi usefulinfo.gastronomy
-        if(appData.usefulinfo&&appData.usefulinfo.gastronomy)allSections.push(appData.usefulinfo.gastronomy);
-        if(appData.usefulinfo&&appData.usefulinfo.nightlife)allSections.push(appData.usefulinfo.nightlife);
-        if(appData.usefulinfo&&appData.usefulinfo.shopping)allSections.push(appData.usefulinfo.shopping);
+        // Prendi tutti i POI
+        const allPois=getAllPois();
         
-        for(let secArray of allSections){
-            if(!secArray||!Array.isArray(secArray))continue;
-            for(let poi of secArray){
-                if(poi.name&&poi.name.toLowerCase().includes(query)){
-                    results.push({type:'poi',name:poi.name,section:poi.section||'usefulinfo',text:'',poi:poi});
-                }
+        // Cerca nel nome (priorità alta)
+        for(let poi of allPois){
+            if(poi.name&&poi.name.toLowerCase().includes(query)){
+                results.push({type:'poi',name:poi.name,section:poi.section||'',text:'',poi:poi});
             }
         }
         
-        // 3. Cerca solo nel campo testo della lingua corrente
-        for(let secArray of allSections){
-            if(!secArray||!Array.isArray(secArray))continue;
-            for(let poi of secArray){
-                const textContent=poi[textField]||'';
-                if(textContent&&textContent.toLowerCase().includes(query)){
-                    const excerpt=textContent.substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
-                    results.push({type:'text',name:poi.name||'',section:poi.section||'usefulinfo',text:excerpt,poi:poi});
-                }
+        // Cerca nel testo della lingua corrente
+        for(let poi of allPois){
+            const textContent=poi[textField]||'';
+            if(textContent&&textContent.toLowerCase().includes(query)){
+                const excerpt=textContent.substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
+                results.push({type:'text',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi});
             }
         }
         
@@ -880,7 +886,7 @@
         }
     }
     
-    function showSearchResults(results,query){
+    function closeSearchModal(){
         const modal=document.getElementById('search-modal');
         const resultsList=document.getElementById('search-results-list');
         const counter=document.getElementById('search-counter');
@@ -943,6 +949,22 @@
     
     let currentSearchResults=[];
     let currentSearchIndex=0;
+    
+    function resetSearch(){
+        currentSearchResults=[];
+        currentSearchIndex=0;
+        const modal=document.getElementById('search-modal');
+        if(modal)modal.style.display='none';
+    }
+    
+    function setLanguage(lang){
+        if(lang!==currentLang){
+            currentLang=lang;
+            resetSearch();
+            localStorage.setItem('guidaLang',lang);
+            renderContent();
+        }
+    }
 
     function renderSection(id){
         if(id==='contact')return renderContact();
@@ -1537,7 +1559,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 706;
+    const BUILD_NUMBER = 707;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
