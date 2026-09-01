@@ -1,4 +1,4 @@
-// ===== V6.26 · 31/08/26 13:41 =====
+// ===== V7.0 · 31/08/26 23:00 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.26-29082630';
+    const APP_CACHE_NAME = 'ancona-guida-v7.0-31082300';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -839,7 +839,12 @@
         query=query.toLowerCase();
         let results=[];
         
-        // 1. Cerca negli array di sezioni (POI)
+        // Mappa lingua a suffisso campo
+        const langMap={it:'It',en:'En',de:'De',pl:'Pl'};
+        const fieldSuffix=langMap[currentLang]||'It';
+        const textField=`${currentLang}Long`;
+        
+        // 1. Cerca negli array di sezioni (POI) - solo nomi
         const allSections=[appData.mustsee,appData.passetto,appData.cardeto,appData.porto,appData.beaches,appData.services.parking,appData.restaurants];
         for(let secArray of allSections){
             if(!secArray||!Array.isArray(secArray))continue;
@@ -850,16 +855,14 @@
             }
         }
         
-        // 2. Cerca nei testi lunghi (itLong, enLong, ecc.)
-        const textFields=['itLong','enLong','deLong','plLong'];
+        // 2. Cerca solo nel campo testo della lingua corrente
         for(let secArray of allSections){
             if(!secArray||!Array.isArray(secArray))continue;
             for(let poi of secArray){
-                for(let field of textFields){
-                    if(poi[field]&&poi[field].toLowerCase().includes(query)){
-                        const excerpt=poi[field].substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
-                        results.push({type:'text',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi});
-                    }
+                const textContent=poi[textField]||'';
+                if(textContent&&textContent.toLowerCase().includes(query)){
+                    const excerpt=textContent.substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
+                    results.push({type:'text',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi});
                 }
             }
         }
@@ -907,9 +910,16 @@
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
         closeSearchModal();
-        // Naviga alla sezione del POI
+        // Naviga alla sezione
         if(result.poi.section){
             selectNav(result.poi.section);
+            // Aspetta che la sezione si renderizzi, poi seleziona il POI
+            setTimeout(()=>{
+                const placeIndex=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
+                if(placeIndex>=0){
+                    selectPlaceDetail(placeIndex);
+                }
+            },200);
         }
     }
     
@@ -928,7 +938,7 @@
         if(id==='apartment')return renderApartment();
         if(id==='restaurants')return renderRestaurants();
         if(id==='services')return renderServices();
-        if(id==='parcheggi')return renderPlaceSection(appData.services.parking||[],'parcheggi');
+        if(id==='parcheggi')return renderPlaceSection(appData.parking||[],'parcheggi');
         if(id==='usefulinfo')return renderUsefulInfo();
         if(id==='itinerari')return renderItinerariPicker();
         if(id==='conero')return renderConero();
@@ -1003,7 +1013,7 @@
         });
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
         
-        // V6.26: Caption resa draggable e resizable
+        // V7.0: Caption resa draggable e resizable
         const captions = data.captions || (data.caption ? [data.caption] : []);
         const currentCaption = captions[0] || '';
         const captionHtml = currentCaption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
@@ -1031,7 +1041,7 @@
             }
         }
         
-        // V6.26: Rendi caption draggable e resizable
+        // V7.0: Rendi caption draggable e resizable
         if (currentCaption) {
             const captionEl = overlay.querySelector('#fs-caption-' + index);
             const headerEl = captionEl.querySelector('.fs-caption-header');
@@ -1523,7 +1533,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 626;
+    const BUILD_NUMBER = 700;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
