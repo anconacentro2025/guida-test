@@ -1526,7 +1526,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 700;
+    const BUILD_NUMBER = 701;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
