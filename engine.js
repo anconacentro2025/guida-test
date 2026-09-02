@@ -1,4 +1,4 @@
-// ===== V7.0 · 02/09/26 08:52 =====
+// ===== V7.0 · 02/09/26 14:34 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -56,7 +56,7 @@
 
     ;
 
-    let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null;
+    let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null, currentSearchQuery = null;
     let placeDataMap = {}, _mapRetryCount = 0;
     let gpsConsentGiven = null, deferredPrompt = null;
     // V5.11: gpsState/fsGpsState (definiti sopra, vicino alle funzioni GPS) sostituiscono
@@ -247,7 +247,7 @@
         renderAll();window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function backToMap(){currentPlaceDetail=-1;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
+    function backToMap(){currentPlaceDetail=-1;currentSearchQuery=null;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
     function panToHome(){if(leafletMap)leafletMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],15);}
 
     function getDisplayNumber(p,index){
@@ -861,6 +861,7 @@
         if(!query||query.trim().length===0){hideSearchModal();return;}
         query=query.toLowerCase();
         let results=[];
+        const seen=new Set();
         
         // Prendi tutti i POI
         const allPois=getAllPois();
@@ -874,45 +875,36 @@
         
         // Cerca in tutti i POI
         for(let poi of allPois){
+            const poiKey=poi.name+'_'+poi.section;
+            if(seen.has(poiKey))continue;
+            
+            let matchedField='';
+            let matchText='';
+            
             // Cerca nel nome (priorità altissima)
             if(poi.name&&poi.name.toLowerCase().includes(query)){
-                const excerpt=createExcerpt(poi.name,query);
-                results.push({
-                    type:'match',
-                    name:poi.name||'',
-                    section:poi.section||'',
-                    poi:poi,
-                    field:'name',
-                    excerpt:excerpt,
-                    plainText:poi.name,
-                    queryWord:query
-                });
-                continue; // Se matcha il nome, non cercare negli altri campi
+                matchedField=poi.name;
+                matchText=poi.name;
             }
             
-            // Cerca in TUTTI i campi della lingua
-            for(let suffix of fieldSuffixes){
-                const fieldName=prefix+suffix;
-                const fieldContent=poi[fieldName];
-                if(fieldContent&&typeof fieldContent==='string'){
-                    const plainText=fieldContent.replace(/<[^>]*>/g,''); // Rimuovi HTML
-                    const plainLower=plainText.toLowerCase();
-                    
-                    if(plainLower.includes(query)){
-                        const excerpt=createExcerpt(plainText,query);
-                        results.push({
-                            type:'match',
-                            name:poi.name||'',
-                            section:poi.section||'',
-                            poi:poi,
-                            field:fieldName,
-                            excerpt:excerpt,
-                            plainText:plainText,
-                            queryWord:query
-                        });
-                        break; // Prendi il primo campo che matcha per questo POI
+            // Se non trovato nel nome, cerca in TUTTI i campi della lingua
+            if(!matchedField){
+                for(let suffix of fieldSuffixes){
+                    const fieldName=prefix+suffix;
+                    const fieldContent=poi[fieldName];
+                    if(fieldContent&&typeof fieldContent==='string'&&fieldContent.toLowerCase().includes(query)){
+                        matchedField=fieldName;
+                        matchText=fieldContent;
+                        break;
                     }
                 }
+            }
+            
+            // Se trovato, aggiungi al risultato
+            if(matchedField){
+                seen.add(poiKey);
+                const excerpt=matchText.substring(0,150).replace(/<[^>]*>/g,'').trim()+'...';
+                results.push({type:'match',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi,field:matchedField});
             }
         }
         
@@ -921,31 +913,6 @@
         }else{
             showSearchResults(results,query);
         }
-    }
-    
-    function createExcerpt(text,query){
-        if(!text)return'';
-        const lower=text.toLowerCase();
-        const index=lower.indexOf(query);
-        if(index===-1)return text.substring(0,120)+'...';
-        
-        // Centra l'excerpt attorno alla parola trovata
-        const start=Math.max(0,index-40);
-        const end=Math.min(text.length,index+query.length+80);
-        let excerpt=text.substring(start,end);
-        
-        // Aggiungi ellissi se non è inizio/fine
-        if(start>0)excerpt='...'+excerpt;
-        if(end<text.length)excerpt=excerpt+'...';
-        
-        // Evidenzia la parola con <strong>
-        excerpt=excerpt.replace(new RegExp('('+escapeRegExp(query)+')','gi'),'<strong>$1</strong>');
-        
-        return excerpt;
-    }
-    
-    function escapeRegExp(string){
-        return string.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     }
     
     function showSearchResults(results,query){
@@ -975,6 +942,12 @@
         modal.style.display='flex';
     }
     
+    function highlightWordInText(text,query){
+        if(!text||!query)return text;
+        const regex=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+        return text.replace(regex,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
+    }
+    
     function updateSearchDisplay(){
         if(currentSearchResults.length===0)return;
         const result=currentSearchResults[currentSearchIndex];
@@ -983,16 +956,16 @@
         
         counter.textContent=(currentSearchIndex+1)+' di '+currentSearchResults.length;
         
-        // Mostra excerpt con la parola cercata in grassetto, e il nome del POI come subtitle
         resultsList.innerHTML='<div class="search-result-item search-result-active" style="background:#e8f5e9;border-left:4px solid var(--navy-2);padding:12px;border-radius:8px;cursor:pointer" onclick="navigateToSearchResult('+currentSearchIndex+')">'+
-            '<div class="search-result-poi-name" style="font-size:.75rem;color:var(--navy-2);opacity:.7;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">'+result.name+'</div>'+
-            '<div class="search-result-excerpt" style="font-size:.9rem;color:#333;line-height:1.6;font-family:\'Outfit\',sans-serif">'+result.excerpt+'</div>'+
+            '<div class="search-result-name" style="font-weight:600;color:var(--navy-2);margin-bottom:8px">'+result.name+'</div>'+
+            '<div class="search-result-text" style="font-size:.85rem;color:#333;line-height:1.4">'+result.text+'</div>'+
             '</div>';
     }
     
     function navigateToSearchResult(index){
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
+        currentSearchQuery=result.queryWord;  // Salva la query per highlighting
         hideSearchModal();
         // Trova l'indice della sezione
         const sectionId=result.poi.section||'usefulinfo';
@@ -1000,59 +973,16 @@
         if(sectionIdx===-1)return;
         // Naviga alla sezione
         goTo(sectionIdx);
-        // Aspetta il rendering, poi apri il dettaglio e highlighta il testo
+        // Aspetta il rendering, poi apri il dettaglio
         setTimeout(()=>{
             if(currentSectionPlaces&&currentSectionPlaces.length){
                 const placeIdx=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
                 if(placeIdx>=0){
                     currentPlaceDetail=placeIdx;
                     renderContent();
-                    // Aspetta il DOM render, poi highlighta il testo e scrolla
-                    setTimeout(()=>{
-                        highlightSearchMatch(result.queryWord);
-                    },300);
                 }
             }
         },400);
-    }
-    
-    function highlightSearchMatch(query){
-        if(!query)return;
-        const detailContent=document.querySelector('.place-card');
-        if(!detailContent)return;
-        
-        const walker=document.createTreeWalker(
-            detailContent,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-        
-        let node;
-        const nodesToReplace=[];
-        const queryLower=query.toLowerCase();
-        
-        // Raccogli tutti i text node che contengono la query
-        while(node=walker.nextNode()){
-            if(node.textContent.toLowerCase().includes(queryLower)){
-                nodesToReplace.push(node);
-            }
-        }
-        
-        // Sostituisci con <mark> tag
-        nodesToReplace.forEach(node=>{
-            const text=node.textContent;
-            const span=document.createElement('span');
-            const regex=new RegExp('('+escapeRegExp(query)+')','gi');
-            span.innerHTML=text.replace(regex,'<mark style="background-color:#ffeb3b;padding:2px 4px;border-radius:2px;font-weight:600">$1</mark>');
-            node.parentNode.replaceChild(span,node);
-        });
-        
-        // Scrolla al primo <mark>
-        const firstMark=document.querySelector('mark');
-        if(firstMark){
-            firstMark.scrollIntoView({behavior:'smooth',block:'center'});
-        }
     }
     
     function hideSearchModal(){
@@ -1305,14 +1235,14 @@
 
     function renderAnyPlaceDetail(p,index,total,isSubMode){
         const wrapId='photowrap_'+index;placeDataMap[wrapId]=p;
-        const desc=tr(p.it,p.en,p.de,p.pl);
+        const desc=currentSearchQuery?highlightWordInText(tr(p.it,p.en,p.de,p.pl),currentSearchQuery):tr(p.it,p.en,p.de,p.pl);
         const hoursBadge=getHoursBadge(p);
         const priceBadge=p.price?'<span class="price-badge" aria-label="Fascia di prezzo">'+p.price+'</span>':'';
         // V6.3: galleria multi-foto (max 4) — p.photos è un array; p.photo (singolare) è
         // mantenuto solo come fallback di compatibilità nel caso residuasse in qualche voce.
         const photos=(p.photos&&p.photos.length?p.photos:(p.photo?[p.photo]:[])).slice(0,4);
         // V6.13: calcola photoTip prima di usarlo in photoHtml (per l'onclick del fullscreen)
-        const photoTip=tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
+        const photoTip=currentSearchQuery?highlightWordInText(tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto),currentSearchQuery):tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
         // Memorizzo i dati per il fullscreen (caption vuoto — didascalia solo se esplicita)
         _detailGalleryData[index] = { photos: photos, caption: '' };
         let photoHtml;
@@ -1336,8 +1266,8 @@
             deepHtml='<div class="place-section-block"><button class="place-deep-toggle" onclick="(function(btn){btn.classList.toggle(\'open\');var b=document.getElementById(\''+deepId+'\');b.classList.toggle(\'open\');btn.setAttribute(\'aria-expanded\',b.classList.contains(\'open\'));this})(this)" aria-expanded="false">📖 '+tr('Approfondisci','Learn more','Mehr erfahren','Dowiedz się więcej')+'</button><div class="place-deep-body" id="'+deepId+'">'+longDesc+'</div></div>';
         }
         // V5.0: meta-sezioni (👀 Da non perdere, 📸 Foto, ⏱ Tempo, 🚶 Prossima tappa)
-        const noteStr=tr(p.itNote,p.enNote,p.deNote,p.plNote);
-        const timeStr=tr(p.itTime,p.enTime,p.deTime,p.plTime);
+        const noteStr=currentSearchQuery?highlightWordInText(tr(p.itNote,p.enNote,p.deNote,p.plNote),currentSearchQuery):tr(p.itNote,p.enNote,p.deNote,p.plNote);
+        const timeStr=currentSearchQuery?highlightWordInText(tr(p.itTime,p.enTime,p.deTime,p.plTime),currentSearchQuery):tr(p.itTime,p.enTime,p.deTime,p.plTime);
         let metaHtml='';
         if(noteStr||photoTip||timeStr){
             metaHtml='<div class="place-section-block"><div class="place-meta">';
@@ -1674,7 +1604,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 708;
+    const BUILD_NUMBER = 710;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
