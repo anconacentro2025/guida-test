@@ -1,4 +1,4 @@
-// ===== V7.0 · 01/09/26 13:32 =====
+// ===== V7.0 · 01/09/26 23:14 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -837,14 +837,20 @@
 
     function getAllPois(){
         const all=[];
-        // Sezioni principali
+        // Itinerari principali
         if(appData.mustsee)all.push(...appData.mustsee.map(p=>{p.section='mustsee';return p;}));
         if(appData.passetto)all.push(...appData.passetto.map(p=>{p.section='passetto';return p;}));
         if(appData.cardeto)all.push(...appData.cardeto.map(p=>{p.section='cardeto';return p;}));
         if(appData.porto)all.push(...appData.porto.map(p=>{p.section='porto';return p;}));
         if(appData.beaches)all.push(...appData.beaches.map(p=>{p.section='beaches';return p;}));
-        if(appData.parking)all.push(...appData.parking.map(p=>{p.section='parcheggi';return p;}));
+        if(appData.borghi)all.push(...appData.borghi.map(p=>{p.section='borghi';return p;}));
+        // Portonovo
+        if(appData.portonovo?.points)all.push(...appData.portonovo.points.map(p=>{p.section='portonovo';return p;}));
+        // Ristoranti e servizi
         if(appData.restaurants)all.push(...appData.restaurants.map(p=>{p.section='restaurants';return p;}));
+        if(appData.parking)all.push(...appData.parking.map(p=>{p.section='parcheggi';return p;}));
+        if(appData.services?.supermarkets)all.push(...appData.services.supermarkets.map(p=>{p.section='services';return p;}));
+        if(appData.services?.other)all.push(...appData.services.other.map(p=>{p.section='services';return p;}));
         // Usefulinfo sottosezioni
         if(appData.usefulinfo?.gastronomy)all.push(...appData.usefulinfo.gastronomy.map(p=>{p.section='usefulinfo';return p;}));
         if(appData.usefulinfo?.nightlife)all.push(...appData.usefulinfo.nightlife.map(p=>{p.section='usefulinfo';return p;}));
@@ -852,41 +858,65 @@
         return all;
     }
     function globalSearch(query){
-        if(!query||query.trim().length===0){closeSearchModal();return;}
+        if(!query||query.trim().length===0){hideSearchModal();return;}
         query=query.toLowerCase();
         let results=[];
-        
-        // Usa il campo testo della lingua corrente
-        const textFieldMap={it:'itLong',en:'enLong',de:'deLong',pl:'plLong'};
-        const textField=textFieldMap[currentLang]||'itLong';
+        const seen=new Set();
         
         // Prendi tutti i POI
         const allPois=getAllPois();
         
-        // Cerca nel nome (priorità alta)
-        for(let poi of allPois){
-            if(poi.name&&poi.name.toLowerCase().includes(query)){
-                results.push({type:'poi',name:poi.name,section:poi.section||'',text:'',poi:poi});
-            }
-        }
+        // Mappa campi multilingua per la lingua attiva
+        const langSuffix={it:'',en:'',de:'',pl:''};
+        const langPrefix={it:'it',en:'en',de:'de',pl:'pl'};
+        const prefix=langPrefix[currentLang]||'it';
         
-        // Cerca nel testo della lingua corrente
+        // Lista di suffissi di campo da cercare in TUTTI i testi della lingua
+        const fieldSuffixes=['','Long','Note','Time','Photo'];
+        
+        // Cerca in tutti i POI
         for(let poi of allPois){
-            const textContent=poi[textField]||'';
-            if(textContent&&textContent.toLowerCase().includes(query)){
-                const excerpt=textContent.substring(0,100).replace(/<[^>]*>/g,'').trim()+'...';
-                results.push({type:'text',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi});
+            const poiKey=poi.name+'_'+poi.section;
+            if(seen.has(poiKey))continue;
+            
+            let matchedField='';
+            let matchText='';
+            
+            // Cerca nel nome (priorità altissima)
+            if(poi.name&&poi.name.toLowerCase().includes(query)){
+                matchedField=poi.name;
+                matchText=poi.name;
+            }
+            
+            // Se non trovato nel nome, cerca in TUTTI i campi della lingua
+            if(!matchedField){
+                for(let suffix of fieldSuffixes){
+                    const fieldName=prefix+suffix;
+                    const fieldContent=poi[fieldName];
+                    if(fieldContent&&typeof fieldContent==='string'&&fieldContent.toLowerCase().includes(query)){
+                        matchedField=fieldName;
+                        matchText=fieldContent;
+                        break;
+                    }
+                }
+            }
+            
+            // Se trovato, aggiungi al risultato
+            if(matchedField){
+                seen.add(poiKey);
+                const excerpt=matchText.substring(0,120).replace(/<[^>]*>/g,'').trim()+'...';
+                results.push({type:'match',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi,field:matchedField});
             }
         }
         
         if(results.length===0){
-            showSearchResults([],query);
+            showSearchResultsEmpty(query);
         }else{
             showSearchResults(results,query);
         }
     }
     
-    function closeSearchModal(){
+    function showSearchResults(results,query){
         const modal=document.getElementById('search-modal');
         const resultsList=document.getElementById('search-results-list');
         const counter=document.getElementById('search-counter');
@@ -901,6 +931,15 @@
         currentSearchResults=results;
         currentSearchIndex=0;
         updateSearchDisplay();
+        modal.style.display='flex';
+    }
+    
+    function showSearchResultsEmpty(query){
+        const modal=document.getElementById('search-modal');
+        const resultsList=document.getElementById('search-results-list');
+        const counter=document.getElementById('search-counter');
+        resultsList.innerHTML='<div class="search-no-results">'+tr('Nessun risultato per ','No results for ','Keine Ergebnisse für ','Brak wyników dla ')+'<strong>'+query+'</strong></div>';
+        counter.textContent='0';
         modal.style.display='flex';
     }
     
@@ -921,7 +960,7 @@
     function navigateToSearchResult(index){
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
-        closeSearchModal();
+        hideSearchModal();
         // Trova l'indice della sezione
         const sectionId=result.poi.section||'usefulinfo';
         const sectionIdx=sections.findIndex(s=>s.id===sectionId);
@@ -940,7 +979,7 @@
         },400);
     }
     
-    function closeSearchModal(){
+    function hideSearchModal(){
         const modal=document.getElementById('search-modal');
         const input=document.getElementById('search-input');
         if(modal) modal.style.display='none';
@@ -1559,7 +1598,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 707;
+    const BUILD_NUMBER = 708;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
