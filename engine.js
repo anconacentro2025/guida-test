@@ -1,4 +1,4 @@
-// ===== V7.0 · 03/09/26 08:50 =====
+// ===== V7.1 · 03/09/26 08:50 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
