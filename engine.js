@@ -1,4 +1,4 @@
-// ===== V7.0 · 02/09/26 19:38 =====
+// ===== V7.0 · 03/09/26 08:09 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -1002,16 +1002,28 @@
                 if(placeIdx>=0){
                     currentPlaceDetail=placeIdx;
                     renderContent();
-                    // Aspetta che il DOM sia renderizzato e scrolla al primo <strong> (parola evidenziata)
+                    // Aspetta che il DOM sia completamente renderizzato
                     setTimeout(()=>{
-                        const detailContent=document.querySelector('.place-card');
-                        if(detailContent){
-                            const firstHighlight=detailContent.querySelector('strong');
-                            if(firstHighlight){
-                                firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
-                            }
+                        // Cerca il <strong> nel campo descrizione principale
+                        let firstHighlight=document.querySelector('.place-desc strong');
+                        
+                        // Se non trovato in desc, cerca negli altri campi (meta, note, etc)
+                        if(!firstHighlight){
+                            firstHighlight=document.querySelector('.place-meta strong');
                         }
-                    },200);
+                        
+                        // Se ancora non trovato, cerca ovunque
+                        if(!firstHighlight){
+                            firstHighlight=document.querySelector('.place-card strong');
+                        }
+                        
+                        if(firstHighlight){
+                            // Scroll con delay per dare tempo al browser
+                            setTimeout(()=>{
+                                firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
+                            },100);
+                        }
+                    },500);
                 }
             }
         },400);
@@ -1636,7 +1648,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 711;
+    const BUILD_NUMBER = 712;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
