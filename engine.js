@@ -1,4 +1,4 @@
-// ===== V7.1 · 03/09/26 14:05 =====
+// ===== V7.1 · 03/09/26 14:15 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -857,6 +857,13 @@
         if(appData.usefulinfo?.shopping)all.push(...appData.usefulinfo.shopping.map(p=>{p.section='usefulinfo';return p;}));
         return all;
     }
+    function searchExactWord(text,query){
+        if(!text||!query)return false;
+        const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        const regex=new RegExp(`\\b${escapedQuery}\\b`,'i');
+        return regex.test(text.toString());
+    }
+    
     function globalSearch(query){
         if(!query||query.trim().length===0){hideSearchModal();return;}
         query=query.toLowerCase();
@@ -878,7 +885,7 @@
                 // Salta array, oggetti, e campi tecnici
                 if(typeof val!=='string'||key.startsWith('_')||['lat','lng','section','emoji','photos','photo','price','dist'].includes(key))continue;
                 
-                if(val.toLowerCase().includes(query)){
+                if(searchExactWord(val,query)){
                     const plainText=val.replace(/<[^>]*>/g,'');
                     const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey=(obj.name||objName)+'_'+section;
@@ -911,7 +918,7 @@
             // Cerca in tutti i campi dell'appartamento
             for(let key in appData.apartment){
                 const val=appData.apartment[key];
-                if(typeof val==='string'&&val.toLowerCase().includes(query)){
+                if(typeof val==='string'&&searchExactWord(val,query)){
                     const plainText=val.replace(/<[^>]*>/g,'');
                     const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey='apartment_'+key;
@@ -937,7 +944,7 @@
             // Cerca in tutti i campi del contatto
             for(let key in appData.contact){
                 const val=appData.contact[key];
-                if(typeof val==='string'&&val.toLowerCase().includes(query)){
+                if(typeof val==='string'&&searchExactWord(val,query)){
                     const plainText=val.replace(/<[^>]*>/g,'');
                     const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey='contact_'+key;
@@ -967,13 +974,17 @@
     
     function createSearchExcerpt(text,query){
         if(!text||!query)return text.substring(0,150)+'...';
-        const lower=text.toLowerCase();
-        const index=lower.indexOf(query);
-        if(index===-1)return text.substring(0,150)+'...';
         
+        const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        const regex=new RegExp(`\\b${escapedQuery}\\b`,'i');
+        const match=text.match(regex);
+        
+        if(!match)return text.substring(0,150)+'...';
+        
+        const index=match.index;
         // Centra l'excerpt attorno alla parola trovata
         const start=Math.max(0,index-50);
-        const end=Math.min(text.length,index+query.length+100);
+        const end=Math.min(text.length,index+match[0].length+100);
         let excerpt=text.substring(start,end);
         
         // Aggiungi ellissi
@@ -981,7 +992,8 @@
         if(end<text.length)excerpt=excerpt+'...';
         
         // Highlight della parola con <strong>
-        excerpt=excerpt.replace(new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
+        const regexHighlight=new RegExp(`\\b(${escapedQuery})\\b`,'gi');
+        excerpt=excerpt.replace(regexHighlight,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
         
         return excerpt;
     }
@@ -1015,7 +1027,8 @@
     
     function highlightWordInText(text,query){
         if(!text||!query)return text;
-        const regex=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+        const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        const regex=new RegExp(`\\b(${escapedQuery})\\b`,'gi');
         return text.replace(regex,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
     }
     
@@ -1718,7 +1731,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 719;
+    const BUILD_NUMBER = 720;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
