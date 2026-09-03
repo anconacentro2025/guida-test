@@ -1,4 +1,4 @@
-// ===== V7.0 · 03/09/26 08:15 =====
+// ===== V7.0 · 03/09/26 08:26 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -905,7 +905,16 @@
                 seen.add(poiKey);
                 const plainText=matchText.replace(/<[^>]*>/g,'');
                 const excerpt=createSearchExcerpt(plainText,query);
-                results.push({type:'match',name:poi.name||'',section:poi.section||'',text:excerpt,poi:poi,field:matchedField,queryWord:query,plainText:plainText});
+                results.push({
+                    type:'match',
+                    name:poi.name||'',
+                    section:poi.section||'',
+                    text:excerpt,
+                    poi:poi,
+                    field:matchedField,
+                    queryWord:query,
+                    plainText:plainText
+                });
             }
         }
         
@@ -987,46 +996,72 @@
     function navigateToSearchResult(index){
         if(!currentSearchResults[index])return;
         const result=currentSearchResults[index];
+        const poi=result.poi;
         currentSearchQuery=result.queryWord;
         hideSearchModal();
+        
         // Trova l'indice della sezione
-        const sectionId=result.poi.section||'usefulinfo';
+        const sectionId=poi.section||'usefulinfo';
         const sectionIdx=sections.findIndex(s=>s.id===sectionId);
         if(sectionIdx===-1)return;
-        // Naviga alla sezione
-        goTo(sectionIdx);
-        // Aspetta il rendering, poi apri il dettaglio
-        setTimeout(()=>{
-            if(currentSectionPlaces&&currentSectionPlaces.length){
-                const placeIdx=currentSectionPlaces.findIndex(p=>p.name===result.poi.name);
-                if(placeIdx>=0){
-                    currentPlaceDetail=placeIdx;
-                    renderAll();
-                    // Aspetta che il DOM sia completamente renderizzato
-                    setTimeout(()=>{
-                        // Cerca il <strong> nel campo descrizione principale
-                        let firstHighlight=document.querySelector('.place-desc strong');
-                        
-                        // Se non trovato in desc, cerca negli altri campi (meta, note, etc)
-                        if(!firstHighlight){
-                            firstHighlight=document.querySelector('.place-meta strong');
-                        }
-                        
-                        // Se ancora non trovato, cerca ovunque
-                        if(!firstHighlight){
-                            firstHighlight=document.querySelector('.place-card strong');
-                        }
-                        
-                        if(firstHighlight){
-                            // Scroll con delay per dare tempo al browser
-                            setTimeout(()=>{
-                                firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
-                            },100);
-                        }
-                    },500);
-                }
+        
+        // Ottieni i dati della sezione
+        const sectionData=getSectionData(sectionId);
+        
+        // Trova l'indice del POI usandolo come reference (non per nome)
+        let placeIdx=-1;
+        for(let i=0;i<sectionData.length;i++){
+            if(sectionData[i]===poi){
+                placeIdx=i;
+                break;
             }
-        },400);
+        }
+        
+        // Se non trovato per reference, cerca per nome (fallback)
+        if(placeIdx===-1){
+            placeIdx=sectionData.findIndex(p=>p.name===poi.name);
+        }
+        
+        // Naviga alla sezione (goTo resetta currentPlaceDetail=-1)
+        goTo(sectionIdx);
+        
+        // DOPO 500ms che goTo() ha finito, imposta il detail e renderizza
+        setTimeout(()=>{
+            if(placeIdx>=0){
+                currentPlaceDetail=placeIdx;
+                renderAll();
+                // Scrolla al testo evidenziato
+                setTimeout(()=>{
+                    let firstHighlight=document.querySelector('.place-desc strong');
+                    if(!firstHighlight){
+                        firstHighlight=document.querySelector('.place-meta strong');
+                    }
+                    if(!firstHighlight){
+                        firstHighlight=document.querySelector('.place-card strong');
+                    }
+                    if(firstHighlight){
+                        firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
+                    }
+                },300);
+            }
+        },500);
+    }
+    
+    function getSectionData(sectionId){
+        const map={
+            mustsee:()=>appData.mustsee||[],
+            passetto:()=>appData.passetto||[],
+            cardeto:()=>appData.cardeto||[],
+            porto:()=>appData.porto||[],
+            beaches:()=>appData.beaches||[],
+            portonovo:()=>(appData.portonovo&&appData.portonovo.points)?appData.portonovo.points:[],
+            borghi:()=>appData.borghi||[],
+            parcheggi:()=>appData.parking||[],
+            restaurants:()=>appData.restaurants||[],
+            services:()=>{let all=[];if(appData.services?.supermarkets)all.push(...appData.services.supermarkets);if(appData.services?.other)all.push(...appData.services.other);return all;},
+            usefulinfo:()=>{let all=[];if(appData.usefulinfo?.gastronomy)all.push(...appData.usefulinfo.gastronomy);if(appData.usefulinfo?.nightlife)all.push(...appData.usefulinfo.nightlife);if(appData.usefulinfo?.shopping)all.push(...appData.usefulinfo.shopping);return all;}
+        };
+        return map[sectionId]?map[sectionId]():[];
     }
     
     function hideSearchModal(){
@@ -1648,7 +1683,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 713;
+    const BUILD_NUMBER = 714;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;

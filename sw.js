@@ -1,4 +1,4 @@
-// ===== V7.0 · 03/09/26 08:15 =====
+// ===== V7.0 · 03/09/26 08:26 =====
 // Service Worker — Affittacamere Ancona Centro · Guida Ospiti V7.0 01/09/26
 // V6.0: aggiunta cache dedicata e persistente per data.js/engine.js (vedi APP_FILES_CACHE_NAME
 // più sotto). A differenza di CACHE_NAME, questa cache NON viene svuotata ad ogni release:
