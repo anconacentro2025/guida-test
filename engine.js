@@ -1,4 +1,4 @@
-// ===== V7.1 · 03/09/26 14:25 =====
+// ===== V7.1 · 03/09/26 14:35 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -868,29 +868,31 @@
     
     function globalSearch(query){
         if(!query||query.trim().length===0){hideSearchModal();return;}
-        query=query.toLowerCase();
+        const q=query.toLowerCase();
         let results=[];
         const seen=new Set();
         
         // Recupera la lingua attiva
         const lang=currentLang||'it';
+        const shortKey=lang;
+        const longKey=lang+'Long';
         
-        // Identifica dinamicamente le chiavi del POI da controllare per la lingua corrente
-        const shortKey=lang;           // es. 'it', 'de', 'en'
-        const longKey=lang+'Long';     // es. 'itLong', 'deLong', 'enLong'
-        
-        // FUNZIONE HELPER: Estrai tutti i POI da tutte le sezioni
-        const allPois=getAllPois();
+        // Funzione helper: pulisce il testo da tag HTML
+        const cleanHtml=(text)=>{
+            if(!text)return '';
+            return text.replace(/<[^>]*>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+        };
         
         // RICERCA 1: In tutti i POI (SOLO lingua attiva)
+        const allPois=getAllPois();
         for(let poi of allPois){
             const poiKey=poi.name+'_'+poi.section;
             if(seen.has(poiKey))continue;
             
-            // Cerca nel nome (universale)
-            if(searchExactWord(poi.name,query)){
-                const plainText=poi.name.replace(/<[^>]*>/g,'');
-                const excerpt=createSearchExcerpt(plainText,query);
+            // Cerca nel nome (universale, pulito)
+            const cleanName=cleanHtml(poi.name);
+            if(searchExactWord(cleanName,q)){
+                const excerpt=createSearchExcerpt(cleanName,q);
                 seen.add(poiKey);
                 results.push({
                     type:'match',
@@ -899,16 +901,16 @@
                     text:excerpt,
                     poi:poi,
                     field:'name',
-                    queryWord:query,
-                    plainText:plainText
+                    queryWord:q,
+                    plainText:cleanName
                 });
                 continue;
             }
             
-            // Cerca SOLO nei campi della lingua attiva
-            if(searchExactWord(poi[shortKey],query)){
-                const plainText=poi[shortKey].replace(/<[^>]*>/g,'');
-                const excerpt=createSearchExcerpt(plainText,query);
+            // Cerca nel campo short della lingua attiva (pulito)
+            const cleanShort=cleanHtml(poi[shortKey]);
+            if(searchExactWord(cleanShort,q)){
+                const excerpt=createSearchExcerpt(cleanShort,q);
                 seen.add(poiKey);
                 results.push({
                     type:'match',
@@ -917,16 +919,16 @@
                     text:excerpt,
                     poi:poi,
                     field:shortKey,
-                    queryWord:query,
-                    plainText:plainText
+                    queryWord:q,
+                    plainText:cleanShort
                 });
                 continue;
             }
             
-            // Cerca nel campo Long della lingua attiva
-            if(searchExactWord(poi[longKey],query)){
-                const plainText=poi[longKey].replace(/<[^>]*>/g,'');
-                const excerpt=createSearchExcerpt(plainText,query);
+            // Cerca nel campo Long della lingua attiva (pulito)
+            const cleanLong=cleanHtml(poi[longKey]);
+            if(searchExactWord(cleanLong,q)){
+                const excerpt=createSearchExcerpt(cleanLong,q);
                 seen.add(poiKey);
                 results.push({
                     type:'match',
@@ -935,19 +937,19 @@
                     text:excerpt,
                     poi:poi,
                     field:longKey,
-                    queryWord:query,
-                    plainText:plainText
+                    queryWord:q,
+                    plainText:cleanLong
                 });
                 continue;
             }
         }
         
-        // RICERCA 2: In apartment (SOLO lingua attiva)
+        // RICERCA 2: In apartment (SOLO lingua attiva, pulito)
         if(appData.apartment){
             // Cerca nel nome
-            if(searchExactWord(appData.apartment.name,query)){
-                const plainText=appData.apartment.name.replace(/<[^>]*>/g,'');
-                const excerpt=createSearchExcerpt(plainText,query);
+            const cleanApartmentName=cleanHtml(appData.apartment.name);
+            if(searchExactWord(cleanApartmentName,q)){
+                const excerpt=createSearchExcerpt(cleanApartmentName,q);
                 const poiKey='apartment_name';
                 if(!seen.has(poiKey)){
                     seen.add(poiKey);
@@ -958,22 +960,20 @@
                         text:excerpt,
                         poi:appData.apartment,
                         field:'name',
-                        queryWord:query,
-                        plainText:plainText
+                        queryWord:q,
+                        plainText:cleanApartmentName
                     });
                 }
             }
             
             // Cerca nei campi della lingua attiva
             for(let key in appData.apartment){
-                // Considera solo campi della lingua attiva
                 if(!key.startsWith(lang))continue;
                 if(typeof appData.apartment[key]!=='string')continue;
                 
-                const val=appData.apartment[key];
-                if(searchExactWord(val,query)){
-                    const plainText=val.replace(/<[^>]*>/g,'');
-                    const excerpt=createSearchExcerpt(plainText,query);
+                const cleanVal=cleanHtml(appData.apartment[key]);
+                if(searchExactWord(cleanVal,q)){
+                    const excerpt=createSearchExcerpt(cleanVal,q);
                     const poiKey='apartment_'+key;
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
@@ -984,8 +984,8 @@
                             text:excerpt,
                             poi:appData.apartment,
                             field:key,
-                            queryWord:query,
-                            plainText:plainText
+                            queryWord:q,
+                            plainText:cleanVal
                         });
                     }
                     break;
@@ -993,12 +993,12 @@
             }
         }
         
-        // RICERCA 3: In contact (SOLO lingua attiva)
+        // RICERCA 3: In contact (SOLO lingua attiva, pulito)
         if(appData.contact){
             // Cerca nel nome
-            if(searchExactWord(appData.contact.name,query)){
-                const plainText=appData.contact.name.replace(/<[^>]*>/g,'');
-                const excerpt=createSearchExcerpt(plainText,query);
+            const cleanContactName=cleanHtml(appData.contact.name);
+            if(searchExactWord(cleanContactName,q)){
+                const excerpt=createSearchExcerpt(cleanContactName,q);
                 const poiKey='contact_name';
                 if(!seen.has(poiKey)){
                     seen.add(poiKey);
@@ -1009,22 +1009,20 @@
                         text:excerpt,
                         poi:appData.contact,
                         field:'name',
-                        queryWord:query,
-                        plainText:plainText
+                        queryWord:q,
+                        plainText:cleanContactName
                     });
                 }
             }
             
             // Cerca nei campi della lingua attiva
             for(let key in appData.contact){
-                // Considera solo campi della lingua attiva
                 if(!key.startsWith(lang))continue;
                 if(typeof appData.contact[key]!=='string')continue;
                 
-                const val=appData.contact[key];
-                if(searchExactWord(val,query)){
-                    const plainText=val.replace(/<[^>]*>/g,'');
-                    const excerpt=createSearchExcerpt(plainText,query);
+                const cleanVal=cleanHtml(appData.contact[key]);
+                if(searchExactWord(cleanVal,q)){
+                    const excerpt=createSearchExcerpt(cleanVal,q);
                     const poiKey='contact_'+key;
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
@@ -1035,8 +1033,8 @@
                             text:excerpt,
                             poi:appData.contact,
                             field:key,
-                            queryWord:query,
-                            plainText:plainText
+                            queryWord:q,
+                            plainText:cleanVal
                         });
                     }
                     break;
@@ -1095,11 +1093,23 @@
         modal.style.display='flex';
     }
     
+    function clearAndCloseSearch(){
+        const input=document.getElementById('search-input');
+        if(input)input.value='';
+        currentSearchQuery=null;
+        currentSearchResults=[];
+        currentSearchIndex=0;
+        hideSearchModal();
+    }
+    
     function showSearchResultsEmpty(query){
         const modal=document.getElementById('search-modal');
         const resultsList=document.getElementById('search-results-list');
         const counter=document.getElementById('search-counter');
-        resultsList.innerHTML='<div class="search-no-results">'+tr('Nessun risultato per ','No results for ','Keine Ergebnisse für ','Brak wyników dla ')+'<strong>'+query+'</strong></div>';
+        resultsList.innerHTML='<div class="search-no-results" style="padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px">'+
+            '<p>'+tr('Nessun risultato per ','No results for ','Keine Ergebnisse für ','Brak wyników dla ')+'<strong>'+query+'</strong></p>'+
+            '<button type="button" style="padding:10px 20px;background:#1a3a52;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px" onclick="clearAndCloseSearch()">'+tr('Chiudi','Close','Schließen','Zamknij')+'</button>'+
+            '</div>';
         counter.textContent='0';
         modal.style.display='flex';
     }
@@ -1811,7 +1821,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 721;
+    const BUILD_NUMBER = 722;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
@@ -1833,6 +1843,16 @@
     }
     window.addEventListener('load', checkBuildNumber);
     document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkBuildNumber(); });
+    
+    // Listener per tasto ESC per chiudere la ricerca
+    document.addEventListener('keydown',(e)=>{
+        if(e.key==='Escape'){
+            const modal=document.getElementById('search-modal');
+            if(modal&&modal.style.display==='flex'){
+                clearAndCloseSearch();
+            }
+        }
+    });
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
         navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
