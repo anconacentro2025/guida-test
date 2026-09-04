@@ -1,4 +1,4 @@
-// ===== V7.1 · 03/09/26 14:15 =====
+// ===== V7.1 · 03/09/26 14:25 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -860,7 +860,9 @@
     function searchExactWord(text,query){
         if(!text||!query)return false;
         const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        const regex=new RegExp(`\\b${escapedQuery}\\b`,'i');
+        // (?<!\p{L}) = Non preceduto da una lettera Unicode
+        // (?!\p{L}) = Non seguito da una lettera Unicode
+        const regex=new RegExp(`(?<!\\p{L})${escapedQuery}(?!\\p{L})`,'iu');
         return regex.test(text.toString());
     }
     
@@ -870,55 +872,106 @@
         let results=[];
         const seen=new Set();
         
-        // Mappa campi multilingua per la lingua attiva
-        const langPrefix={it:'it',en:'en',de:'de',pl:'pl'};
-        const prefix=langPrefix[currentLang]||'it';
+        // Recupera la lingua attiva
+        const lang=currentLang||'it';
+        
+        // Identifica dinamicamente le chiavi del POI da controllare per la lingua corrente
+        const shortKey=lang;           // es. 'it', 'de', 'en'
+        const longKey=lang+'Long';     // es. 'itLong', 'deLong', 'enLong'
         
         // FUNZIONE HELPER: Estrai tutti i POI da tutte le sezioni
         const allPois=getAllPois();
         
-        // FUNZIONE HELPER: Cerca in un oggetto generico per qualsiasi campo stringa
-        const searchInObject=(obj,section,objName)=>{
-            if(!obj)return;
-            for(let key in obj){
-                const val=obj[key];
-                // Salta array, oggetti, e campi tecnici
-                if(typeof val!=='string'||key.startsWith('_')||['lat','lng','section','emoji','photos','photo','price','dist'].includes(key))continue;
-                
-                if(searchExactWord(val,query)){
-                    const plainText=val.replace(/<[^>]*>/g,'');
-                    const excerpt=createSearchExcerpt(plainText,query);
-                    const poiKey=(obj.name||objName)+'_'+section;
-                    
-                    if(!seen.has(poiKey)){
-                        seen.add(poiKey);
-                        results.push({
-                            type:'match',
-                            name:obj.name||objName||'',
-                            section:section||'',
-                            text:excerpt,
-                            poi:obj,
-                            field:key,
-                            queryWord:query,
-                            plainText:plainText
-                        });
-                    }
-                    return; // Prendi il primo match per questo oggetto
-                }
-            }
-        };
-        
-        // RICERCA 1: In tutti i POI
+        // RICERCA 1: In tutti i POI (SOLO lingua attiva)
         for(let poi of allPois){
-            searchInObject(poi,poi.section||'');
+            const poiKey=poi.name+'_'+poi.section;
+            if(seen.has(poiKey))continue;
+            
+            // Cerca nel nome (universale)
+            if(searchExactWord(poi.name,query)){
+                const plainText=poi.name.replace(/<[^>]*>/g,'');
+                const excerpt=createSearchExcerpt(plainText,query);
+                seen.add(poiKey);
+                results.push({
+                    type:'match',
+                    name:poi.name||'',
+                    section:poi.section||'',
+                    text:excerpt,
+                    poi:poi,
+                    field:'name',
+                    queryWord:query,
+                    plainText:plainText
+                });
+                continue;
+            }
+            
+            // Cerca SOLO nei campi della lingua attiva
+            if(searchExactWord(poi[shortKey],query)){
+                const plainText=poi[shortKey].replace(/<[^>]*>/g,'');
+                const excerpt=createSearchExcerpt(plainText,query);
+                seen.add(poiKey);
+                results.push({
+                    type:'match',
+                    name:poi.name||'',
+                    section:poi.section||'',
+                    text:excerpt,
+                    poi:poi,
+                    field:shortKey,
+                    queryWord:query,
+                    plainText:plainText
+                });
+                continue;
+            }
+            
+            // Cerca nel campo Long della lingua attiva
+            if(searchExactWord(poi[longKey],query)){
+                const plainText=poi[longKey].replace(/<[^>]*>/g,'');
+                const excerpt=createSearchExcerpt(plainText,query);
+                seen.add(poiKey);
+                results.push({
+                    type:'match',
+                    name:poi.name||'',
+                    section:poi.section||'',
+                    text:excerpt,
+                    poi:poi,
+                    field:longKey,
+                    queryWord:query,
+                    plainText:plainText
+                });
+                continue;
+            }
         }
         
-        // RICERCA 2: In apartment
+        // RICERCA 2: In apartment (SOLO lingua attiva)
         if(appData.apartment){
-            // Cerca in tutti i campi dell'appartamento
+            // Cerca nel nome
+            if(searchExactWord(appData.apartment.name,query)){
+                const plainText=appData.apartment.name.replace(/<[^>]*>/g,'');
+                const excerpt=createSearchExcerpt(plainText,query);
+                const poiKey='apartment_name';
+                if(!seen.has(poiKey)){
+                    seen.add(poiKey);
+                    results.push({
+                        type:'match',
+                        name:tr('Appartamento','Apartment','Wohnung','Mieszkanie'),
+                        section:'apartment',
+                        text:excerpt,
+                        poi:appData.apartment,
+                        field:'name',
+                        queryWord:query,
+                        plainText:plainText
+                    });
+                }
+            }
+            
+            // Cerca nei campi della lingua attiva
             for(let key in appData.apartment){
+                // Considera solo campi della lingua attiva
+                if(!key.startsWith(lang))continue;
+                if(typeof appData.apartment[key]!=='string')continue;
+                
                 const val=appData.apartment[key];
-                if(typeof val==='string'&&searchExactWord(val,query)){
+                if(searchExactWord(val,query)){
                     const plainText=val.replace(/<[^>]*>/g,'');
                     const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey='apartment_'+key;
@@ -935,16 +988,41 @@
                             plainText:plainText
                         });
                     }
+                    break;
                 }
             }
         }
         
-        // RICERCA 3: In contact
+        // RICERCA 3: In contact (SOLO lingua attiva)
         if(appData.contact){
-            // Cerca in tutti i campi del contatto
+            // Cerca nel nome
+            if(searchExactWord(appData.contact.name,query)){
+                const plainText=appData.contact.name.replace(/<[^>]*>/g,'');
+                const excerpt=createSearchExcerpt(plainText,query);
+                const poiKey='contact_name';
+                if(!seen.has(poiKey)){
+                    seen.add(poiKey);
+                    results.push({
+                        type:'match',
+                        name:tr('Contatti','Contact','Kontakt','Kontakt'),
+                        section:'contact',
+                        text:excerpt,
+                        poi:appData.contact,
+                        field:'name',
+                        queryWord:query,
+                        plainText:plainText
+                    });
+                }
+            }
+            
+            // Cerca nei campi della lingua attiva
             for(let key in appData.contact){
+                // Considera solo campi della lingua attiva
+                if(!key.startsWith(lang))continue;
+                if(typeof appData.contact[key]!=='string')continue;
+                
                 const val=appData.contact[key];
-                if(typeof val==='string'&&searchExactWord(val,query)){
+                if(searchExactWord(val,query)){
                     const plainText=val.replace(/<[^>]*>/g,'');
                     const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey='contact_'+key;
@@ -961,6 +1039,7 @@
                             plainText:plainText
                         });
                     }
+                    break;
                 }
             }
         }
@@ -976,7 +1055,7 @@
         if(!text||!query)return text.substring(0,150)+'...';
         
         const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        const regex=new RegExp(`\\b${escapedQuery}\\b`,'i');
+        const regex=new RegExp(`(?<!\\p{L})${escapedQuery}(?!\\p{L})`,'iu');
         const match=text.match(regex);
         
         if(!match)return text.substring(0,150)+'...';
@@ -992,7 +1071,7 @@
         if(end<text.length)excerpt=excerpt+'...';
         
         // Highlight della parola con <strong>
-        const regexHighlight=new RegExp(`\\b(${escapedQuery})\\b`,'gi');
+        const regexHighlight=new RegExp(`(?<!\\p{L})(${escapedQuery})(?!\\p{L})`,'giu');
         excerpt=excerpt.replace(regexHighlight,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
         
         return excerpt;
@@ -1028,7 +1107,8 @@
     function highlightWordInText(text,query){
         if(!text||!query)return text;
         const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        const regex=new RegExp(`\\b(${escapedQuery})\\b`,'gi');
+        // Evidenzia solo se la parola è isolata rispetto a qualsiasi lettera Unicode
+        const regex=new RegExp(`(?<!\\p{L})(${escapedQuery})(?!\\p{L})`,'giu');
         return text.replace(regex,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
     }
     
@@ -1731,7 +1811,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 720;
+    const BUILD_NUMBER = 721;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
