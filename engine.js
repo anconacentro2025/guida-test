@@ -1,4 +1,4 @@
-// ===== V7.1 · 03/09/26 14:35 =====
+// ===== V7.1 · 03/09/26 14:40 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -857,123 +857,67 @@
         if(appData.usefulinfo?.shopping)all.push(...appData.usefulinfo.shopping.map(p=>{p.section='usefulinfo';return p;}));
         return all;
     }
-    function searchExactWord(text,query){
-        if(!text||!query)return false;
-        const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        // (?<!\p{L}) = Non preceduto da una lettera Unicode
-        // (?!\p{L}) = Non seguito da una lettera Unicode
-        const regex=new RegExp(`(?<!\\p{L})${escapedQuery}(?!\\p{L})`,'iu');
-        return regex.test(text.toString());
-    }
-    
     function globalSearch(query){
+        const cleanHtml=(text)=>{
+            if(!text)return "";
+            return text.replace(/<[^>]*>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");
+        };
         if(!query||query.trim().length===0){hideSearchModal();return;}
-        const q=query.toLowerCase();
+        query=query.toLowerCase();
         let results=[];
         const seen=new Set();
         
-        // Recupera la lingua attiva
-        const lang=currentLang||'it';
-        const shortKey=lang;
-        const longKey=lang+'Long';
+        // Mappa campi multilingua per la lingua attiva
+        const langPrefix={it:'it',en:'en',de:'de',pl:'pl'};
+        const prefix=langPrefix[currentLang]||'it';
         
-        // Funzione helper: pulisce il testo da tag HTML
-        const cleanHtml=(text)=>{
-            if(!text)return '';
-            return text.replace(/<[^>]*>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
-        };
-        
-        // RICERCA 1: In tutti i POI (SOLO lingua attiva)
+        // FUNZIONE HELPER: Estrai tutti i POI da tutte le sezioni
         const allPois=getAllPois();
-        for(let poi of allPois){
-            const poiKey=poi.name+'_'+poi.section;
-            if(seen.has(poiKey))continue;
-            
-            // Cerca nel nome (universale, pulito)
-            const cleanName=cleanHtml(poi.name);
-            if(searchExactWord(cleanName,q)){
-                const excerpt=createSearchExcerpt(cleanName,q);
-                seen.add(poiKey);
-                results.push({
-                    type:'match',
-                    name:poi.name||'',
-                    section:poi.section||'',
-                    text:excerpt,
-                    poi:poi,
-                    field:'name',
-                    queryWord:q,
-                    plainText:cleanName
-                });
-                continue;
-            }
-            
-            // Cerca nel campo short della lingua attiva (pulito)
-            const cleanShort=cleanHtml(poi[shortKey]);
-            if(searchExactWord(cleanShort,q)){
-                const excerpt=createSearchExcerpt(cleanShort,q);
-                seen.add(poiKey);
-                results.push({
-                    type:'match',
-                    name:poi.name||'',
-                    section:poi.section||'',
-                    text:excerpt,
-                    poi:poi,
-                    field:shortKey,
-                    queryWord:q,
-                    plainText:cleanShort
-                });
-                continue;
-            }
-            
-            // Cerca nel campo Long della lingua attiva (pulito)
-            const cleanLong=cleanHtml(poi[longKey]);
-            if(searchExactWord(cleanLong,q)){
-                const excerpt=createSearchExcerpt(cleanLong,q);
-                seen.add(poiKey);
-                results.push({
-                    type:'match',
-                    name:poi.name||'',
-                    section:poi.section||'',
-                    text:excerpt,
-                    poi:poi,
-                    field:longKey,
-                    queryWord:q,
-                    plainText:cleanLong
-                });
-                continue;
-            }
-        }
         
-        // RICERCA 2: In apartment (SOLO lingua attiva, pulito)
-        if(appData.apartment){
-            // Cerca nel nome
-            const cleanApartmentName=cleanHtml(appData.apartment.name);
-            if(searchExactWord(cleanApartmentName,q)){
-                const excerpt=createSearchExcerpt(cleanApartmentName,q);
-                const poiKey='apartment_name';
-                if(!seen.has(poiKey)){
-                    seen.add(poiKey);
-                    results.push({
-                        type:'match',
-                        name:tr('Appartamento','Apartment','Wohnung','Mieszkanie'),
-                        section:'apartment',
-                        text:excerpt,
-                        poi:appData.apartment,
-                        field:'name',
-                        queryWord:q,
-                        plainText:cleanApartmentName
-                    });
+        // FUNZIONE HELPER: Cerca in un oggetto generico per qualsiasi campo stringa
+        const searchInObject=(obj,section,objName)=>{
+            if(!obj)return;
+            for(let key in obj){
+                const val=obj[key];
+                // Salta array, oggetti, e campi tecnici
+                if(typeof val!=='string'||key.startsWith('_')||['lat','lng','section','emoji','photos','photo','price','dist'].includes(key))continue;
+                
+                if(val.toLowerCase().includes(query)){
+                    const plainText=val.replace(/<[^>]*>/g,'');
+                    const excerpt=createSearchExcerpt(plainText,query);
+                    const poiKey=(obj.name||objName)+'_'+section;
+                    
+                    if(!seen.has(poiKey)){
+                        seen.add(poiKey);
+                        results.push({
+                            type:'match',
+                            name:obj.name||objName||'',
+                            section:section||'',
+                            text:excerpt,
+                            poi:obj,
+                            field:key,
+                            queryWord:query,
+                            plainText:plainText
+                        });
+                    }
+                    return; // Prendi il primo match per questo oggetto
                 }
             }
-            
-            // Cerca nei campi della lingua attiva
+        };
+        
+        // RICERCA 1: In tutti i POI
+        for(let poi of allPois){
+            searchInObject(poi,poi.section||'');
+        }
+        
+        // RICERCA 2: In apartment
+        if(appData.apartment){
+            // Cerca in tutti i campi dell'appartamento
             for(let key in appData.apartment){
-                if(!key.startsWith(lang))continue;
-                if(typeof appData.apartment[key]!=='string')continue;
-                
-                const cleanVal=cleanHtml(appData.apartment[key]);
-                if(searchExactWord(cleanVal,q)){
-                    const excerpt=createSearchExcerpt(cleanVal,q);
+                const val=appData.apartment[key];
+                if(typeof val==='string'&&val.toLowerCase().includes(query)){
+                    const plainText=val.replace(/<[^>]*>/g,'');
+                    const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey='apartment_'+key;
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
@@ -984,45 +928,22 @@
                             text:excerpt,
                             poi:appData.apartment,
                             field:key,
-                            queryWord:q,
-                            plainText:cleanVal
+                            queryWord:query,
+                            plainText:plainText
                         });
                     }
-                    break;
                 }
             }
         }
         
-        // RICERCA 3: In contact (SOLO lingua attiva, pulito)
+        // RICERCA 3: In contact
         if(appData.contact){
-            // Cerca nel nome
-            const cleanContactName=cleanHtml(appData.contact.name);
-            if(searchExactWord(cleanContactName,q)){
-                const excerpt=createSearchExcerpt(cleanContactName,q);
-                const poiKey='contact_name';
-                if(!seen.has(poiKey)){
-                    seen.add(poiKey);
-                    results.push({
-                        type:'match',
-                        name:tr('Contatti','Contact','Kontakt','Kontakt'),
-                        section:'contact',
-                        text:excerpt,
-                        poi:appData.contact,
-                        field:'name',
-                        queryWord:q,
-                        plainText:cleanContactName
-                    });
-                }
-            }
-            
-            // Cerca nei campi della lingua attiva
+            // Cerca in tutti i campi del contatto
             for(let key in appData.contact){
-                if(!key.startsWith(lang))continue;
-                if(typeof appData.contact[key]!=='string')continue;
-                
-                const cleanVal=cleanHtml(appData.contact[key]);
-                if(searchExactWord(cleanVal,q)){
-                    const excerpt=createSearchExcerpt(cleanVal,q);
+                const val=appData.contact[key];
+                if(typeof val==='string'&&val.toLowerCase().includes(query)){
+                    const plainText=val.replace(/<[^>]*>/g,'');
+                    const excerpt=createSearchExcerpt(plainText,query);
                     const poiKey='contact_'+key;
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
@@ -1033,11 +954,10 @@
                             text:excerpt,
                             poi:appData.contact,
                             field:key,
-                            queryWord:q,
-                            plainText:cleanVal
+                            queryWord:query,
+                            plainText:plainText
                         });
                     }
-                    break;
                 }
             }
         }
@@ -1051,17 +971,13 @@
     
     function createSearchExcerpt(text,query){
         if(!text||!query)return text.substring(0,150)+'...';
+        const lower=text.toLowerCase();
+        const index=lower.indexOf(query);
+        if(index===-1)return text.substring(0,150)+'...';
         
-        const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        const regex=new RegExp(`(?<!\\p{L})${escapedQuery}(?!\\p{L})`,'iu');
-        const match=text.match(regex);
-        
-        if(!match)return text.substring(0,150)+'...';
-        
-        const index=match.index;
         // Centra l'excerpt attorno alla parola trovata
         const start=Math.max(0,index-50);
-        const end=Math.min(text.length,index+match[0].length+100);
+        const end=Math.min(text.length,index+query.length+100);
         let excerpt=text.substring(start,end);
         
         // Aggiungi ellissi
@@ -1069,8 +985,7 @@
         if(end<text.length)excerpt=excerpt+'...';
         
         // Highlight della parola con <strong>
-        const regexHighlight=new RegExp(`(?<!\\p{L})(${escapedQuery})(?!\\p{L})`,'giu');
-        excerpt=excerpt.replace(regexHighlight,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
+        excerpt=excerpt.replace(new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
         
         return excerpt;
     }
@@ -1116,9 +1031,7 @@
     
     function highlightWordInText(text,query){
         if(!text||!query)return text;
-        const escapedQuery=query.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        // Evidenzia solo se la parola è isolata rispetto a qualsiasi lettera Unicode
-        const regex=new RegExp(`(?<!\\p{L})(${escapedQuery})(?!\\p{L})`,'giu');
+        const regex=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
         return text.replace(regex,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
     }
     
@@ -1143,44 +1056,52 @@
         currentSearchQuery=result.queryWord;
         hideSearchModal();
         
-        const sectionId=poi.section||result.section||'usefulinfo';
+        // Trova l'indice della sezione
+        const sectionId=poi.section||'usefulinfo';
         const sectionIdx=sections.findIndex(s=>s.id===sectionId);
         if(sectionIdx===-1)return;
         
-        // Se il risultato appartiene a sezioni statiche/senza lista dettagliata POI
-        if(sectionId==='apartment'||sectionId==='contact'){
-            goTo(sectionIdx);
-            return;
+        // Ottieni i dati della sezione
+        const sectionData=getSectionData(sectionId);
+        
+        // Trova l'indice del POI per reference (identità di oggetto)
+        let placeIdx=sectionData.findIndex(p=>p===poi);
+        
+        // Se non trovato per reference, cerca per nome (case-insensitive)
+        if(placeIdx===-1&&poi.name){
+            const poiNameLower=poi.name.toLowerCase();
+            placeIdx=sectionData.findIndex(p=>p.name&&p.name.toLowerCase()===poiNameLower);
         }
         
-        // Ricava i dati della sezione e trova l'indice esatto del POI
-        const sectionData=getSectionData(sectionId);
-        let placeIdx=sectionData.findIndex(p=>p===poi||p.name===poi.name);
+        // Se ANCORA non trovato, cerca il primo match parziale (fallback)
+        if(placeIdx===-1&&poi.name){
+            const poiNameLower=poi.name.toLowerCase();
+            placeIdx=sectionData.findIndex(p=>p.name&&p.name.toLowerCase().includes(poiNameLower));
+        }
         
-        // Imposta lo stato per aprire direttamente la scheda dettaglio
-        currentSection=sectionIdx;
-        currentPlaceDetail=placeIdx>=0?placeIdx:-1;
+        // Naviga alla sezione
+        goTo(sectionIdx);
         
-        if(leafletMap){leafletMap.remove();leafletMap=null;}
-        
-        renderAll();
-        window.scrollTo({top:0,behavior:'smooth'});
-        
-        // Scroll automatico fino al testo evidenziato ed eventuale apertura approfondimento
+        // DOPO che goTo() ha finito, imposta il detail e renderizza
         setTimeout(()=>{
-            // Se la parola è dentro il blocco 'Approfondisci', apri il fisarmonica automaticamente
-            const deepBody=document.querySelector('.place-deep-body');
-            if(deepBody&&deepBody.innerHTML.toLowerCase().includes(currentSearchQuery.toLowerCase())){
-                deepBody.classList.add('open');
-                const toggleBtn=document.querySelector('.place-deep-toggle');
-                if(toggleBtn)toggleBtn.classList.add('open');
+            if(placeIdx>=0){
+                currentPlaceDetail=placeIdx;
+                renderAll();
+                // Scrolla al testo evidenziato
+                setTimeout(()=>{
+                    let firstHighlight=document.querySelector('.place-desc strong');
+                    if(!firstHighlight){
+                        firstHighlight=document.querySelector('.place-meta strong');
+                    }
+                    if(!firstHighlight){
+                        firstHighlight=document.querySelector('.place-card strong');
+                    }
+                    if(firstHighlight){
+                        firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
+                    }
+                },300);
             }
-            
-            const firstHighlight=document.querySelector('strong');
-            if(firstHighlight){
-                firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
-            }
-        },300);
+        },500);
     }
     
     function getSectionData(sectionId){
@@ -1477,9 +1398,7 @@
         const deepId='deep_'+index;
         let deepHtml='';
         if(p.itLong||p.enLong||p.deLong||p.plLong){
-            let rawLongDesc=tr(p.itLong||p.it,p.enLong||p.en,p.deLong||p.de,p.plLong||p.pl);
-            // Applica l'evidenziatore al testo esteso
-            const longDesc=currentSearchQuery?highlightWordInText(rawLongDesc,currentSearchQuery):rawLongDesc;
+            const longDesc=tr(p.itLong||p.it,p.enLong||p.en,p.deLong||p.de,p.plLong||p.pl);
             deepHtml='<div class="place-section-block"><button class="place-deep-toggle" onclick="(function(btn){btn.classList.toggle(\'open\');var b=document.getElementById(\''+deepId+'\');b.classList.toggle(\'open\');btn.setAttribute(\'aria-expanded\',b.classList.contains(\'open\'));this})(this)" aria-expanded="false">📖 '+tr('Approfondisci','Learn more','Mehr erfahren','Dowiedz się więcej')+'</button><div class="place-deep-body" id="'+deepId+'">'+longDesc+'</div></div>';
         }
         // V5.0: meta-sezioni (👀 Da non perdere, 📸 Foto, ⏱ Tempo, 🚶 Prossima tappa)
@@ -1844,7 +1763,6 @@
     window.addEventListener('load', checkBuildNumber);
     document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkBuildNumber(); });
     
-    // Listener per tasto ESC per chiudere la ricerca
     document.addEventListener('keydown',(e)=>{
         if(e.key==='Escape'){
             const modal=document.getElementById('search-modal');
