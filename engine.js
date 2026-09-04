@@ -1,4 +1,4 @@
-// ===== V7.1 · 03/09/26 14:40 =====
+// ===== V7.1 · 04/09/26 11:45 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -1740,7 +1740,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 722;
+    const BUILD_NUMBER = 723;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
