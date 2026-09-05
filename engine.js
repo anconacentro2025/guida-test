@@ -1868,7 +1868,7 @@
     });
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
-        navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
+        navigator.serviceWorker.register('./sw.js?v=7.2',{scope:'./'}).then(reg=>{
             // Invia APP_CACHE_NAME al SW (attivo, in waiting o in installazione)
             // così sw.js non ha più bisogno del CACHE_NAME hardcoded
             const sendVersion=sw=>{if(sw)sw.postMessage({type:'SET_CACHE_NAME',cacheName:APP_CACHE_NAME,buildNumber:BUILD_NUMBER});};
