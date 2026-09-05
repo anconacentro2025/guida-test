@@ -1,4 +1,4 @@
-// ===== V7.1 · 05/09/26 07:50 =====
+// ===== V7.1 · 05/09/26 08:30 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.1-05090750';
+    const APP_CACHE_NAME = 'ancona-guida-v7.1-05090830';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -867,26 +867,23 @@
         let results=[];
         const seen=new Set();
         
-        // Mappa campi multilingua per la lingua attiva
+        // Lingua attiva — UNICA fonte per il filtro linguistico
         const langPrefix={it:'it',en:'en',de:'de',pl:'pl'};
         const prefix=langPrefix[currentLang]||'it';
+        const longPrefix=prefix+'Long';
         
-        // FUNZIONE HELPER: Estrai tutti i POI da tutte le sezioni
-        const allPois=getAllPois();
-        
-        // FUNZIONE HELPER: Cerca in un oggetto generico per qualsiasi campo stringa
-        const searchInObject=(obj,section,objName)=>{
+        // FUNZIONE HELPER: Cerca in un oggetto per la lingua attiva (short e long)
+        const searchInObjectByLang=(obj,section,objName)=>{
             if(!obj)return;
-            for(let key in obj){
-                const val=obj[key];
-                // Salta array, oggetti, e campi tecnici
-                if(typeof val!=='string'||key.startsWith('_')||['lat','lng','section','emoji','photos','photo','price','dist'].includes(key))continue;
-                
-                if(val.toLowerCase().includes(query)){
-                    const plainText=val.replace(/<[^>]*>/g,'');
+            
+            // Prova il campo short (it, en, de, pl)
+            const shortVal=obj[prefix];
+            if(shortVal&&typeof shortVal==='string'){
+                const cleanShort=cleanHtml(shortVal).toLowerCase();
+                if(cleanShort.includes(query)){
+                    const plainText=cleanHtml(shortVal);
                     const excerpt=createSearchExcerpt(plainText,query);
-                    const poiKey=(obj.name||objName)+'_'+section;
-                    
+                    const poiKey=(obj.name||objName)+'_'+section+'_short';
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
                         results.push({
@@ -895,39 +892,129 @@
                             section:section||'',
                             text:excerpt,
                             poi:obj,
-                            field:key,
+                            field:prefix,
                             queryWord:query,
                             plainText:plainText
                         });
+                        return;
                     }
-                    return; // Prendi il primo match per questo oggetto
+                }
+            }
+            
+            // Prova il campo long (itLong, enLong, deLong, plLong)
+            const longVal=obj[longPrefix];
+            if(longVal&&typeof longVal==='string'){
+                const cleanLong=cleanHtml(longVal).toLowerCase();
+                if(cleanLong.includes(query)){
+                    const plainText=cleanHtml(longVal);
+                    const excerpt=createSearchExcerpt(plainText,query);
+                    const poiKey=(obj.name||objName)+'_'+section+'_long';
+                    if(!seen.has(poiKey)){
+                        seen.add(poiKey);
+                        results.push({
+                            type:'match',
+                            name:obj.name||objName||'',
+                            section:section||'',
+                            text:excerpt,
+                            poi:obj,
+                            field:longPrefix,
+                            queryWord:query,
+                            plainText:plainText
+                        });
+                        return;
+                    }
                 }
             }
         };
         
-        // RICERCA 1: In tutti i POI
+        // RICERCA 1: In tutti i POI (mustsee, passetto, cardeto, etc.)
+        const allPois=getAllPois();
         for(let poi of allPois){
-            searchInObject(poi,poi.section||'');
+            searchInObjectByLang(poi, poi.section||'');
         }
         
-        // RICERCA 2: In apartment
+        // RICERCA 2: In apartment (ogni campo è un oggetto multilingua {it:'...', en:'...', ...})
         if(appData.apartment){
-            // Cerca in tutti i campi dell'appartamento
             for(let key in appData.apartment){
-                const val=appData.apartment[key];
-                if(typeof val==='string'&&val.toLowerCase().includes(query)){
-                    const plainText=val.replace(/<[^>]*>/g,'');
+                const fieldObj=appData.apartment[key];
+                // Controlla se è un oggetto multilingua
+                if(typeof fieldObj==='object'&&fieldObj!==null&&!Array.isArray(fieldObj)){
+                    const val=fieldObj[prefix];
+                    if(val&&typeof val==='string'){
+                        const cleanVal=cleanHtml(val).toLowerCase();
+                        if(cleanVal.includes(query)){
+                            const plainText=cleanHtml(val);
+                            const excerpt=createSearchExcerpt(plainText,query);
+                            const poiKey='apartment_'+key;
+                            if(!seen.has(poiKey)){
+                                seen.add(poiKey);
+                                results.push({
+                                    type:'match',
+                                    name:tr('Appartamento','Apartment','Wohnung','Mieszkanie'),
+                                    section:'apartment',
+                                    text:excerpt,
+                                    poi:appData.apartment,
+                                    field:key,
+                                    queryWord:query,
+                                    plainText:plainText
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // RICERCA 3: In contact (ogni campo è un oggetto multilingua {it:'...', en:'...', ...})
+        if(appData.contact){
+            for(let key in appData.contact){
+                const fieldObj=appData.contact[key];
+                if(typeof fieldObj==='object'&&fieldObj!==null&&!Array.isArray(fieldObj)){
+                    const val=fieldObj[prefix];
+                    if(val&&typeof val==='string'){
+                        const cleanVal=cleanHtml(val).toLowerCase();
+                        if(cleanVal.includes(query)){
+                            const plainText=cleanHtml(val);
+                            const excerpt=createSearchExcerpt(plainText,query);
+                            const poiKey='contact_'+key;
+                            if(!seen.has(poiKey)){
+                                seen.add(poiKey);
+                                results.push({
+                                    type:'match',
+                                    name:tr('Contatti','Contact','Kontakt','Kontakt'),
+                                    section:'contact',
+                                    text:excerpt,
+                                    poi:appData.contact,
+                                    field:key,
+                                    queryWord:query,
+                                    plainText:plainText
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // RICERCA 4: In gastronomy.intro
+        if(appData.gastronomy&&appData.gastronomy.intro){
+            const introObj=appData.gastronomy.intro;
+            const val=introObj[prefix];
+            if(val&&typeof val==='string'){
+                const cleanVal=cleanHtml(val).toLowerCase();
+                if(cleanVal.includes(query)){
+                    const plainText=cleanHtml(val);
                     const excerpt=createSearchExcerpt(plainText,query);
-                    const poiKey='apartment_'+key;
+                    const poiKey='gastronomy_intro';
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
                         results.push({
                             type:'match',
-                            name:tr('Appartamento','Apartment','Wohnung','Mieszkanie'),
-                            section:'apartment',
+                            name:tr('Gastronomia','Gastronomy','Gastronomie','Gastronomia'),
+                            section:'usefulinfo',
                             text:excerpt,
-                            poi:appData.apartment,
-                            field:key,
+                            poi:introObj,
+                            field:prefix,
                             queryWord:query,
                             plainText:plainText
                         });
@@ -936,29 +1023,37 @@
             }
         }
         
-        // RICERCA 3: In contact
-        if(appData.contact){
-            // Cerca in tutti i campi del contatto
-            for(let key in appData.contact){
-                const val=appData.contact[key];
-                if(typeof val==='string'&&val.toLowerCase().includes(query)){
-                    const plainText=val.replace(/<[^>]*>/g,'');
+        // RICERCA 5: In gastronomy.hostTip
+        if(appData.gastronomy&&appData.gastronomy.hostTip){
+            const tipObj=appData.gastronomy.hostTip;
+            const val=tipObj[prefix];
+            if(val&&typeof val==='string'){
+                const cleanVal=cleanHtml(val).toLowerCase();
+                if(cleanVal.includes(query)){
+                    const plainText=cleanHtml(val);
                     const excerpt=createSearchExcerpt(plainText,query);
-                    const poiKey='contact_'+key;
+                    const poiKey='gastronomy_hosttip';
                     if(!seen.has(poiKey)){
                         seen.add(poiKey);
                         results.push({
                             type:'match',
-                            name:tr('Contatti','Contact','Kontakt','Kontakt'),
-                            section:'contact',
+                            name:tr('Gastronomia - Consiglio','Gastronomy - Host Tip','Gastronomie - Tipp','Gastronomia - Porada'),
+                            section:'usefulinfo',
                             text:excerpt,
-                            poi:appData.contact,
-                            field:key,
+                            poi:tipObj,
+                            field:prefix,
                             queryWord:query,
                             plainText:plainText
                         });
                     }
                 }
+            }
+        }
+        
+        // RICERCA 6: In gastronomy.dishes[] — come POI (hanno it, en, de, pl direttamente)
+        if(appData.gastronomy&&appData.gastronomy.dishes&&Array.isArray(appData.gastronomy.dishes)){
+            for(let dish of appData.gastronomy.dishes){
+                searchInObjectByLang(dish, 'usefulinfo', dish.name);
             }
         }
         
@@ -1740,7 +1835,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 726;
+    const BUILD_NUMBER = 727;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
