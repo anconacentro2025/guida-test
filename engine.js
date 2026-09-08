@@ -1,4 +1,4 @@
-// ===== V7.2 · 08/09/26 08:45 =====
+// ===== V7.2 · 08/09/26 14:00 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.2-08090845';
+    const APP_CACHE_NAME = 'ancona-guida-v7.2-08091400';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1496,15 +1496,13 @@
             const longDesc=tr(p.itLong||p.it,p.enLong||p.en,p.deLong||p.de,p.plLong||p.pl);
             deepHtml='<div class="place-section-block"><button class="place-deep-toggle" onclick="(function(btn){btn.classList.toggle(\'open\');var b=document.getElementById(\''+deepId+'\');b.classList.toggle(\'open\');btn.setAttribute(\'aria-expanded\',b.classList.contains(\'open\'));this})(this)" aria-expanded="false">📖 '+tr('Approfondisci','Learn more','Mehr erfahren','Dowiedz się więcej')+'</button><div class="place-deep-body" id="'+deepId+'">'+longDesc+'</div></div>';
         }
-        // V5.0: meta-sezioni (👀 Da non perdere, 📸 Foto, ⏱ Tempo, 🚶 Prossima tappa)
+        // V5.0: meta-sezioni (👀 Da non perdere, 📸 Foto, 🚶 Prossima tappa)
         const noteStr=currentSearchQuery?highlightWordInText(tr(p.itNote,p.enNote,p.deNote,p.plNote),currentSearchQuery):tr(p.itNote,p.enNote,p.deNote,p.plNote);
-        const timeStr=currentSearchQuery?highlightWordInText(tr(p.itTime,p.enTime,p.deTime,p.plTime),currentSearchQuery):tr(p.itTime,p.enTime,p.deTime,p.plTime);
         let metaHtml='';
-        if(noteStr||photoTip||timeStr){
+        if(noteStr||photoTip){
             metaHtml='<div class="place-section-block"><div class="place-meta">';
             if(noteStr) metaHtml+='<div class="place-meta-row"><span class="place-meta-icon">👀</span><span>'+noteStr+'</span></div>';
             if(photoTip) metaHtml+='<div class="place-meta-row"><span class="place-meta-icon">📸</span><span>'+photoTip+'</span></div>';
-            if(timeStr) metaHtml+='<div class="place-meta-row"><span class="place-meta-icon">⏱</span><span>'+timeStr+'</span></div>';
             metaHtml+='</div></div>';
         }
         const displayNum=getDisplayNumber(p,index),totalDisplay=getTotalDisplay(currentSectionPlaces,total);
@@ -1856,7 +1854,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 739;
+    const BUILD_NUMBER = 740;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
