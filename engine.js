@@ -1,4 +1,4 @@
-// ===== V7.2 · 07/09/26 13:45 =====
+// ===== V7.2 · 08/09/26 04:00 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.2-07091345b';
+    const APP_CACHE_NAME = 'ancona-guida-v7.2-08090400';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1655,7 +1655,12 @@
         if(currentPlaceDetail>=0&&currentPlaceDetail<points.length)return renderAnyPlaceDetail(points[currentPlaceDetail],currentPlaceDetail,points.length,false);
 
         const introTxt=tr(p.intro.it,p.intro.en,p.intro.de,p.intro.pl);
-        let html='<div class="card" style="margin-bottom:8px"><div class="card-body" style="font-size:.82rem;line-height:1.6;color:var(--text)">'+introTxt+'</div></div>';
+        let html='<div class="card" style="margin-bottom:8px"><div class="card-body" style="font-size:.82rem;line-height:1.6;color:var(--text)">'+introTxt;
+        if(p.intro.itLong||p.intro.enLong||p.intro.deLong||p.intro.plLong){
+            const longDesc=tr(p.intro.itLong,p.intro.enLong,p.intro.deLong,p.intro.plLong);
+            html+='<div class="place-section-block"><button class="place-deep-toggle" onclick="(function(btn){btn.classList.toggle(\'open\');var b=document.getElementById(\'portoIntroDeep\');b.classList.toggle(\'open\');btn.setAttribute(\'aria-expanded\',b.classList.contains(\'open\'));this})(this)" aria-expanded="false">📖 '+tr('Approfondisci','Learn more','Mehr erfahren','Dowiedz się więcej')+'</button><div class="place-deep-body" id="portoIntroDeep">'+longDesc+'</div></div>';
+        }
+        html+='</div></div>';
         // Mappa + lista dei punti (numerati)
         const btns=points.map((pt,i)=>{const dn=getDisplayNumber(pt,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+pt.name+'">'+dn+'. '+pt.name+'</button>';}).join('');
         html+='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa Porto"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
@@ -1851,7 +1856,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 736;
+    const BUILD_NUMBER = 737;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
