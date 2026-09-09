@@ -1,5 +1,5 @@
-// ===== V7.2 · 08/09/26 14:00 =====
-// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V7.2 · 08/09/26 14:00
+// ===== V7.3 · 09/09/26 23:20 =====
+// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V7.3 · 09/09/26 23:20
 // V6.0: aggiunta cache dedicata e persistente per data.js/engine.js (vedi APP_FILES_CACHE_NAME
 // più sotto). A differenza di CACHE_NAME, questa cache NON viene svuotata ad ogni release:
 // serve proprio a evitare che un piccolo aggiornamento di contenuto (data.js) costringa a
@@ -9,7 +9,7 @@
 // CACHE_NAME non è più hardcoded: viene ricevuto da index.html tramite postMessage
 // {type:'SET_CACHE_NAME', cacheName:'...'} subito dopo la registrazione.
 // Il valore di fallback copre il primo avvio prima che il messaggio arrivi.
-let CACHE_NAME = 'ancona-guida-v7.2-08091400';
+let CACHE_NAME = 'ancona-guida-v7.3-09092320';
 let TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 

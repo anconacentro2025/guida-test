@@ -1,18 +1,18 @@
-// ===== V7.2 · 08/09/26 14:00 =====
+// ===== V7.3 · 09/09/26 23:20 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
 // Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
-    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'itinerari'];
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.2-08091400';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3-09092320';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -46,13 +46,17 @@
     ;
 
 ;
-    // FIX 23/08/26: sostituisce NAV_DIVIDER_AFTER_INDEX (indice numerico fisso, fragile
-    // se l'array sections cambia ordine/lunghezza). Home e nav-pills ora mostrano solo
-    // questi 6 id; le 8 sezioni-itinerario (mustsee...borghi) confluiscono nel picker
-    // "Itinerari" invece di comparire come tile/pill separate. I link diretti tipo #mustsee
-    // continuano a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','parcheggi','itinerari'];
-    const ITINERARY_IDS = ['mustsee','passetto','cardeto','porto','beaches','portonovo','conero','borghi'];
+    // V7.3 09/09/26: home riorganizzata per priorità ospite (arrivo → vicino a piedi →
+    // esplora con mezzi → ristoranti → servizi/info), sostituendo il precedente unico
+    // picker "Itinerari" con 3 picker tematici. Home e nav-pills mostrano solo questi 6 id;
+    // le sezioni di dettaglio confluiscono nel picker corrispondente (vedi PICKER_CHILDREN)
+    // invece di comparire come tile/pill separate. I link diretti tipo #mustsee continuano
+    // a funzionare: sectionHashMap non viene toccato per quegli id.
+    const HOME_NAV_IDS = ['apartment','contact','vicino','esplora','restaurants','info'];
+    const NEARBY_IDS = ['mustsee','passetto','cardeto','porto'];
+    const EXPLORE_IDS = ['beaches','portonovo','conero','borghi'];
+    const INFO_IDS = ['services','parcheggi','usefulinfo'];
+    const PICKER_CHILDREN = { vicino:NEARBY_IDS, esplora:EXPLORE_IDS, info:INFO_IDS };
 
     ;
 
@@ -636,14 +640,14 @@
         nav.innerHTML=HOME_NAV_IDS.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             const idx=sections.indexOf(s);
-            // Il pillolo "Itinerari" resta evidenziato anche quando si è dentro una delle
-            // 8 sotto-sezioni (mustsee, passetto, ecc.) raggiunte tramite il picker o un
-            // link diretto tipo #passetto — altrimenti nessun pillolo risulterebbe attivo.
-            const isActive=(id==='itinerari')
-                ? (currentSection===idx || ITINERARY_IDS.includes(sections[currentSection]&&sections[currentSection].id))
+            // Un pillolo picker (vicino/esplora/info) resta evidenziato anche quando si è
+            // dentro una delle sue sotto-sezioni raggiunte tramite il picker o un link
+            // diretto tipo #passetto — altrimenti nessun pillolo risulterebbe attivo.
+            const children=PICKER_CHILDREN[id];
+            const isActive=children
+                ? (currentSection===idx || children.includes(sections[currentSection]&&sections[currentSection].id))
                 : (currentSection===idx);
-            const divider=(id==='itinerari')?'<span class="nav-pill-divider" aria-hidden="true"></span>':'';
-            return divider+'<button class="nav-pill'+(isActive?' active':'')+'" data-index="'+idx+'" role="tab" aria-selected="'+(isActive?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>';
+            return '<button class="nav-pill'+(isActive?' active':'')+'" data-index="'+idx+'" role="tab" aria-selected="'+(isActive?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>';
         }).join('');
         nav.querySelectorAll('.nav-pill').forEach(btn=>btn.addEventListener('click',function(){
             // U2 V5.0 01/07/26: feedback immediato al click — riduce opacità del contenuto
@@ -817,11 +821,11 @@
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
     }
 
-    // FIX 23/08/26: schermata "Itinerari" — griglia di tile che raccoglie le 8 sezioni
-    // di esplorazione (prima tutte separate in home/nav). Riusa .nav-grid/.nav-tile,
-    // lo stesso stile già usato in home, nessun CSS nuovo introdotto.
-    function renderItinerariPicker(){
-        const tiles=ITINERARY_IDS.map(id=>{
+    // V7.3 09/09/26: griglia di tile generica per un picker (vicino/esplora/info) — prima
+    // esisteva solo per "Itinerari" (renderItinerariPicker), ora parametrica sui 3 picker.
+    // Riusa .nav-grid/.nav-tile, lo stesso stile già usato in home, nessun CSS nuovo introdotto.
+    function renderPickerGrid(ids){
+        const tiles=ids.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             if(!s)return'';
             const idx=sections.indexOf(s);
@@ -1249,7 +1253,9 @@
         if(id==='services')return renderServices();
         if(id==='parcheggi')return renderPlaceSection(appData.parking||[],'parcheggi');
         if(id==='usefulinfo')return renderUsefulInfo();
-        if(id==='itinerari')return renderItinerariPicker();
+        if(id==='vicino')return renderPickerGrid(NEARBY_IDS);
+        if(id==='esplora')return renderPickerGrid(EXPLORE_IDS);
+        if(id==='info')return renderPickerGrid(INFO_IDS);
         if(id==='conero')return renderConero();
         if(id==='portonovo')return renderPortonovo();
         if(id==='porto')return renderPorto();
@@ -1854,7 +1860,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 740;
+    const BUILD_NUMBER = 741;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
