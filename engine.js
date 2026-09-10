@@ -1,18 +1,18 @@
-// ===== V7.3.1 · 10/09/26 11:30 =====
+// ===== V7.3.1 · 10/09/26 17:10 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
 // Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
-    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info'];
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info', 'feedback'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.1-10091130';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.1-10091710';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -52,7 +52,7 @@
     // le sezioni di dettaglio confluiscono nel picker corrispondente (vedi PICKER_CHILDREN)
     // invece di comparire come tile/pill separate. I link diretti tipo #mustsee continuano
     // a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','vicino','esplora','restaurants','info'];
+    const HOME_NAV_IDS = ['apartment','contact','vicino','esplora','restaurants','info','feedback'];
     const NEARBY_IDS = ['mustsee','passetto','cardeto','porto'];
     const EXPLORE_IDS = ['beaches','portonovo','conero','borghi'];
     const INFO_IDS = ['services','parcheggi','usefulinfo'];
@@ -666,7 +666,7 @@
         cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div></section>';
         document.getElementById('home-btn')?.addEventListener('click',function(){goTo(-1);});
         document.getElementById('sub-back-btn')?.addEventListener('click',closeSubItinerary);
-        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();attachNavTileListeners();
+        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();attachNavTileListeners();attachFeedbackListeners();
         if(currentPlaceDetail<0&&!NO_GPS_SECTIONS.includes(s.id)){
             const cardsEl=cont.querySelector('.cards'),gpsContainer=document.createElement('div');gpsContainer.className='gps-container';
             gpsContainer.innerHTML='<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>';
@@ -1262,6 +1262,7 @@
         if(id==='vicino')return renderPickerGrid(NEARBY_IDS);
         if(id==='esplora')return renderPickerGrid(EXPLORE_IDS);
         if(id==='info')return renderPickerGrid(INFO_IDS);
+        if(id==='feedback')return renderFeedback();
         if(id==='conero')return renderConero();
         if(id==='portonovo')return renderPortonovo();
         if(id==='porto')return renderPorto();
@@ -1809,17 +1810,46 @@
 
     function renderContact(){
         const fp=HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
-        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('JG97+66 Ancona, Provincia di Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>'
-            // V7.3 09/09/26: card feedback - tasto WhatsApp precompilato, distinto dal tasto
-            // "Live Chat" (che e' per contattare l'host durante il soggiorno). Testo pensato
-            // per raccogliere impressioni su appartamento, guida e consigli seguiti
-            // (ristoranti/itinerari), da usare per migliorare i soggiorni futuri.
-            +'<div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">💬</span><span class="card-title">'+tr('Il tuo feedback','Your feedback','Dein Feedback','Twoja opinia')+'</span></div><div class="card-body"><div>'+tr('Il tuo parere mi aiuta a migliorare l\'appartamento, la guida e i consigli su ristoranti e itinerari. Raccontami cosa hai apprezzato e cosa potrei migliorare.','Your feedback helps me improve the apartment, the guide, and the restaurant and itinerary suggestions. Tell me what you liked and what I could improve.','Dein Feedback hilft mir, die Wohnung, den Guide sowie die Restaurant- und Routenvorschläge zu verbessern. Erzähl mir, was dir gefallen hat und was ich verbessern könnte.','Twoja opinia pomaga mi ulepszać mieszkanie, przewodnik oraz sugestie dotyczące restauracji i tras. Powiedz mi, co Ci się podobało, a co mógłbym poprawić.')+'</div><div style="margin-top:10px;text-align:center"><a href="https://wa.me/39'+HOST_PHONE+'?text='+encodeURIComponent(tr(
-                'Ciao! 👋 Ecco il mio feedback sul soggiorno:\n\n🏠 Appartamento: \n📱 Guida: \n🍽️ Consigli seguiti (ristoranti/itinerari): \n👍 Apprezzamenti: \n⚠️ Problemi: \n\n\n',
-                'Hi! 👋 Here\'s my feedback about the stay:\n\n🏠 Apartment: \n📱 Guide: \n🍽️ Suggestions followed (restaurants/itineraries): \n👍 What I liked: \n⚠️ Issues: \n\n\n',
-                'Hallo! 👋 Hier ist mein Feedback zum Aufenthalt:\n\n🏠 Wohnung: \n📱 Guide: \n🍽️ Befolgte Empfehlungen (Restaurants/Routen): \n👍 Was mir gefallen hat: \n⚠️ Probleme: \n\n\n',
-                'Cześć! 👋 Oto moja opinia o pobycie:\n\n🏠 Mieszkanie: \n📱 Przewodnik: \n🍽️ Zastosowane sugestie (restauracje/trasy): \n👍 Co mi się podobało: \n⚠️ Problemy: \n\n\n'
-            ))+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="'+tr('Scrivimi un feedback','Send me feedback','Feedback senden','Wyślij opinię')+'">💬 '+tr('Scrivimi un feedback','Send me feedback','Feedback senden','Wyślij opinię')+'</a></div></div></div>';
+        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('JG97+66 Ancona, Provincia di Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
+    }
+
+    // V7.3.1 10/09/26: sezione dedicata Feedback — tile propria in fondo alla home
+    // (prima era una card dentro Contatti). Il testo si compila DENTRO l'app in una
+    // textarea precompilata e modificabile; solo al tap su "Invia su WhatsApp" si apre
+    // WhatsApp con il testo definitivo. L'invio effettivo resta comunque un tap manuale
+    // dentro WhatsApp stesso: nessuna pagina web può inviare messaggi WhatsApp in modo
+    // automatico, per policy della piattaforma.
+    function renderFeedback(){
+        const introTxt=tr(
+            'Il tuo parere mi aiuta a migliorare l\'appartamento, la guida e i consigli su ristoranti e itinerari. Scrivi qui il tuo feedback — puoi modificare liberamente il testo — poi premi "Invia su WhatsApp".',
+            'Your feedback helps me improve the apartment, the guide, and the restaurant and itinerary suggestions. Write your feedback here — feel free to edit the text — then tap "Send via WhatsApp".',
+            'Dein Feedback hilft mir, die Wohnung, den Guide sowie die Restaurant- und Routenvorschläge zu verbessern. Schreib dein Feedback hier — du kannst den Text frei bearbeiten — und tippe dann auf "Über WhatsApp senden".',
+            'Twoja opinia pomaga mi ulepszać mieszkanie, przewodnik oraz sugestie dotyczące restauracji i tras. Napisz tutaj swoją opinię — możesz dowolnie edytować tekst — a następnie naciśnij „Wyślij przez WhatsApp”.'
+        );
+        const template=tr(
+            'Ciao! 👋 Ecco il mio feedback sul soggiorno:\n\n🏠 Appartamento: \n📱 Guida: \n🍽️ Consigli seguiti (ristoranti/itinerari): \n👍 Apprezzamenti: \n⚠️ Problemi: \n\n',
+            'Hi! 👋 Here\'s my feedback about the stay:\n\n🏠 Apartment: \n📱 Guide: \n🍽️ Suggestions followed (restaurants/itineraries): \n👍 What I liked: \n⚠️ Issues: \n\n',
+            'Hallo! 👋 Hier ist mein Feedback zum Aufenthalt:\n\n🏠 Wohnung: \n📱 Guide: \n🍽️ Befolgte Empfehlungen (Restaurants/Routen): \n👍 Was mir gefallen hat: \n⚠️ Probleme: \n\n',
+            'Cześć! 👋 Oto moja opinia o pobycie:\n\n🏠 Mieszkanie: \n📱 Przewodnik: \n🍽️ Zastosowane sugestie (restauracje/trasy): \n👍 Co mi się podobało: \n⚠️ Problemy: \n\n'
+        );
+        // Escape minimo per inserimento sicuro dentro <textarea>...</textarea>
+        const safeTemplate=template.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const sendLabel=tr('Invia su WhatsApp','Send via WhatsApp','Über WhatsApp senden','Wyślij przez WhatsApp');
+        let html='<div class="card"><div class="card-body">'+introTxt+'</div></div>';
+        html+='<div class="card" style="margin-top:10px"><div class="card-body">';
+        html+='<textarea id="feedback-textarea" class="feedback-textarea" rows="11">'+safeTemplate+'</textarea>';
+        html+='<div style="margin-top:12px;text-align:center"><button type="button" class="btn-wa" style="border:none;cursor:pointer;font:inherit" id="feedback-send-btn" aria-label="'+sendLabel+'">💬 '+sendLabel+'</button></div>';
+        html+='</div></div>';
+        return html;
+    }
+
+    function attachFeedbackListeners(){
+        document.getElementById('feedback-send-btn')?.addEventListener('click',function(){
+            const ta=document.getElementById('feedback-textarea');
+            const text=ta?ta.value:'';
+            if(!text.trim())return;
+            window.open('https://wa.me/39'+HOST_PHONE+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
+        });
     }
 
     function initSectionMap(){
@@ -1876,7 +1906,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 742;
+    const BUILD_NUMBER = 743;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
