@@ -1,4 +1,4 @@
-// ===== V7.3 · 09/09/26 23:20 =====
+// ===== V7.3.1 · 10/09/26 11:30 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v7.0 — aggiornare la query string "?v=" nel tag <script> di index.html
