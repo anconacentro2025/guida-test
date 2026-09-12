@@ -1,4 +1,4 @@
-// ===== V7.3.1 · 10/09/26 17:10 =====
+// ===== V7.3.2 · 11/09/26 21:00 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.1-10091710';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.2-11092100';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -52,7 +52,13 @@
     // le sezioni di dettaglio confluiscono nel picker corrispondente (vedi PICKER_CHILDREN)
     // invece di comparire come tile/pill separate. I link diretti tipo #mustsee continuano
     // a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','vicino','esplora','restaurants','info','feedback'];
+    // V7.3.2 10/09/26: nuovo ordine home su richiesta: Appartamento/Servizi&Info,
+    // Contatti/Ristoranti, Vicino a piedi/Scopri di più, Cerca/Feedback (griglia 2 colonne,
+    // 4 righe). 'search' non è una sezione vera (apre un modale, non un id in sections[]),
+    // quindi resta fuori da HOME_NAV_IDS (che pilota anche le pillole di navigazione in
+    // alto) e viene inserito via splice() nell'array delle tile solo per la home, nella
+    // posizione 7ª (tra Scopri di più e Feedback).
+    const HOME_NAV_IDS = ['apartment','info','contact','restaurants','vicino','esplora','feedback'];
     const NEARBY_IDS = ['mustsee','passetto','cardeto','porto'];
     const EXPLORE_IDS = ['beaches','portonovo','conero','borghi'];
     const INFO_IDS = ['services','parcheggi','usefulinfo'];
@@ -799,13 +805,12 @@
         const tiles=HOME_NAV_IDS.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             const idx=sections.indexOf(s);
-            // FIX 23/08/26: divisore rimosso qui — grid-column:1/-1 lo fa occupare l'intera
-            // riga della griglia a 2 colonne, spingendo la tile successiva (Itinerari) da
-            // sola su un nuovo rigo invece di lasciarla affianco a Informazioni utili.
             return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
-        }).join('');
+        });
         const searchTile='<button class="nav-tile" onclick="document.getElementById(\'search-modal\').style.display=\'flex\';document.getElementById(\'search-input\').focus()" aria-label="'+tr('Cerca','Search','Suchen','Szukaj')+'"><div class="nav-tile-icon" aria-hidden="true">🔍</div><div class="nav-tile-label">'+tr('Cerca','Search','Suchen','Szukaj')+'</div></button>';
-        const tilesWithSearch=searchTile+tiles;
+        // Cerca va tra Scopri di più (indice 5) e Feedback (indice 6, ultimo) — riga 4 colonna 1
+        tiles.splice(6,0,searchTile);
+        const tilesWithSearch=tiles.join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
         const countdownHtml=getCountdownHtml();
@@ -1906,7 +1911,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 743;
+    const BUILD_NUMBER = 744;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;

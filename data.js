@@ -1,4 +1,4 @@
-// ===== V7.3.1 · 10/09/26 17:10 =====
+// ===== V7.3.2 · 11/09/26 21:00 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v7.0 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -1228,8 +1228,8 @@ const appData = {
         { id:'borghi',      icon:'🏘️', it:'Borghi e dintorni',      en:'Villages & surrounds',  de:'Dörfer & Umgebung',    pl:'Miasteczka i okolice' },
         { id:'parcheggi',   icon:'🅿️', it:'Parcheggi',              en:'Parking',               de:'Parkplätze',           pl:'Parkingi' },
         { id:'usefulinfo',  icon:'ℹ️', it:'Informazioni utili',     en:'Useful Information',    de:'Nützliche Informationen', pl:'Przydatne informacje' },
-        { id:'vicino',      icon:'📍', it:'Vicino a piedi',         en:'Nearby on foot',        de:'Zu Fuß erreichbar',    pl:'Blisko pieszo' },
-        { id:'esplora',     icon:'🧭', it:'Scopri di più',          en:'Discover more',         de:'Mehr entdecken',      pl:'Odkryj więcej' },
+        { id:'vicino',      icon:'🚶', it:'Vicino a piedi',         en:'Nearby on foot',        de:'Zu Fuß erreichbar',    pl:'Blisko pieszo' },
+        { id:'esplora',     icon:'🚗', it:'Scopri di più',          en:'Discover more',         de:'Mehr entdecken',      pl:'Odkryj więcej' },
         { id:'info',        icon:'🧰', it:'Servizi & Info',         en:'Services & Info',       de:'Dienste & Info',      pl:'Usługi i informacje' },
         { id:'feedback',    icon:'💬', it:'Feedback',               en:'Feedback',              de:'Feedback',           pl:'Opinia' }
     ]
