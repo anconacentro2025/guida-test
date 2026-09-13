@@ -1,4 +1,4 @@
-// ===== V7.3.2 · 11/09/26 21:00 =====
+// ===== V7.3.2 · 13/09/26 · Build 746 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.2-11092100';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.2-b746';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -86,6 +86,11 @@
         const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
         return val || '';
     }
+    // V7.3.2 11/09/26: nomi tradotti per POI — la stragrande maggioranza dei nomi (monumenti,
+    // vie, piazze) NON va tradotta (sono nomi propri). Solo per titoli descrittivi (es. "Ancona
+    // sotto le bombe") si aggiungono nameEn/nameDe/namePl al singolo POI in data.js; il fallback
+    // a p.name garantisce zero impatto su tutti i POI che non hanno questi campi extra.
+    function getName(p){ return tr(p.name, p.nameEn||p.name, p.nameDe||p.name, p.namePl||p.name); }
     function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;} _rf_lang=null; renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
@@ -532,7 +537,7 @@
             if (p.isSubItinerary) markerClass += ' has-sub';
             
             const icon = L.divIcon({
-                html: '<div class="' + markerClass + '" aria-label="' + p.name + '" role="img">' + displayNum + '</div>',
+                html: '<div class="' + markerClass + '" aria-label="' + getName(p) + '" role="img">' + displayNum + '</div>',
                 className: '',
                 iconSize: [24, 24],
                 iconAnchor: [12, 12],
@@ -540,7 +545,7 @@
             });
             
             const m = L.marker([p.lat, p.lng], { icon: icon }).addTo(fullscreenMapInstance);
-            m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + p.name + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
+            m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + getName(p) + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
             
             m.on('click', function() {
                 const originalIndex = p._originalIndex !== undefined ? p._originalIndex : idx;
@@ -1312,14 +1317,14 @@
             let parent=null;for(let k=0;k<appData.mustsee.length;k++){if(appData.mustsee[k].subId===currentSubItinerary){parent=appData.mustsee[k];break;}}
             const descHtml=parent?'<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+parent.emoji+'</div><div><div class="place-name">'+parent.name+'</div><div class="place-desc" style="margin-top:5px">'+tr(parent.it,parent.en,parent.de,parent.pl)+'</div></div></div></div>':'';
             if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,true)+extraInfoBox;
-            const subBtns=items.map((p,i)=>{const dn=getDisplayNumber(p,i),sel=(i===currentPlaceDetail)?' selected':'';return'<button class="place-btn-mini'+sel+'" data-index="'+i+'" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';}).join('');
+            const subBtns=items.map((p,i)=>{const dn=getDisplayNumber(p,i),sel=(i===currentPlaceDetail)?' selected':'';return'<button class="place-btn-mini'+sel+'" data-index="'+i+'" aria-label="'+getName(p)+'">'+dn+'. '+getName(p)+'</button>';}).join('');
             return'<button class="back-btn" id="sub-back-btn">← '+tr('Torna al tour principale','Back to main tour','Zurück zur Haupttour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+subBtns+'</div></div>'+extraInfoBox;
         }
         if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,false)+extraInfoBox;
         const sortedItems = distSortActive ? items.slice().sort((a,b)=>(a._dist||Infinity)-(b._dist||Infinity)) : items;
         const distSortLabel = distSortActive ? '📍 '+tr('Ordine distanza','By distance','Nach Entfernung','Wg odległości') : '📍 '+tr('Ordina per distanza','Sort by distance','Nach Entfernung sortieren','Sortuj wg odl.');
         const distSortBtn = '<button class="dist-sort-btn'+(distSortActive?' active':'')+'" id="dist-sort-btn">'+distSortLabel+'</button>';
-        const btns=sortedItems.map((p,i)=>{const origIdx=items.indexOf(p),dn=getDisplayNumber(p,origIdx),sel=(origIdx===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+origIdx+'" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';}).join('');
+        const btns=sortedItems.map((p,i)=>{const origIdx=items.indexOf(p),dn=getDisplayNumber(p,origIdx),sel=(origIdx===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+origIdx+'" aria-label="'+getName(p)+subHint+'">'+dn+'. '+getName(p)+subBadge+'</button>';}).join('');
         return'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+distSortBtn+btns+'</div></div>'+extraInfoBox;
     }
 
@@ -1499,13 +1504,13 @@
             let slidesHtml='';
             photos.forEach((filename,i)=>{
                 const src=PHOTO_BASE+filename;
-                slidesHtml+='<div class="gallery-slide"><div class="detail-photo-placeholder" id="ph_'+index+'_'+i+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+' '+(i+1)+'" loading="lazy" id="img_'+index+'_'+i+'"></div>';
+                slidesHtml+='<div class="gallery-slide"><div class="detail-photo-placeholder" id="ph_'+index+'_'+i+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+getName(p)+' '+(i+1)+'" loading="lazy" id="img_'+index+'_'+i+'"></div>';
             });
             const dotsHtml=photos.length>1?('<div class="gallery-dots" id="dots_'+index+'">'+photos.map((_,i)=>'<span class="dot'+(i===0?' active':'')+'" data-idx="'+i+'"></span>').join('')+'</div>'):'';
             photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-gallery" id="gallery_'+index+'" onclick="openDetailGalleryFullscreen('+index+')" style="cursor:pointer">'+slidesHtml+'</div>'+dotsHtml+'</div>';
         }
         else photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
-        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
+        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+getName(p)+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
         if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
         // V5.0: sezione 📖 Approfondisci
         const deepId='deep_'+index;
@@ -1527,7 +1532,7 @@
         const backLabel=tr('Tutti i luoghi','All places','Alle Orte','Wszystkie miejsca');
         const prev=index>0?'<button class="nav-detail-btn" data-prev="'+(index-1)+'" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Vor.','Poprz.')+'</button>':'<span></span>';
         const next=index<total-1?'<button class="nav-detail-btn" data-next="'+(index+1)+'" aria-label="Luogo successivo">'+tr('Succ.','Next','Näch.','Nast.')+' ▶</button>':'<span></span>';
-        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div style="width:100%"><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+priceBadge+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:6px">'+desc+'</div>'+deepHtml+metaHtml+'</div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
+        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div style="width:100%"><div class="place-name">'+getName(p)+'</div><div class="place-dist">'+p.dist+priceBadge+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:6px">'+desc+'</div>'+deepHtml+metaHtml+'</div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
         // V6.3: gestione caricamento/errore per-immagine + fallback completo solo se
         // TUTTE le immagini della galleria falliscono; sincronizzazione dots via scroll.
         setTimeout(()=>{
@@ -1621,7 +1626,7 @@
         if(currentPlaceDetail>=0&&currentPlaceDetail<places.length)return renderAnyPlaceDetail(places[currentPlaceDetail],currentPlaceDetail,places.length,false);
 
         // Mappa + lista numerata, stesso pattern delle altre sezioni-luogo
-        const btns=places.map((p,i)=>{const price=p.price?' '+p.price:'';return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+(i+1)+'. '+p.emoji+' '+p.name+price+'</button>';}).join('');
+        const btns=places.map((p,i)=>{const price=p.price?' '+p.price:'';return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+getName(p)+'">'+(i+1)+'. '+p.emoji+' '+getName(p)+price+'</button>';}).join('');
         let html='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei ristoranti"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         return html;
     }
@@ -1641,7 +1646,7 @@
         for(let i=0;i<c.links.length;i++){const l=c.links[i];const label=tr(l.it,l.en,l.de,l.pl);html+='<div class="link-row"><span class="link-icon" aria-hidden="true">'+l.icon+'</span><div class="link-info"><div class="link-name">'+label+'</div></div><a href="'+l.url+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="'+label+'">↗</a></div>';}
         html+='</div></div>';
         // Mappa + lista dei punti (numerati, stesso pattern di Cardeto/Passetto)
-        const btns=points.map((p,i)=>{const dn=getDisplayNumber(p,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';}).join('');
+        const btns=points.map((p,i)=>{const dn=getDisplayNumber(p,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+getName(p)+'">'+dn+'. '+getName(p)+'</button>';}).join('');
         html+='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa Monte Conero"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         return html;
     }
@@ -1693,7 +1698,7 @@
         if(currentPlaceDetail>=0&&currentPlaceDetail<allPlaces.length)return renderAnyPlaceDetail(allPlaces[currentPlaceDetail],currentPlaceDetail,allPlaces.length,false);
 
         // Mappa con tutti i servizi (stesso pattern delle altre sezioni-luogo)
-        const mapBtns=allPlaces.map((p,i)=>'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+(i+1)+'. '+p.emoji+' '+p.name+'</button>').join('');
+        const mapBtns=allPlaces.map((p,i)=>'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+getName(p)+'">'+(i+1)+'. '+p.emoji+' '+getName(p)+'</button>').join('');
         let html='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei servizi"></div><div class="place-btn-col">'+starBtnHtml()+mapBtns+'</div></div>';
 
         // Supermercati
@@ -1701,14 +1706,14 @@
         for(let i=0;i<s.supermarkets.length;i++){
             const p=s.supermarkets[i];
             const hours=getHoursBadge(p);
-            html+='<div class="place-row" onclick="selectServiceItem('+i+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div>'+hours+'</div></div>';
+            html+='<div class="place-row" onclick="selectServiceItem('+i+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(i+1)+'. '+getName(p)+'</div><div class="place-row-dist">'+p.dist+'</div>'+hours+'</div></div>';
         }
         // Altri servizi (lavanderia, ecc.)
         if(s.other&&s.other.length){
             html+='<div class="section-list-header" style="margin-top:8px"><span class="section-list-title">'+tr('Altri servizi','Other services','Weitere Dienstleistungen','Inne usługi')+'</span></div>';
             for(let i=0;i<s.other.length;i++){
                 const p=s.other[i];
-                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
+                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+getName(p)+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
             }
         }
         window._servicePlaces=allPlaces;
@@ -1870,7 +1875,7 @@
         leafletMap=L.map('sectionMap',{zoomControl:true,attributionControl:true});
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(leafletMap);
         const bounds=[];
-        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
+        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+getName(p)+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+getName(p)+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
             m.on('click',function(e){
                 // Bug fix V5.0: stopPropagation impedisce che il click sul marker
                 // risalga alla mappa e apra il fullscreen inaspettatamente
@@ -1911,7 +1916,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 744;
+    const BUILD_NUMBER = 746;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
