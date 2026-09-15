@@ -1,18 +1,18 @@
-// ===== V7.3.2 · 13/09/26 · Build 746 =====
+// ===== V7.3.2 · 15/09/26 · Build 747 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
 // Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
-    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info', 'feedback'];
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info', 'feedback', 'trasporti'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.2-b746';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.2-b747';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -61,7 +61,7 @@
     const HOME_NAV_IDS = ['apartment','info','contact','restaurants','vicino','esplora','feedback'];
     const NEARBY_IDS = ['mustsee','passetto','cardeto','porto'];
     const EXPLORE_IDS = ['beaches','portonovo','conero','borghi'];
-    const INFO_IDS = ['services','parcheggi','usefulinfo'];
+    const INFO_IDS = ['services','parcheggi','usefulinfo','trasporti'];
     const PICKER_CHILDREN = { vicino:NEARBY_IDS, esplora:EXPLORE_IDS, info:INFO_IDS };
 
     ;
@@ -1272,6 +1272,7 @@
         if(id==='vicino')return renderPickerGrid(NEARBY_IDS);
         if(id==='esplora')return renderPickerGrid(EXPLORE_IDS);
         if(id==='info')return renderPickerGrid(INFO_IDS);
+        if(id==='trasporti')return renderTrasporti();
         if(id==='feedback')return renderFeedback();
         if(id==='conero')return renderConero();
         if(id==='portonovo')return renderPortonovo();
@@ -1720,6 +1721,21 @@
         return html;
     }
 
+    // 13/09/26: sottosezione Trasporti dentro Servizi & Info. Stesso pattern visivo
+    // di "Come raggiungerci" in Appartamento (practical-block con header icona+titolo,
+    // corpo in HTML libero) — qui iterato su appData.transport invece di campi fissi,
+    // perché il numero di sotto-argomenti (bus/treno/aereo/taxi/ecc.) può cambiare.
+    function renderTrasporti(){
+        const t=appData.transport||[];
+        let html='';
+        for(let i=0;i<t.length;i++){
+            const item=t[i];
+            const body=tr(item.itBody,item.enBody,item.deBody,item.plBody);
+            html+='<div class="practical-block"><div class="practical-header"><span class="practical-icon" aria-hidden="true">'+item.icon+'</span><span class="practical-title">'+tr(item.it,item.en,item.de,item.pl)+'</span></div><div class="practical-body">'+body+'</div></div>';
+        }
+        return html;
+    }
+
     function renderUsefulInfo(){
         let html='';
 
@@ -1916,7 +1932,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 746;
+    const BUILD_NUMBER = 747;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
