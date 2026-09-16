@@ -1,4 +1,4 @@
-// ===== V7.3.3 · 15/09/26 · Build 748 =====
+// ===== V7.3.3-749 · 16/09/26 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.3-b748';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.3-749';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -91,6 +91,18 @@
     // sotto le bombe") si aggiungono nameEn/nameDe/namePl al singolo POI in data.js; il fallback
     // a p.name garantisce zero impatto su tutti i POI che non hanno questi campi extra.
     function getName(p){ return tr(p.name, p.nameEn||p.name, p.nameDe||p.name, p.namePl||p.name); }
+    // 16/09/26: risolve i token {{GOTO:sectionId:Testo del link}} in bottoni cliccabili
+    // reali che chiamano goTo(indice). Serve perché l'app non ascolta 'hashchange' — un
+    // <a href="#sezione"> cambierebbe solo la barra indirizzi senza navigare da nessuna
+    // parte, un link morto silenzioso. L'indice si calcola qui, non va mai scritto a mano
+    // in data.js (fragile, dipende dall'ordine di sections[] che può cambiare).
+    function resolveGotoLinks(html){
+        return html.replace(/\{\{GOTO:([a-z]+):([^}]+)\}\}/g, function(_, id, label){
+            const idx = sections.findIndex(s=>s.id===id);
+            if (idx === -1) return label;
+            return '<button class="inline-photo-link" onclick="goTo('+idx+')">'+label+'</button>';
+        });
+    }
     function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;} _rf_lang=null; renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
@@ -1596,7 +1608,7 @@
         window._reachTexts={};
         reachTabs.forEach(t=>{
             const entry=r[t.key];
-            window._reachTexts[t.key]=entry?tr(entry.it,entry.en,entry.de,entry.pl):'';
+            window._reachTexts[t.key]=entry?resolveGotoLinks(tr(entry.it,entry.en,entry.de,entry.pl)):'';
         });
         if(!reachTabs.some(t=>t.key===window._activeReachTab))window._activeReachTab='auto';
 
@@ -1730,7 +1742,7 @@
         let html='';
         for(let i=0;i<t.length;i++){
             const item=t[i];
-            const body=tr(item.itBody,item.enBody,item.deBody,item.plBody);
+            const body=resolveGotoLinks(tr(item.itBody,item.enBody,item.deBody,item.plBody));
             html+='<div class="practical-block"><div class="practical-header"><span class="practical-icon" aria-hidden="true">'+item.icon+'</span><span class="practical-title">'+tr(item.it,item.en,item.de,item.pl)+'</span></div><div class="practical-body">'+body+'</div></div>';
         }
         return html;
@@ -1932,7 +1944,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 748;
+    const BUILD_NUMBER = 749;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
