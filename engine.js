@@ -1,4 +1,4 @@
-// ===== V7.3.3-749 · 16/09/26 =====
+// ===== V7.3.4-750 · 18/09/26 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.3-749';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.4-750';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1621,6 +1621,8 @@
             a.keys       && {icon:'🔑', title:tr('Consegna chiavi','Key handover','Schlüsselübergabe','Przekazanie kluczy'), body:tr(a.keys.it,a.keys.en,a.keys.de,a.keys.pl)},
             a.checkin    && {icon:'🛬', title:tr('Check-in','Check-in','Check-in','Zameldowanie'), body:tr(a.checkin.it,a.checkin.en,a.checkin.de,a.checkin.pl)},
             a.checkout   && {icon:'🛫', title:tr('Check-out','Check-out','Check-out','Wymeldowanie'), body:tr(a.checkout.it,a.checkout.en,a.checkout.de,a.checkout.pl)},
+            a.elevator   && {icon:'🛗', title:tr('Ascensore','Lift','Aufzug','Winda'), body:tr(a.elevator.it,a.elevator.en,a.elevator.de,a.elevator.pl)},
+            a.shutters   && {icon:'🪟', title:tr('Persiane','Shutters','Fensterläden','Okiennice'), body:tr(a.shutters.it,a.shutters.en,a.shutters.de,a.shutters.pl)},
             a.quietHours && {icon:'🤫', title:tr('Silenzio','Quiet hours','Ruhezeiten','Cisza nocna'), body:tr(a.quietHours.it,a.quietHours.en,a.quietHours.de,a.quietHours.pl)},
             a.recycling  && {icon:'♻️', title:tr('Differenziata','Recycling','Mülltrennung','Segregacja odpadów'), body:tr(a.recycling.it,a.recycling.en,a.recycling.de,a.recycling.pl)},
             a.water      && {icon:'🚰', title:tr('Acqua del rubinetto','Tap water','Leitungswasser','Woda z kranu'), body:tr(a.water.it,a.water.en,a.water.de,a.water.pl)}
@@ -1944,7 +1946,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 749;
+    const BUILD_NUMBER = 750;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
