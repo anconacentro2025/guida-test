@@ -1,4 +1,4 @@
-// ===== V7.3.4-750 · 18/09/26 =====
+// ===== V7.3.4-751 · 22/09/26 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.4-750';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.4-751';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1525,6 +1525,11 @@
         else photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
         let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+getName(p)+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
         if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
+        // V7.3.4-751: bottoni opzionali telefono/sito, stesso pattern pillola di extraMap.
+        // p.phone è il numero come scritto in data.js (con spazi, per la lettura); per l'href
+        // si tolgono spazi e si aggiunge +39 (funziona anche per chi chiama da SIM estera).
+        if(p.phone){const telHref='tel:+39'+p.phone.replace(/\s+/g,'');btns+=' <a href="'+telHref+'" class="map-button" aria-label="'+tr('Chiama','Call','Anrufen','Zadzwoń')+' '+getName(p)+'">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a>';}
+        if(p.website){btns+=' <a href="'+p.website+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+tr('Sito web','Website','Webseite','Strona')+' '+getName(p)+'">🌐 '+tr('Sito','Website','Webseite','Strona')+'</a>';}
         // V5.0: sezione 📖 Approfondisci
         const deepId='deep_'+index;
         let deepHtml='';
@@ -1946,7 +1951,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 750;
+    const BUILD_NUMBER = 751;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
