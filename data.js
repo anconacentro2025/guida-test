@@ -1,4 +1,4 @@
-// ===== V7.3.4-753 · 30/09/26 =====
+// ===== V7.3.4-755 · 02/10/26 =====
 // data.js — Ancona Centro Guida Ospiti
 // Contiene SOLO i dati (contenuti multilingua, POI, ristoranti, ecc). Nessuna logica.
 // Versione dati: v7.0 — aggiornare la query string "?v=" nel tag <script> di index.html
@@ -1283,6 +1283,7 @@ const appData = {
         { id:'esplora',     icon:'🚗', it:'Scopri di più',          en:'Discover more',         de:'Mehr entdecken',      pl:'Odkryj więcej' },
         { id:'info',        icon:'🧰', it:'Servizi & Info',         en:'Services & Info',       de:'Dienste & Info',      pl:'Usługi i informacje' },
         { id:'trasporti',   icon:'🚍', it:'Trasporti',              en:'Transport',              de:'Transport',           pl:'Transport' },
+        { id:'linkutili',   icon:'🔗', it:'Link Utili',             en:'Useful Links',           de:'Nützliche Links',     pl:'Przydatne linki' },
         { id:'feedback',    icon:'💬', it:'Feedback',               en:'Feedback',              de:'Feedback',           pl:'Opinia' }
     ]
 

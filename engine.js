@@ -1,18 +1,18 @@
-// ===== V7.3.4-753 · 30/09/26 =====
+// ===== V7.3.4-755 · 02/10/26 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
 // Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
-    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info', 'feedback', 'trasporti'];
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info', 'feedback', 'trasporti', 'linkutili'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.3.4-753';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.4-755';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -61,7 +61,7 @@
     const HOME_NAV_IDS = ['apartment','info','contact','restaurants','vicino','esplora','feedback'];
     const NEARBY_IDS = ['mustsee','passetto','cardeto','porto'];
     const EXPLORE_IDS = ['beaches','portonovo','conero','borghi'];
-    const INFO_IDS = ['services','parcheggi','usefulinfo','trasporti'];
+    const INFO_IDS = ['services','parcheggi','usefulinfo','trasporti','linkutili'];
     const PICKER_CHILDREN = { vicino:NEARBY_IDS, esplora:EXPLORE_IDS, info:INFO_IDS };
 
     ;
@@ -1285,6 +1285,7 @@
         if(id==='esplora')return renderPickerGrid(EXPLORE_IDS);
         if(id==='info')return renderPickerGrid(INFO_IDS);
         if(id==='trasporti')return renderTrasporti();
+        if(id==='linkutili')return renderLinkUtili();
         if(id==='feedback')return renderFeedback();
         if(id==='conero')return renderConero();
         if(id==='portonovo')return renderPortonovo();
@@ -1525,7 +1526,7 @@
         else photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
         let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+getName(p)+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
         if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
-        // V7.3.4-753: bottoni opzionali telefono/sito, stesso pattern pillola di extraMap.
+        // V7.3.4-755: bottoni opzionali telefono/sito, stesso pattern pillola di extraMap.
         // p.phone è il numero come scritto in data.js (con spazi, per la lettura); per l'href
         // si tolgono spazi e si aggiunge +39 (funziona anche per chi chiama da SIM estera).
         if(p.phone){const telHref='tel:+39'+p.phone.replace(/\s+/g,'');btns+=' <a href="'+telHref+'" class="map-button" aria-label="'+tr('Chiama','Call','Anrufen','Zadzwoń')+' '+getName(p)+'">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a>';}
@@ -1855,7 +1856,15 @@
 
     function renderContact(){
         const fp=HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
-        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('JG97+66 Ancona, Provincia di Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
+        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div>';
+    }
+
+    // V7.3.4-755: "Link utili" spostato da Contatti a una propria sotto-sezione di
+    // Servizi & Info (stesso pattern di Trasporti — nuovo id in sections[], aggiunto a
+    // INFO_IDS e NO_GPS_SECTIONS, non in HOME_NAV_IDS). Riusa esattamente la stessa
+    // struttura card/link-row che aveva in Contatti, solo spostata.
+    function renderLinkUtili(){
+        return '<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('JG97+66 Ancona, Provincia di Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">letsmarche.it</div><div class="link-desc">'+tr('Portale ufficiale del turismo della Regione Marche','Official tourism portal of the Marche Region','Offizielles Tourismusportal der Region Marken','Oficjalny portal turystyczny Regionu Marche')+'</div></div><a href="https://letsmarche.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri letsmarche.it">↗</a></div></div></div>';
     }
 
     // V7.3.1 10/09/26: sezione dedicata Feedback — tile propria in fondo alla home
@@ -1951,7 +1960,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 753;
+    const BUILD_NUMBER = 755;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
